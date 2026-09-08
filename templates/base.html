@@ -32,6 +32,37 @@
       {% endif %}
     }
   </style>
+  {# Search — 总开关 [extra.search].enable，provider: "pagefind"（默认）| "algolia" | "none"，search.html 共用。
+     本 Tera 版本缺 key 直接访问会报错，故全部经 is defined 收敛为全局变量。
+     placeholder 为翻译 key，经 trans 按当前语言解析。 #}
+  {% set_global search_enabled = true %}
+  {% if config.extra.search is defined and config.extra.search.enable is defined %}{% set_global search_enabled = config.extra.search.enable %}{% endif %}
+  {% set_global search_provider = "pagefind" %}
+  {% if config.extra.search is defined and config.extra.search.provider is defined and config.extra.search.provider != "" %}{% set_global search_provider = config.extra.search.provider %}{% endif %}
+  {% set_global search_hits = 8 %}
+  {% set_global search_hits_page = 12 %}
+  {% if config.extra.search is defined and config.extra.search.hits_per_page is defined %}{% set_global search_hits = config.extra.search.hits_per_page %}{% set_global search_hits_page = config.extra.search.hits_per_page %}{% endif %}
+  {% set_global search_ph_key = "search_placeholder" %}
+  {% if config.extra.search is defined and config.extra.search.placeholder is defined and config.extra.search.placeholder != "" %}{% set_global search_ph_key = config.extra.search.placeholder %}{% endif %}
+  {% set_global search_ph = trans(key=search_ph_key, lang=lang | default(value=config.default_language)) %}
+  {# Pagefind bundle 目录（`pagefind --site public` 输出位置，默认 pagefind/；经 get_url 拼接 base_url 子路径） #}
+  {% set_global pf_dir = "pagefind/" %}
+  {% if config.extra.pagefind is defined and config.extra.pagefind.path is defined and config.extra.pagefind.path != "" %}{% set_global pf_dir = config.extra.pagefind.path %}{% endif %}
+  {% if not pf_dir is ending_with(pat="/") %}{% set_global pf_dir = pf_dir ~ "/" %}{% endif %}
+  {% set_global pf_js = get_url(path=pf_dir ~ "pagefind.js") %}
+  {% set_global pf_dir_url = get_url(path=pf_dir, trailing_slash=true) %}
+  {% set_global pf_ui_js = get_url(path=pf_dir ~ "pagefind-ui.js") %}
+  {% set_global pf_ui_css = get_url(path=pf_dir ~ "pagefind-ui.css") %}
+  {% set_global search_use_algolia = search_enabled and search_provider == "algolia" and config.extra.algolia is defined and config.extra.algolia.app_id is defined and config.extra.algolia.app_id != "" and config.extra.algolia.api_key is defined and config.extra.algolia.api_key != "" and config.extra.algolia.index_name is defined and config.extra.algolia.index_name != "" %}
+  {% set_global search_use_pagefind = search_enabled and search_provider == "pagefind" %}
+  {% set_global search_powered = false %}
+  {% if search_use_algolia %}
+    {% set_global search_powered = true %}
+    {% if config.extra.algolia.show_powered_by is defined %}{% set_global search_powered = config.extra.algolia.show_powered_by %}{% endif %}
+  {% endif %}
+  {% if search_use_pagefind %}
+  <script type="module" src="{{ get_url(path="js/pagefind-search.js") | safe }}"></script>
+  {% endif %}
   {% block head %}{% endblock head %}
 </head>
 <body>
@@ -195,24 +226,28 @@
 
       {# Wiki 子项目页：隐藏搜索框与年份进度条，保持左侧纯目录 #}
       {% if not is_wiki_context %}
-      {# Algolia Search — configurable via [extra.algolia] #}
-      {% if config.extra.algolia and config.extra.algolia.enable and config.extra.algolia.app_id and config.extra.algolia.api_key and config.extra.algolia.index_name %}
+      {# Search — provider 由 [extra.search] 选择（默认 pagefind 本地索引） #}
+      {% if search_use_algolia or search_use_pagefind %}
       <div class="search" id="searchRoot"
-        data-app-id="{{ config.extra.algolia.app_id | safe }}"
+        data-provider="{{ search_provider }}"
+        data-hits-per-page="{{ search_hits }}"
+        data-placeholder="{{ search_ph | safe }}"
+        data-bundle="{{ pf_js | safe }}"
+        data-site-root="{{ get_url(path="/", trailing_slash=true) | safe }}"
+        data-search-page="{{ get_url(path="search/", lang=cur_lang, trailing_slash=true) | safe }}"
+        {% if search_use_algolia %}data-app-id="{{ config.extra.algolia.app_id | safe }}"
         data-api-key="{{ config.extra.algolia.api_key | safe }}"
         data-index-name="{{ config.extra.algolia.index_name | safe }}"
-        data-hits-per-page="{{ config.extra.algolia.hits_per_page | default(value=8) }}"
-        data-placeholder="{{ config.extra.algolia.placeholder | default(value="搜索...") | safe }}"
-        data-powered="{{ config.extra.algolia.show_powered_by | default(value=true) }}">
+        data-powered="{{ search_powered }}"{% endif %}>
         <label for="searchInput" class="sr-only">搜索</label>
         <div class="search__input-wrap">
           {{ <icon name="search" class="search__icon"/> }}
-          <input id="searchInput" class="search__input" type="search" placeholder="{{ config.extra.algolia.placeholder | default(value="搜索文章...") }}" autocomplete="off" spellcheck="false" aria-autocomplete="list" aria-expanded="false" aria-controls="searchResults">
+          <input id="searchInput" class="search__input" type="search" placeholder="{{ search_ph }}" autocomplete="off" spellcheck="false" aria-autocomplete="list" aria-expanded="false" aria-controls="searchResults">
           <button id="searchClear" class="search__clear" type="button" aria-label="清空搜索" hidden>✕</button>
           <kbd class="search__kbd" aria-hidden="true">/</kbd>
         </div>
         <div id="searchResults" class="search__results" hidden role="listbox" aria-label="搜索结果"></div>
-        {% if config.extra.algolia.show_powered_by | default(value=true) %}
+        {% if search_use_algolia and search_powered %}
         <div id="searchPowered" class="search__powered" hidden>Search by <a href="https://www.algolia.com" target="_blank" rel="noopener">Algolia</a></div>
         {% endif %}
       </div>
@@ -337,19 +372,19 @@
       <footer class="site-footer">
         <div class="site-footer__copyright">{% if config.extra.footer %}{{ config.extra.footer | markdown | safe }}{% else %}© {{ now() | date(format="%Y") }} {{ config.title }} · <a href="{{ config.base_url | safe }}">{{ config.base_url }}</a>{% endif %}</div>
       </footer>
-      {% if config.extra.icp %}
-      {% set mengguo_number = config.extra.icp.mengguo | default(value=config.extra.icp.moe) %}
+      {% if config.extra.filing %}
+      {% set mengguo_number = config.extra.filing.moe %}
       <div class="site-footer__filings" aria-label="网站备案信息">
-        {% if config.extra.icp.icp %}
+        {% if config.extra.filing.icp %}
         <a class="site-footer__filing" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">
           {{ <icon name="shield-check"/> }}
-          <span>{{ config.extra.icp.icp }}</span>
+          <span>{{ config.extra.filing.icp }}</span>
         </a>
         {% endif %}
-        {% if config.extra.icp.police %}
+        {% if config.extra.filing.police %}
         <a class="site-footer__filing" href="https://beian.mps.gov.cn/" target="_blank" rel="noopener">
           {{ <icon name="shield-text"/> }}
-          <span>{{ config.extra.icp.police }}</span>
+          <span>{{ config.extra.filing.police }}</span>
         </a>
         {% endif %}
         {% if mengguo_number %}
@@ -373,7 +408,7 @@
 <script>window.ELYSIA_ICONS_URL="{{ get_url(path="icons.svg") | safe }}?v=20260907";</script>
 <script src="{{ get_url(path="js/site-decrypt.js") | safe }}?v=20260907" defer></script>
 <script src="{{ get_url(path="js/main.js") | safe }}?v=20260907" defer></script>
-{% if config.extra.algolia and config.extra.algolia.enable and config.extra.algolia.app_id and config.extra.algolia.api_key and config.extra.algolia.index_name %}
+{% if search_use_algolia %}
 <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" defer></script>
 <script src="{{ get_url(path="js/search.js") | safe }}" defer></script>
 {% endif %}

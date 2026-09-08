@@ -30,6 +30,14 @@ jobs:
         env:
           SITE_ENCRYPT_PASSWORDS: ${{ secrets.ENCRYPT_PASSWORDS }}
 
+      - name: Build Pagefind index
+        run: |
+          wget -O pagefind.tar.gz \
+                      https://github.com/CloudCannon/pagefind/releases/latest/download/pagefind_extended-x86_64-unknown-linux-musl.tar.gz
+          tar -xzf pagefind.tar.gz
+          ./pagefind_extended \
+                      --site public
+
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
         with:

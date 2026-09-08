@@ -82,13 +82,13 @@ footer = "© 2026 My Blog"
 ## Filing
 
 ```toml
-[extra.icp]
+[extra.filing]
 icp = ""
 police = ""
-mengguo = ""
+moe = ""
 ```
 
-ICP, public security, and Moe ICP numbers. Empty values are not rendered.
+ICP, public security, and Moe ICP numbers. Empty values are not rendered. For Moe ICP, just fill in the number (e.g. `20268080`); the theme renders "萌 ICP 备案 X 号" with a lookup link automatically.
 
 ## Navigation and translations
 
@@ -183,16 +183,33 @@ show_reading_time = true
 - `toc`: right-side table of contents starting from `##`.
 - `code_line_numbers`: code line numbers.
 
+## Search
+
+```toml
+[extra.search]
+enable = true              # master switch; false disables the search box and page
+provider = "pagefind"      # pagefind (default, local index) | algolia | none
+hits_per_page = 8          # sidebar dropdown result count
+placeholder = "search_placeholder"   # translation key for the input placeholder
+
+[extra.pagefind]
+path = "pagefind/"         # Pagefind bundle output dir (relative to site root)
+```
+
+- `pagefind`: zero config, works with Chinese out of the box; run `pagefind --site public` after each build to generate the index (a `pagefind` binary ships in the repo root, CI runs it automatically). `[extra.pagefind].path` controls the bundle output dir. The search page embeds Pagefind's own UI; the sidebar uses a theme-styled dropdown.
+- `algolia`: uses `[extra.algolia]` below (`app_id + api_key + index_name` required), plus pushing content to the index.
+- `placeholder` is a key in `[translations]` (e.g. the default `search_placeholder`), rendered in the current language; a custom key must be defined in every language's translations (same rule as menu `name_key`), otherwise the build fails.
+- `search/_index.md` is the standalone search page; `/` focuses the sidebar input, `?q=` deep-links the search page.
+- Indexing is allowlist-based: only blog posts and wiki leaf articles are indexed; list pages (home/sections/categories/tags/archive/friends/resume/search/404) and encrypted bodies are excluded automatically. New templates must add a `data-pagefind-body` marker to searchable regions, or the page will be silently skipped.
+- Heading-level jumps are supported: the main result links straight to the best-matching section `#` anchor (with that section's excerpt).
+
 ## Algolia search
 
 ```toml
 [extra.algolia]
-enable = true
 app_id = "YOUR_APP_ID"
 api_key = "YOUR_SEARCH_ONLY_KEY"
 index_name = "YOUR_INDEX"
-hits_per_page = 8
-placeholder = "Search posts..."
 show_powered_by = true
 ```
 

@@ -83,9 +83,9 @@ Card layouts with cover images can look nice, but they require careful design. I
 
 This theme intentionally avoids cover images to save bandwidth (though it is not much) 😄. Images inside posts are supported via the `image` component; fancybox is not included yet — that can wait until it is actually needed.
 
-## No local search yet
+## Local search
 
-Zola's recommended search scripts have limited Chinese support. Currently only Algolia search is supported; local search may be considered later.
+Pagefind local search is the default and works with Chinese out of the box — just run `pagefind --site public` after building to generate the index. You can switch to Algolia (requires pushing the index yourself) or `none` in `[extra.search]`.
 
 ## Nested directories in Zola
 

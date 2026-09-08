@@ -32,3 +32,9 @@ console.log(secret);
 {% <note title="提示" color="yellow"> %}
 密码别名通过 front matter 的 `extra.password` 配置（如 `key1`），真密码只存放在加密脚本的 `encrypt.toml` 中；构建后脚本对正文做 AES-GCM 加密，前端解密。适合简单的访问控制。
 {% </note> %}
+
+
+```mermaid
+graph LR
+A --> B
+```

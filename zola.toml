@@ -1,5 +1,7 @@
 # Zola configuration — Elysia Theme (modern minimalist)
-base_url = "https://blog.elysiamoon.com/zola-theme-elysia/"
+# base_url = "https://blog.elysiamoon.com/zola-theme-elysia/"
+base_url = "http://localhost:1414"
+author="Elysia"
 title = "诗酒趁年华"
 description = "A modern, minimalist Zola theme — Reading is enjoyment."
 default_language = "zh"
@@ -39,10 +41,10 @@ footer = """
 
 # ── Site filings / 备案信息（留空则不显示对应项目）──
 # 支持 icp、公安、萌国备案号
-[extra.icp]
+[extra.filing]
 icp = ""
 police = ""
-mengguo = "20268080"
+moe = "20268080"
 
 # ── Top Navigation Buttons (wrap automatically, 4 per row on desktop) ──
 # icon is optional, can be emoji / svg name / url
@@ -149,9 +151,9 @@ comment_title = "欢迎评论 — 留下你的想法"
 
 # ── Giscus ──
 [extra.giscus]
-repo = "jhlzlove/jhlzlove.github.io"
-repo_id = "R_kgDOGiQvcQ"
-category = "DIC_kwDOGiQvcc4CN8Z2"
+repo = "user/repo"
+repo_id = "repo_id"
+category = ""
 category_id = ""
 mapping = "pathname"
 strict = "0"
@@ -184,15 +186,28 @@ requiredMeta = ["nick", "mail"]
 login = "false"
 placeholder = ""
 
+# ── Search ──
+# provider: "pagefind"（默认，本地索引）| "algolia" | "none"
+# pagefind：构建后运行 ./pagefind --site public 生成 public/pagefind/ 索引，无需任何 key
+# algolia：沿用下方 [extra.algolia] 配置（需 app_id + api_key + index_name）
+# placeholder：搜索框提示文案的翻译 key（见 [translations] search_placeholder），自定义 key 必须在各语言 translations 中定义，否则构建会报错（与菜单 name_key 规则一致）
+[extra.search]
+enable = false
+provider = "pagefind"
+hits_per_page = 8
+placeholder = "search_placeholder"
+
+# ── Pagefind Search（本地索引）──
+# bundle 输出目录（`pagefind --site public` 的位置），站内相对路径；默认 "pagefind/"
+[extra.pagefind]
+path = "pagefind/"
+
 # ── Algolia Search ──
 [extra.algolia]
-enable = true
 # Get from https://dashboard.algolia.com
-app_id = "CCI6NCGAK0"          # e.g. "LATENCY"
-api_key = "b2aa1cb7c425b70cd34bac3137a2156f"         # search-only API key
-index_name = "jhlzloveio"      # e.g. "elysia"
-hits_per_page = 8
-placeholder = "搜索文章..."
+app_id = ""          # e.g. "LATENCY"
+api_key = ""         # search-only API key
+index_name = ""      # e.g. "elysia"
 show_powered_by = true
 # Optional: customize hits display (title, url, summary, content)
 # attribute_for_highlight = ["title", "content"]
@@ -242,6 +257,7 @@ menu_links = "工具集"
 article_expiry = "本文最后更新于 {date}，已超过 {days} 天未更新，内容可能已过时，请注意甄别。"
 toc_title = "目录"
 toc_on_this_page = "本页目录"
+search_placeholder = "搜索文章..."
 
 [languages.en]
 title = "Elysia EN"
@@ -265,6 +281,7 @@ menu_links = "Tools"
 article_expiry = "This article was last updated on {date} and has not been updated for over {days} days. The content may be outdated, please verify the information."
 toc_title = "On this page"
 toc_on_this_page = "On this page"
+search_placeholder = "Search posts..."
 
 [slugify]
 paths = "on"

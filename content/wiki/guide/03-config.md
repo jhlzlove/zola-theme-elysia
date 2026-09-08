@@ -25,7 +25,7 @@ theme = "elysia"  # 仅子模块方式需要
 - `base_url`：线上真实地址，影响链接、Feed、sitemap 与 canonical。上线前必改。
 - `default_language`：默认语言，如 `zh` / `en`。
 - `compile_sass`：本主题不使用 Sass，保持 `false`。
-- `build_search_index`：本主题使用 Algolia，保持 `false`。
+- `build_search_index`：Zola 自带索引，本主题不用（默认 Pagefind 本地索引，另可选 Algolia），保持 `false`。
 - `generate_feeds` / `feed_filenames`：生成 `atom.xml` 等订阅。
 - `theme`：主题目录名，仅在 `themes/elysia/` 方式下需要。
 
@@ -88,13 +88,13 @@ footer = "© 2026 我的博客"
 ## 备案信息
 
 ```toml
-[extra.icp]
+[extra.filing]
 icp = ""
 police = ""
-mengguo = ""
+moe = ""
 ```
 
-三项分别对应 ICP、公安、萌 ICP。留空不显示。
+三项分别对应 ICP、公安、萌 ICP，留空不显示。其中萌 ICP 只需填写萌号数字（如 `20268080`），主题会自动拼接"萌 ICP 备案 X 号"并链接到查询页。
 
 ## 导航与多语言
 
@@ -193,16 +193,33 @@ show_reading_time = true
 - `paginate_by`：首页列表每页数量。
 - `show_reading_time`：标题下方阅读时间。
 
+## 搜索
+
+```toml
+[extra.search]
+enable = true              # 总开关，false 则关闭搜索框与搜索页
+provider = "pagefind"      # pagefind（默认，本地索引）| algolia | none
+hits_per_page = 8          # 侧栏下拉结果数
+placeholder = "search_placeholder"   # 搜索框提示文案的翻译 key
+
+[extra.pagefind]
+path = "pagefind/"         # Pagefind bundle 输出目录（站内相对路径）
+```
+
+- `pagefind`：零配置，中文开箱即用；每次构建后运行 `pagefind --site public` 生成索引（仓库根目录已附带 `pagefind` 二进制，CI 会自动执行）。`[extra.pagefind].path` 为索引输出目录。搜索页直接使用 Pagefind 官方 UI，侧栏为主题定制下拉。
+- `algolia`：沿用下方 `[extra.algolia]`（需 `app_id + api_key + index_name`），并将文章数据推送至对应 index。
+- `placeholder` 为 `[translations]` 中的 key（如默认的 `search_placeholder`），按当前语言显示；自定义 key 必须在各语言 translations 中定义（与菜单 `name_key` 规则一致），否则构建报错。
+- `search/_index.md` 为独立搜索页；侧边栏支持 `/` 聚焦，搜索页支持 `?q=` 直达。
+- 索引是白名单制：仅博客正文与 wiki 叶子文章进索引，各类列表页（首页/目录/分类/标签/归档/友链/简历/搜索页/404）与加密正文自动排除；新增模板时，被搜页面须加 `data-pagefind-body` 标记，否则整页不会被收录。
+- 搜索结果支持标题级跳转：主结果直达最匹配的小节 `#` 锚点（附该小节摘要）。
+
 ## Algolia 搜索
 
 ```toml
 [extra.algolia]
-enable = true
 app_id = "YOUR_APP_ID"
 api_key = "YOUR_SEARCH_ONLY_KEY"
 index_name = "YOUR_INDEX"
-hits_per_page = 8
-placeholder = "搜索文章..."
 show_powered_by = true
 ```
 

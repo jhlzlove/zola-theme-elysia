@@ -4,27 +4,40 @@
 
 {% block head %}
 <meta name="robots" content="noindex">
+{% if search_use_pagefind %}<link rel="stylesheet" href="{{ pf_ui_css | safe }}">{% endif %}
 {% endblock head %}
 
 {% block content %}
 <div class="page-header">
   <h1>搜索</h1>
+  {% if search_use_algolia %}
   <p>基于 Algolia 的全站搜索，输入关键词实时检索</p>
+  {% else %}
+  <p>基于本地 Pagefind 索引的全站搜索，输入关键词实时检索</p>
+  {% endif %}
 </div>
 
-{% if config.extra.algolia and config.extra.algolia.enable and config.extra.algolia.app_id and config.extra.algolia.api_key and config.extra.algolia.index_name %}
+{% if search_use_pagefind %}
+<div class="search-page">
+  <div id="pagefind-search"></div>
+</div>
+
+<div class="notice" style="margin-top:18px">
+  <p class="muted" style="font-size:13px;margin:0">提示：按 <kbd>/</kbd> 快速聚焦侧边栏搜索；本页支持 <code>?q=关键词</code> 直达。本地索引在每次构建后运行 <code>pagefind --site public</code> 生成。</p>
+</div>
+{% elif search_use_algolia %}
 <div class="search-page" data-algolia-page
   data-app-id="{{ config.extra.algolia.app_id | safe }}"
   data-api-key="{{ config.extra.algolia.api_key | safe }}"
   data-index-name="{{ config.extra.algolia.index_name | safe }}"
-  data-hits-per-page="{{ config.extra.algolia.hits_per_page | default(value=12) }}">
+  data-hits-per-page="{{ search_hits_page }}">
   <div class="search-page__wrap">
     {{ <icon name="search" class="search-page__icon"/> }}
-    <input id="searchPageInput" class="search-page__input" type="search" placeholder="{{ config.extra.algolia.placeholder | default(value="输入关键词搜索…") }}" autocomplete="off" spellcheck="false" aria-label="搜索">
+    <input id="searchPageInput" class="search-page__input" type="search" placeholder="{{ search_ph }}" autocomplete="off" spellcheck="false" aria-label="搜索">
   </div>
   <div id="searchPageStats" class="search-page__stats" aria-live="polite"></div>
   <div id="searchPageResults" class="search__results" style="position:static;max-height:none;box-shadow:none;border:none;padding:0;background:transparent" role="listbox" aria-label="搜索结果"></div>
-  {% if config.extra.algolia.show_powered_by | default(value=true) %}
+  {% if search_powered %}
   <div class="search__powered" style="margin-top:12px">Search by <a href="https://www.algolia.com" target="_blank" rel="noopener">Algolia</a></div>
   {% endif %}
 </div>
@@ -34,16 +47,14 @@
 </div>
 {% else %}
 <div class="notice">
-  <p><strong>Algolia 未启用</strong></p>
-  <p class="muted" style="font-size:13px">请在 <code>zola.toml</code> 中配置：</p>
-  <pre style="background:var(--bg-muted);border:1px solid var(--border);padding:12px;border-radius:8px;overflow:auto;font-size:12px"><code>[extra.algolia]
+  <p><strong>搜索未启用</strong></p>
+  <p class="muted" style="font-size:13px"><code>[extra.search] provider</code> 为 <code>none</code>（或 <code>algolia</code> 但缺少 key），侧边栏与本站均不显示搜索框。本地搜索请在 <code>zola.toml</code> 中配置：</p>
+  <pre style="background:var(--bg-muted);border:1px solid var(--border);padding:12px;border-radius:8px;overflow:auto;font-size:12px"><code>[extra.search]
 enable = true
-app_id = "YOUR_APP_ID"
-api_key = "YOUR_SEARCH_ONLY_KEY"
-index_name = "YOUR_INDEX"
+provider = "pagefind"   # pagefind | algolia | none
 hits_per_page = 8
-placeholder = "搜索文章..."</code></pre>
-  <p class="muted" style="font-size:13px">并使用 <code>algolia-indexer</code> 或自定义脚本将 <code>content</code> 推送至 Algolia。推送字段建议：<code>title, url, content, summary, date, tags, categories</code>。</p>
+placeholder = "search_placeholder"   # 翻译 key，见 [translations]</code></pre>
+  <p class="muted" style="font-size:13px">使用 <code>pagefind</code> 时，每次构建后运行 <code>pagefind --site public</code> 生成索引；使用 <code>algolia</code> 时，需另行配置 <code>[extra.algolia]</code> 并将 <code>content</code> 推送至对应 index。</p>
 </div>
 {% endif %}
 
@@ -51,3 +62,74 @@ placeholder = "搜索文章..."</code></pre>
 <div class="prose" style="margin-top:18px">{{ section.content | safe }}</div>
 {% endif %}
 {% endblock content %}
+
+{% block scripts %}
+{% if search_use_pagefind %}
+<script src="{{ pf_ui_js | safe }}"></script>
+<script>
+(function(){
+  var bundlePath = "{{ pf_dir_url | safe }}".replace(/\/+$/, "");
+  var opts = {
+    element: "#pagefind-search",
+    bundlePath: bundlePath,
+    showImages: false,
+    showSubResults: false,
+    // 主结果直达最匹配的小节锚点（sub_results 按相关度排序），无锚点时保持页面链接
+    processResult: function (result) {
+      try {
+        var subs = (result && result.sub_results) || [];
+        for (var i = 0; i < subs.length; i++) {
+          if (subs[i] && subs[i].url && subs[i].url !== result.url) {
+            result.url = subs[i].url;
+            if (subs[i].excerpt) result.excerpt = subs[i].excerpt;
+            break;
+          }
+        }
+      } catch (_) {}
+      return result;
+    }
+  };
+  {% set pflang = lang | default(value=config.default_language) %}
+  {% if pflang == "zh" %}
+  opts.translations = {
+    placeholder: "搜索文章...",
+    clear_search: "清除",
+    load_more: "加载更多结果",
+    search_label: "站内搜索",
+    filters_label: "筛选",
+    zero_results: '没有找到 "[SEARCH_TERM]" 相关结果',
+    many_results: '找到 [COUNT] 条 "[SEARCH_TERM]" 相关结果',
+    one_result: '找到 [COUNT] 条 "[SEARCH_TERM]" 相关结果',
+    alt_search: '没有找到 "[SEARCH_TERM]"，改为显示 "[DIFFERENT_TERM]" 的结果',
+    search_suggestion: "试试搜索：",
+    searching: "正在搜索 [SEARCH_TERM]..."
+  };
+  {% endif %}
+  new PagefindUI(opts);
+  try {
+    var q0 = new URLSearchParams(window.location.search).get("q");
+    var inp = document.querySelector("#pagefind-search .pagefind-ui__search-input");
+    if (q0 && inp) {
+      inp.value = q0;
+      inp.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    if (inp) {
+      var t = null;
+      inp.addEventListener("input", function(){
+        clearTimeout(t);
+        t = setTimeout(function(){
+          try {
+            var url = new URL(window.location.href);
+            var q = inp.value.trim();
+            if (q) url.searchParams.set("q", q);
+            else url.searchParams.delete("q");
+            history.replaceState(null, "", url.toString());
+          } catch (_) {}
+        }, 400);
+      });
+    }
+  } catch (_) {}
+})();
+</script>
+{% endif %}
+{% endblock scripts %}

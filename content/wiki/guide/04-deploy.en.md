@@ -47,6 +47,7 @@ Then:
 
 ```bash
 zola build --force
+./pagefind --site public   # required when [extra.search] provider = "pagefind" (the default)
 ```
 
 Upload `public/` to Nginx, Apache, object storage, or another static host. For example, with rsync:

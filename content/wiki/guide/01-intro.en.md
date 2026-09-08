@@ -10,7 +10,7 @@ Elysia keeps the workflow simple: Zola reads Markdown from `content/`, templates
 ## Suitable and not suitable
 
 - Suitable: text-focused blogs, maintained docs / Wiki, sites that need categories and archives.
-- Not suitable: card streams that require cover images, offline local search, or heavy Headless CMS integration (requires custom extension).
+- Not suitable: card streams that require cover images, or heavy Headless CMS integration (requires custom extension).
 
 ## Guide structure
 

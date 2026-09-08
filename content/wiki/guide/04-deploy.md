@@ -43,6 +43,9 @@ jobs:
 3. 在 GitHub 的 **Settings → Pages** 中选择 Action 或构建输出分支。
 4. 等待 Actions 完成后打开站点地址。
 
+> [!warning]
+> 如果站点启用了文章加密（见下文），不能使用上面这种构建+部署一步完成的一键脚本，必须拆成手动三步：build → 加密 → 部署。
+
 ## 手动构建
 
 ```bash
@@ -60,6 +63,108 @@ rsync -avz --delete public/ user@example.com:/var/www/html/
 ```bash
 npx serve public
 ```
+
+## 文章加密（可选）
+
+本主题支持加密文章，在文章 front matter 中标记即可：
+
+```toml
+[extra]
+encrypted = true
+password = "blog"   # 密码别名，真密码只放在加密配置里，不要写在这里
+```
+
+加密由 [ssg-encrypt](https://github.com/jhlzlove/ssg-encrypt) 对构建产物做后处理（AES-256-GCM），流程固定为：
+
+```text
+zola build → ssg-encrypt 加密 public/ → 部署
+```
+
+> [!warning]
+> 加密必须发生在构建之后、部署之前。一旦启用加密，就不能再使用构建+部署一步完成的官方一键脚本（如 `shalzz/zola-deploy-action`），必须手动拆成 build → 加密 → 部署三步。
+
+加密后订阅源（atom.xml / rss.xml）中对应条目的正文会被替换为占位文本，不会泄漏原文。
+
+### 手动部署
+
+1. 到 [ssg-encrypt Releases](https://github.com/jhlzlove/ssg-encrypt/releases) 下载对应平台的二进制文件，放到站点根目录。
+2. 在站点根目录准备 `encrypt.toml`（真密码只写在这里；该文件已在 `.gitignore` 中，不会提交到仓库），`[passwords]` 的别名与文章 `extra.password` 对应：
+
+```toml
+[passwords]
+blog = "真正的密码写这里"
+```
+
+3. 构建、加密、建索引、再部署：
+
+```bash
+zola build
+./ssg-encrypt -c encrypt.toml   # -c 指定配置文件；public/ 为默认输入目录，可省略 --input
+./pagefind --site public        # 生成本地搜索索引（provider = "pagefind" 时必需）
+# 然后把 public/ 发布到任意平台：Nginx、对象存储、GitHub Pages 分支……
+```
+
+可用 `--dry-run` 先扫描校验而不写文件，确认规则命中后再正式执行。
+
+### GitHub Action 自动部署
+
+参考本仓库 `.github/workflows/deploy.yml`：在 `zola build` 之后、上传部署产物之前插入加密步骤，真密码通过 Secrets 传入：
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Zola
+        uses: taiki-e/install-action@v2
+        with:
+          tool: zola
+
+      - name: Build Zola
+        run: zola build
+
+      - name: Encrypt private content
+        uses: jhlzlove/ssg-encrypt@main
+        with:
+          selector: "#encryptedBox"
+          content-selector: "#articleContent"
+        env:
+          SITE_ENCRYPT_PASSWORDS: {% raw %}${{ secrets.ENCRYPT_PASSWORDS }}{% endraw %}
+
+      - name: Build Pagefind index
+        env:
+          GH_TOKEN: {% raw %}${{ github.token }}{% endraw %}
+        run: |
+          gh release download v1.5.2 --repo CloudCannon/pagefind --pattern '*x86_64-unknown-linux-musl.tar.gz' --dir /tmp --clobber
+          tar -xzf /tmp/pagefind-*.tar.gz -C /tmp
+          /tmp/pagefind --site public
+
+      - name: Upload Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: {% raw %}${{ steps.deployment.outputs.page_url }}{% endraw %}
+    steps:
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+要点：
+
+- 在仓库 **Settings → Secrets and variables → Actions** 中添加 `ENCRYPT_PASSWORDS`，内容为 TOML 格式的 `别名 = "密码"`（可多行，如 `blog = "……"`）。
+- 顺序不能错：先 `zola build`，再加密，再 `pagefind --site public` 建索引，最后才上传/部署产物。仓库里已有可直接抄的完整流程，见 `.github/workflows/deploy.yml`。
 
 ## Netlify、Vercel 和 Cloudflare Pages
 

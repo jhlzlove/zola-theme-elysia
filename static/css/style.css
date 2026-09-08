@@ -216,6 +216,7 @@ html[data-palette="violet"][data-theme="dark"]{
   max-width: var(--page-max);
   width: min(96%, var(--page-max));
   margin:0 auto;
+  justify-content:center;
   align-items:start;
   min-height:100vh;
   min-height:100dvh;
@@ -306,6 +307,7 @@ html[data-palette="violet"][data-theme="dark"]{
     grid-template-columns: 220px minmax(0, var(--content-max)) 200px;
     gap:24px;
     width: min(98%, 1280px);
+    justify-content:center;
   }
   .shell:not(:has(.toc-aside)){
     grid-template-columns: 220px minmax(0, var(--content-max)) 200px;
@@ -668,6 +670,25 @@ html[data-palette="violet"][data-theme="dark"]{
 .search-page__wrap{position:relative}
 .search-page__icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted-2)}
 .search-page__stats{font-size:13px;color:var(--muted);margin:12px 2px}
+
+/* ── Pagefind Default UI — 主题变量映射（亮/暗自动跟随） ── */
+#pagefind-search{
+  --pagefind-ui-primary: var(--accent);
+  --pagefind-ui-text: var(--fg);
+  --pagefind-ui-background: var(--bg-soft);
+  --pagefind-ui-border: var(--border);
+  --pagefind-ui-tag: var(--bg-muted);
+  --pagefind-ui-border-width: 1px;
+  --pagefind-ui-border-radius: 12px;
+  --pagefind-ui-image-border-radius: 8px;
+  --pagefind-ui-font: var(--font-body);
+  --pagefind-ui-image-box-ratio: 3 / 2;
+}
+#pagefind-search .pagefind-ui__search-input{color:var(--fg);}
+#pagefind-search .pagefind-ui__search-input::placeholder{color:var(--muted-2);}
+#pagefind-search .pagefind-ui__result-link{color:var(--fg);}
+#pagefind-search .pagefind-ui__result-excerpt{color:var(--muted);}
+#pagefind-search .pagefind-ui__result-excerpt mark{background:var(--accent-soft);color:var(--accent);padding:0 2px;border-radius:4px;}
 
 /* Sidebar footer — 开放式，无容器边界 */
 .sidebar__footer{
