@@ -1,6 +1,6 @@
 # Zola configuration — Elysia Theme (modern minimalist)
-# base_url = "https://blog.elysiamoon.com/zola-theme-elysia/"
-base_url = "http://localhost:1414"
+base_url = "https://blog.elysiamoon.com/zola-theme-elysia/"
+# base_url = "http://localhost:1414"
 author="Elysia"
 title = "诗酒趁年华"
 description = "A modern, minimalist Zola theme — Reading is enjoyment."
