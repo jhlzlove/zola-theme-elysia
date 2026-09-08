@@ -192,7 +192,7 @@ placeholder = ""
 # algolia：沿用下方 [extra.algolia] 配置（需 app_id + api_key + index_name）
 # placeholder：搜索框提示文案的翻译 key（见 [translations] search_placeholder），自定义 key 必须在各语言 translations 中定义，否则构建会报错（与菜单 name_key 规则一致）
 [extra.search]
-enable = false
+enable = true
 provider = "pagefind"
 hits_per_page = 8
 placeholder = "search_placeholder"
