@@ -42,7 +42,7 @@ sticky = true
 ```
 
 - `date`：排序与显示日期；`updated`：更新时间（用于过期提示）。
-- `description`：列表摘要与页面描述；也可用正文 `<!-- more -->` 分隔。
+- `description`：列表摘要与页面描述；普通文章也可用正文 `<!-- more -->` 分隔生成 `page.summary`。
 - `weight`：Wiki 章节排序；`sticky` / `top` / `pinned` 置顶。
 - 分类与标签必须写在 `[taxonomies]` 下。
 
@@ -348,9 +348,11 @@ Spotify（`type` 支持 `single` / `album` / `playlist`，`single` 对应 `track
 github:
   - title: Zola
     url: https://github.com/getzola/zola
-    icon: https://www.getzola.org/icons/apple-touch-icon.png
+    cover: https://picsum.photos/seed/zola/600/300
     desc: Zola 官方仓库
 ```
+
+卡片只显示封面、标题与摘要，不显示链接地址与图标；`cover` 支持远程地址与本地图片（放在 `static/` 下，如 `/images/tool.jpg`，会自动拼接 `base_url`）；标题前方的 ★ 为个人精选标识；摘要超出两行被截断时，鼠标悬浮显示全文。
 
 **写法：**
 
@@ -366,7 +368,31 @@ github:
 
 ### friends 友链
 
-`friends` 默认读取 `data/friends.yaml`，也支持复用链接数据。
+`friends` 默认读取 `data/friends.yaml`，数据格式（仅以下字段）：
+
+```yaml
+developer:
+  - title: 对方名称
+    url: https://example.com
+    icon: https://example.com/avatar.jpg
+    description: 一句话自我描述
+    feed: https://example.com/atom.xml
+```
+
+- `title` / `url`：显示名称与主页链接（点击卡片跳转）。
+- `icon`：网站图标，为空时显示标题首字母。
+- `description`：一句话简介，显示在名称下方。
+- `feed`：订阅地址；构建时自动抓取最近 3 篇文章展示在卡片右侧。
+  为空显示"暂未配置 feed 订阅"且排序靠后；地址无效或抓取失败显示"订阅暂不可用"，不影响构建。
+- 卡片不再显示网站链接地址；顶层键为分组名，可用 `group` 参数只渲染某一组。
+
+支持 `api` 参数调用远程接口获取数据。`api` 为纯前端实时渲染：构建时不请求，
+访客每次进入页面由 `friends.js` 拉取并渲染（查看源代码为空、无 SEO；需要接口允许跨域，
+即返回 `Access-Control-Allow-Origin`）。获取失败或没有数据时整个远端网格不显示，不影响构建。
+远程返回 `{"version": "v2", "content": [...]}`，仅取与静态相同的字段（`title/url/icon/description/feed`）和 `posts` 列表
+（`posts[].title / posts[].link / posts[].published`，最多取前 3 篇），其余字段忽略；
+有 `feed` 的靠前、无 `feed` 的靠后。`group` 与 `api` 混用时 `group` 被忽略，
+要同时展示静态与远端请写两个块（如友链页现状）：
 
 **写法：**
 
@@ -374,6 +400,7 @@ github:
 ```jinja
 {{ <friends group="developer" /> }}
 {{ <friends /> }}
+{{ <friends api="https://example.com/api/friends" /> }}
 ```
 {% endraw %}
 
@@ -459,6 +486,7 @@ content/wiki/my-guide/
 ```toml
 +++
 title = "我的指南"
+description = "一句话介绍这个项目，显示在 Wiki 列表的卡片摘要中。"
 sort_by = "weight"
 template = "section.html"
 page_template = "page.html"
@@ -466,6 +494,10 @@ page_template = "page.html"
 ```
 
 章节文章使用 `weight` 排序；Wiki 导航来自目录结构。
+
+> [!NOTE]
+> Wiki 项目首页即 `_index.md` 是一个 Section，没有 `page.summary`，`<!-- more -->` 对它无效。
+> 如需在 Wiki 列表中正常显示摘要，必须在 Front Matter 写 `description`；不写则回退为正文截断（会把正文一起显示）。
 
 ## 自定义样式
 

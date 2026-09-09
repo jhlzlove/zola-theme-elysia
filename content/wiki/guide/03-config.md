@@ -206,7 +206,9 @@ placeholder = "search_placeholder"   # 搜索框提示文案的翻译 key
 path = "pagefind/"         # Pagefind bundle 输出目录（站内相对路径）
 ```
 
-- `pagefind`：零配置，中文开箱即用；每次构建后运行 `pagefind --site public` 生成索引（仓库根目录已附带 `pagefind` 二进制，CI 会自动执行）。`[extra.pagefind].path` 为索引输出目录。搜索页直接使用 Pagefind 官方 UI，侧栏为主题定制下拉。
+- `pagefind`：零配置；每次构建后运行 `pagefind_extended --site public` 生成索引（仓库根目录已附带 `pagefind_extended` 二进制，CI 会自动执行）。`[extra.pagefind].path` 为索引输出目录。搜索页直接使用 Pagefind 官方 UI，侧栏为主题定制下拉。
+> [!warning]
+> 中文站必须使用 `pagefind_extended`（而非普通版 `pagefind`）：普通版不含中文分词，中文基本搜不出来。[Pagefind Releases](https://github.com/Pagefind/pagefind/releases) 下载对应平台的 `pagefind_extended` 包。
 - `algolia`：沿用下方 `[extra.algolia]`（需 `app_id + api_key + index_name`），并将文章数据推送至对应 index。
 - `placeholder` 为 `[translations]` 中的 key（如默认的 `search_placeholder`），按当前语言显示；自定义 key 必须在各语言 translations 中定义（与菜单 `name_key` 规则一致），否则构建报错。
 - `search/_index.md` 为独立搜索页；侧边栏支持 `/` 聚焦，搜索页支持 `?q=` 直达。

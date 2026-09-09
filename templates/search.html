@@ -23,7 +23,7 @@
 </div>
 
 <div class="notice" style="margin-top:18px">
-  <p class="muted" style="font-size:13px;margin:0">提示：按 <kbd>/</kbd> 快速聚焦侧边栏搜索；本页支持 <code>?q=关键词</code> 直达。本地索引在每次构建后运行 <code>pagefind --site public</code> 生成。</p>
+  <p class="muted" style="font-size:13px;margin:0">提示：按 <kbd>/</kbd> 快速聚焦侧边栏搜索；本页支持 <code>?q=关键词</code> 直达。本地索引在每次构建后运行 <code>pagefind_extended --site public</code> 生成（中文必须用 extended，普通版不支持中文分词）。</p>
 </div>
 {% elif search_use_algolia %}
 <div class="search-page" data-algolia-page
@@ -54,7 +54,7 @@ enable = true
 provider = "pagefind"   # pagefind | algolia | none
 hits_per_page = 8
 placeholder = "search_placeholder"   # 翻译 key，见 [translations]</code></pre>
-  <p class="muted" style="font-size:13px">使用 <code>pagefind</code> 时，每次构建后运行 <code>pagefind --site public</code> 生成索引；使用 <code>algolia</code> 时，需另行配置 <code>[extra.algolia]</code> 并将 <code>content</code> 推送至对应 index。</p>
+  <p class="muted" style="font-size:13px">使用 <code>pagefind</code> 时，每次构建后运行 <code>pagefind_extended --site public</code> 生成索引（中文必须用 extended）；使用 <code>algolia</code> 时，需另行配置 <code>[extra.algolia]</code> 并将 <code>content</code> 推送至对应 index。</p>
 </div>
 {% endif %}
 

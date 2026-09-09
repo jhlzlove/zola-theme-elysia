@@ -1,22 +1,24 @@
+# 工具集数据（顶层键为分组名，模板用 group 参数渲染某一组）
+# 字段说明：
+# - title: 显示标题，卡片前方自动带 ★ 精选标识
+# - url:   点击卡片后跳转的地址
+# - cover: 封面图，支持远程地址（https://…）与本地图片（放在 static/ 下，如 /images/tool.jpg）
+# - desc:  摘要，超出两行截断，鼠标悬浮显示全文
 github:
   - title: Zola
     url: https://github.com/getzola/zola
-    icon: https://www.getzola.org/icons/apple-touch-icon.png
     cover: https://picsum.photos/seed/zola/600/300
     desc: 高性能静态站点生成器，Rust 编写，单二进制极速构建
   - title: Tera
     url: https://github.com/Keats/tera
-    icon: https://avatars.githubusercontent.com/u/10832834?s=200&v=4
     cover: https://picsum.photos/seed/tera/600/300
     desc: Jinja2 风格的 Rust 模板引擎，Zola 的核心
   - title: shadcn/ui
     url: https://github.com/shadcn/ui
-    icon: https://avatars.githubusercontent.com/u/139895814?s=200&v=4
     cover: https://picsum.photos/seed/shadcn/600/300
     desc: 素雅黑配色的组件灵感来源，简洁美观
 other:
   - title: 示例站点
     url: https://example.com
-    icon: ""
     cover: https://picsum.photos/seed/example/600/300
     desc: 示例外链，展示封面图效果

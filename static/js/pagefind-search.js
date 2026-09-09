@@ -55,13 +55,13 @@ async function pf(bundle) {
     return pfModule;
   } catch (e) {
     pfFailed = true;
-    console.warn('[elysia] pagefind bundle not found — run `pagefind --site public` after build', e);
+    console.warn('[elysia] pagefind bundle not found — run `pagefind_extended --site public` after build (Chinese sites must use extended)', e);
     return null;
   }
 }
 
 function missingNotice() {
-  return '<div class="search__empty">本地搜索索引缺失，请先运行 <code>pagefind --site public</code> 生成索引</div>';
+  return '<div class="search__empty">本地搜索索引缺失，请先运行 <code>pagefind_extended --site public</code> 生成索引（中文必须用 extended）</div>';
 }
 
 function renderHits(items, container, basePath, query) {

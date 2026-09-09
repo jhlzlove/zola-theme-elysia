@@ -196,7 +196,9 @@ placeholder = "search_placeholder"   # translation key for the input placeholder
 path = "pagefind/"         # Pagefind bundle output dir (relative to site root)
 ```
 
-- `pagefind`: zero config, works with Chinese out of the box; run `pagefind --site public` after each build to generate the index (a `pagefind` binary ships in the repo root, CI runs it automatically). `[extra.pagefind].path` controls the bundle output dir. The search page embeds Pagefind's own UI; the sidebar uses a theme-styled dropdown.
+- `pagefind`: zero config; run `pagefind_extended --site public` after each build to generate the index (a `pagefind_extended` binary ships in the repo root, CI runs it automatically). `[extra.pagefind].path` controls the bundle output dir. The search page embeds Pagefind's own UI; the sidebar uses a theme-styled dropdown.
+> [!warning]
+> Sites with Chinese content must use `pagefind_extended` instead of the regular `pagefind` binary: the regular build has no Chinese segmentation and Chinese queries will largely return nothing. On Windows use the `pagefind_extended.exe` in the repo root; on Linux/macOS download the matching `pagefind_extended` archive from [Pagefind Releases](https://github.com/Pagefind/pagefind/releases).
 - `algolia`: uses `[extra.algolia]` below (`app_id + api_key + index_name` required), plus pushing content to the index.
 - `placeholder` is a key in `[translations]` (e.g. the default `search_placeholder`), rendered in the current language; a custom key must be defined in every language's translations (same rule as menu `name_key`), otherwise the build fails.
 - `search/_index.md` is the standalone search page; `/` focuses the sidebar input, `?q=` deep-links the search page.

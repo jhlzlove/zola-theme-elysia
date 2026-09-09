@@ -71,29 +71,129 @@
 {% if not data %}{% set data = load_data(path="data/links.yml", required=false) %}{% endif -%}
 {% if not data %}{% set data = load_data(path="data/links.json", required=false) %}{% endif -%}
 {% if data and data[group] is defined -%}
-<div class="links-grid" data-component="links">{% for item in data[group] %}{% set url = item.url | default(value=item.href) | default(value="#") %}{% set title = item.title | default(value=item.name) | default(value=url) %}{% set icon = item.icon | default(value="") %}{% set cover = item.cover | default(value="") %}{% set desc = item.desc | default(value=item.description) | default(value="") %}<a class="bookmark-card" href="{{ url | safe }}" target="_blank" rel="noopener"><div class="bookmark-card__cover {% if not cover %}bookmark-card__cover--empty{% endif %}">{% if cover %}<img src="{{ cover | safe }}" alt="{{ title }}" loading="lazy">{% elif icon %}<img src="{{ icon | safe }}" alt="" loading="lazy" style="width:48px;height:48px;border-radius:10px;object-fit:cover">{% else %}🔗{% endif %}</div><div class="bookmark-card__main">{% if cover %}<div class="bookmark-card__icon">{% if icon %}<img src="{{ icon | safe }}" alt="" loading="lazy">{% else %}<span style="font-size:18px">🔗</span>{% endif %}</div>{% endif %}<div class="bookmark-card__body"><div class="bookmark-card__title">{{ title }}</div>{% if desc %}<div class="bookmark-card__desc">{{ desc }}</div>{% endif %}<div class="bookmark-card__url">{{ url }}</div></div></div></a>{% endfor %}</div>
+<div class="links-grid" data-component="links">
+{% for item in data[group] %}{% set url = item.url | default(value=item.href) | default(value="#") %}{% set title = item.title | default(value=item.name) | default(value=url) %}{% set cover = item.cover | default(value="") %}{% set desc = item.desc | default(value=item.description) | default(value="") -%}
+{% if cover is starting_with(pat="/") and not cover is starting_with(pat="//") -%}{% set cover_url = get_url(path=cover) -%}{% else -%}{% set cover_url = cover -%}{% endif -%}
+<a class="bookmark-card" href="{{ url | safe }}" target="_blank" rel="noopener">
+<div class="bookmark-card__cover {% if not cover %}bookmark-card__cover--empty{% endif %}">{% if cover %}<img src="{{ cover_url | safe }}" alt="{{ title }}" loading="lazy">{% endif %}</div>
+<div class="bookmark-card__main"><div class="bookmark-card__body"><div class="bookmark-card__title"><span class="bookmark-card__star" aria-hidden="true">★</span>{{ title }}</div>{% if desc %}<div class="bookmark-card__desc" data-full="{{ desc }}">{{ desc }}</div>{% endif %}</div></div>
+</a>
+{% endfor %}</div>
 {% else -%}
 <div class="muted" style="font-size:13px;padding:12px;border:1px dashed var(--border);border-radius:10px">Links group “{{ group }}” not found in data/links.yaml</div>
 {% endif -%}
 {% endcomponent links -%}
 
-{% component friends(group = "") -%}
+{% component friends(group = "", api = "") -%}
+{% if api and api != "" -%}
+{# 纯 CSR：build 时不请求，访客每次进页面由 friends.js 实时拉取渲染（无 SEO；group 与 api 混用时 group 被忽略） #}
+<div class="friends-grid" data-component="friends" data-friends-api="{{ api | safe }}" aria-live="polite" aria-busy="true">
+{% for i in range(end=6) -%}
+<article class="friend-card" aria-hidden="true"><div class="friend-card__side"><span class="friend-card__head"><span class="friend-card__avatar"></span><span class="friend-card__name">加载中…</span></span><p class="friend-card__desc">正在获取友链…</p></div><div class="friend-card__posts"><p class="friend-card__rss-empty">加载中…</p></div></article>
+{% endfor -%}
+</div>
+{% else -%}
 {% set data = load_data(path="data/friends.yaml", required=false) -%}
 {% if not data %}{% set data = load_data(path="data/friends.yml", required=false) %}{% endif -%}
-{% if not data %}{% set data = load_data(path="data/links.yaml", required=false) %}{% endif -%}
 {% if not data %}{% set data = load_data(path="data/friends.json", required=false) %}{% endif -%}
-{% set list = [] -%}
+{# ── 归一化：静态（title/url/icon/description/feed）── #}
+{% set_global raw = [] -%}
 {% if group and data and data[group] is defined -%}
-{% set list = data[group] -%}
+{% for item in data[group] -%}
+{% set_global raw = [...raw, {"title": item.title | default(value=""), "url": item.url | default(value="#"), "icon": item.icon | default(value=""), "description": item.description | default(value=""), "feed": item.feed | default(value="") | trim, "posts": []}] -%}
+{% endfor -%}
 {% elif not group and data -%}
 {% for k, v in data -%}
-{% set_global list = [...list, ...v] -%}
+{% for item in v -%}
+{% set_global raw = [...raw, {"title": item.title | default(value=""), "url": item.url | default(value="#"), "icon": item.icon | default(value=""), "description": item.description | default(value=""), "feed": item.feed | default(value="") | trim, "posts": []}] -%}
+{% endfor -%}
 {% endfor -%}
 {% endif -%}
+{# ── 排序：有 feed 靠前，无 feed 靠后（组内保持原顺序）── #}
+{% set_global with_feed = [] -%}
+{% set_global without_feed = [] -%}
+{% for item in raw -%}
+{% if item.feed != "" -%}
+{% set_global with_feed = [...with_feed, item] -%}
+{% else -%}
+{% set_global without_feed = [...without_feed, item] -%}
+{% endif -%}
+{% endfor -%}
+{% set_global list = [...with_feed, ...without_feed] -%}
 {% if list | length > 0 -%}
-<div class="friends-grid" data-component="friends">{% for item in list %}{% set url = item.url | default(value=item.href) | default(value="#") %}{% set title = item.name | default(value=item.title) | default(value=url) %}{% set icon = item.icon | default(value="") %}{% set desc = item.desc | default(value=item.description) | default(value="") %}{% set initial = title | truncate(length=1, end="") | upper %}<a class="friend-card" href="{{ url | safe }}" target="_blank" rel="noopener"><div class="friend-card__avatar">{% if icon %}<img src="{{ icon | safe }}" alt="{{ title }}" loading="lazy">{% else %}{{ initial }}{% endif %}</div><div class="friend-card__name">{{ title }}</div>{% if desc %}<div class="friend-card__desc">{{ desc }}</div>{% endif %}<div class="friend-card__url">{{ url | replace(from="https://", to="") | replace(from="http://", to="") | truncate(length=28, end="…") }}</div></a>{% endfor %}</div>
+<div class="friends-grid" data-component="friends">
+{% for item in list -%}
+{% set furl = item.url | default(value="#") -%}
+{% set fname = item.title | default(value=furl) -%}
+{% set avatar = item.icon | default(value="") -%}
+{% set desc = item.description | default(value="") -%}
+{% set feed_url = item.feed | default(value="") | trim -%}
+{% set initial = fname | truncate(length=1, end="") | upper -%}
+<article class="friend-card">
+<div class="friend-card__side">
+<a class="friend-card__head" href="{{ furl }}" target="_blank" rel="noopener">
+<span class="friend-card__avatar">{% if avatar %}<img src="{{ avatar }}" alt="{{ fname }}" loading="lazy">{% else %}{{ initial }}{% endif %}</span>
+<span class="friend-card__name">{{ fname }}</span>
+</a>
+{% if desc %}<p class="friend-card__desc">{{ desc }}</p>{% endif -%}
+</div>
+<div class="friend-card__posts">
+{% if feed_url != "" -%}
+{% set feed = load_data(url=feed_url, format="xml", required=false) -%}
+{% set_global posts = [] -%}
+{% if feed and feed.rss and feed.rss.channel and feed.rss.channel.item -%}
+{% set feed_raw = feed.rss.channel.item -%}
+{% if feed_raw[0] is defined %}{% set feed_items = feed_raw %}{% else %}{% set feed_items = [feed_raw] %}{% endif -%}
+{% for it in feed_items -%}{% if loop.index0 > 2 %}{% break %}{% endif -%}
+{% set t = it.title | default(value="") -%}
+{% if t is string %}{% set title = t %}{% else %}{% set title = t["#text"] | default(value="") %}{% endif -%}
+{% set l = it.link | default(value="") -%}
+{% if l is string %}{% set href = l %}{% else %}{% set href = l["#text"] | default(value="") %}{% endif -%}
+{% set d = it.pubDate | default(value="") -%}
+{% if d is string %}{% set fdate = d %}{% else %}{% set fdate = d["#text"] | default(value="") %}{% endif -%}
+{% set fdate = fdate | truncate(length=16, end="") -%}
+{% set_global posts = [...posts, {"title": title, "href": href, "date": fdate}] -%}
+{% endfor -%}
+{% elif feed and feed.feed and feed.feed.entry -%}
+{% set feed_raw = feed.feed.entry -%}
+{% if feed_raw[0] is defined %}{% set feed_items = feed_raw %}{% else %}{% set feed_items = [feed_raw] %}{% endif -%}
+{% for it in feed_items -%}{% if loop.index0 > 2 %}{% break %}{% endif -%}
+{% set t = it.title | default(value="") -%}
+{% if t is string %}{% set title = t %}{% else %}{% set title = t["#text"] | default(value="") %}{% endif -%}
+{% set l = it.link | default(value="") -%}
+{% if l is string -%}
+{% set href = l -%}
+{% elif l[0] is defined -%}
+{% set f = l | first | default(value="") -%}
+{% if f is string %}{% set href = "" %}{% else %}{% set href = f["@href"] | default(value="") %}{% endif -%}
+{% else -%}
+{% set href = l["@href"] | default(value="") -%}
+{% endif -%}
+{% set d = it.updated | default(value=it.published) | default(value="") -%}
+{% if d is string %}{% set fdate = d %}{% else %}{% set fdate = d["#text"] | default(value="") %}{% endif -%}
+{% set fdate = fdate | split(pat="T") | first -%}
+{% set_global posts = [...posts, {"title": title, "href": href, "date": fdate}] -%}
+{% endfor -%}
+{% endif -%}
+{% if posts | length > 0 -%}
+<ul class="friend-card__post-list">
+{% for p in posts -%}
+<li><a href="{{ p.href }}" target="_blank" rel="noopener">{{ p.title }}</a>{% if p.date %}<time>{{ p.date }}</time>{% endif %}</li>
+{% endfor -%}
+</ul>
+{% else -%}
+<p class="friend-card__rss-empty">订阅暂不可用</p>
+{% endif -%}
+{% else -%}
+<p class="friend-card__rss-empty">暂未配置 feed 订阅</p>
+{% endif -%}
+</div>
+</article>
+{% endfor -%}
+</div>
 {% else -%}
 <div class="muted" style="font-size:13px;padding:12px;border:1px dashed var(--border);border-radius:10px">Friends group “{{ group }}” not found</div>
+{% endif -%}
 {% endif -%}
 {% endcomponent friends -%}
 

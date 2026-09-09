@@ -1051,6 +1051,17 @@
     });
   }
 
+  // ── Bookmark card desc overflow tooltip（仅确实被截断时才显示全文）──
+  function initBookmarkTips(){
+    document.querySelectorAll('.bookmark-card__desc[data-full]').forEach(function(el){
+      if(el._tipBound) return; el._tipBound=true;
+      el.addEventListener('mouseenter', function(){
+        if(el.scrollHeight > el.clientHeight + 1) el.classList.add('is-overflow');
+      });
+      el.addEventListener('mouseleave', function(){ el.classList.remove('is-overflow'); });
+    });
+  }
+
   // ── Init all ──
   document.addEventListener('DOMContentLoaded', ()=>{
     initTheme();
@@ -1069,6 +1080,7 @@
     initVideo();
     initAudioPlayers();
     initNeteaseToggle();
+    initBookmarkTips();
     initGiscusWatcher();
     // 首次渲染后再次同步，确保 giscus iframe 已生成
     setTimeout(syncCommentTheme, 500);

@@ -47,8 +47,11 @@ Then:
 
 ```bash
 zola build --force
-./pagefind --site public   # required when [extra.search] provider = "pagefind" (the default)
+./pagefind_extended --site public   # required when [extra.search] provider = "pagefind" (the default); Chinese sites must use extended — the regular pagefind binary has no Chinese segmentation
 ```
+
+> [!warning]
+> Sites with Chinese content must use `pagefind_extended` instead of the regular `pagefind` binary, otherwise Chinese queries will largely return nothing. Download the matching `pagefind_extended` archive from [Pagefind Releases](https://github.com/Pagefind/pagefind/releases).
 
 Upload `public/` to Nginx, Apache, object storage, or another static host. For example, with rsync:
 

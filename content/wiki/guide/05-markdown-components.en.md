@@ -42,7 +42,7 @@ sticky = true
 ```
 
 - `date` controls sorting and display; `updated` records a later update.
-- `description` is used for summaries and page metadata; `<!-- more -->` also works.
+- `description` is used for summaries and page metadata; regular posts can also use `<!-- more -->` to generate `page.summary`.
 - `weight` orders Wiki chapters.
 - `sticky`, `top`, or `pinned` pins a post.
 - Categories and tags belong under `[taxonomies]`.
@@ -353,9 +353,11 @@ Prepare `data/links.yaml`:
 github:
   - title: Zola
     url: https://github.com/getzola/zola
-    icon: https://www.getzola.org/icons/apple-touch-icon.png
+    cover: https://picsum.photos/seed/zola/600/300
     desc: Official Zola repository
 ```
+
+Cards show only the cover, title, and summary — no URL or icon. `cover` accepts remote URLs and local images (placed under `static/`, e.g. `/images/tool.jpg`, automatically prefixed with `base_url`); the ★ before the title marks a personal pick. When the summary is clamped, hovering reveals the full text.
 
 **Syntax:**
 
@@ -371,7 +373,32 @@ github:
 
 ### friends
 
-`friends` normally reads `data/friends.yaml` and can also reuse link data.
+`friends` reads `data/friends.yaml` (only these fields):
+
+```yaml
+developer:
+  - title: Friend name
+    url: https://example.com
+    icon: https://example.com/avatar.jpg
+    description: One-line intro
+    feed: https://example.com/atom.xml
+```
+
+- `title` / `url`: display name and homepage (clicking the card opens it).
+- `icon`: site icon; falls back to the first letter of the title when empty.
+- `description`: one-line intro, shown below the name.
+- `feed`: subscription URL; the latest 3 posts are fetched at build time and shown on the right side of the card.
+  Empty shows a "no feed configured" note and sorts later; an unreachable feed shows an "unavailable" note without breaking the build.
+- The card no longer shows the raw site URL; top-level keys are groups, use `group` to render one group only.
+
+The `api` parameter fetches remote data with pure client-side rendering: nothing is requested
+at build time; `friends.js` fetches and renders on every page visit (empty in view-source, no SEO;
+the endpoint must allow CORS via `Access-Control-Allow-Origin`). If the fetch fails or returns
+no data, the whole remote grid is hidden without breaking the build.
+The endpoint returns `{"version": "v2", "content": [...]}`; only the same fields as static (`title/url/icon/description/feed`) plus the `posts` list
+(`posts[].title / posts[].link / posts[].published`, first 3) are used, other fields are ignored;
+entries with `feed` sort first. `group` is ignored when `api` is set; to show both sources,
+use two blocks (as the friends page does):
 
 **Syntax:**
 
@@ -379,6 +406,7 @@ github:
 ```jinja
 {{ <friends group="developer" /> }}
 {{ <friends /> }}
+{{ <friends api="https://example.com/api/friends" /> }}
 ```
 {% endraw %}
 
@@ -463,6 +491,7 @@ The `_index.md`:
 ```toml
 +++
 title = "My Guide"
+description = "One-line intro shown as the card summary in the Wiki list."
 sort_by = "weight"
 template = "section.html"
 page_template = "page.html"
@@ -470,6 +499,10 @@ page_template = "page.html"
 ```
 
 Use `weight` to order chapter pages. Do not add `extra.series`; Wiki navigation comes from the directory structure.
+
+> [!NOTE]
+> A Wiki project homepage (`_index.md`) is a Section, so it has no `page.summary` and `<!-- more -->` does not work there.
+> To show a proper summary in the Wiki list, set `description` in the front matter; otherwise the template falls back to truncating the full body text.
 
 ## Custom CSS
 

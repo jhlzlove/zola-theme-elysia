@@ -20,7 +20,7 @@ jobs:
           tool: zola
 
       - name: Build Zola
-        run: zola build
+        run: zola build --minify
 
       - name: Encrypt private content
         uses: jhlzlove/ssg-encrypt@main

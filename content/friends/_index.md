@@ -1,10 +1,9 @@
 +++
-title = "友链"
-description = "朋友们"
+title = "山海故人"
+description = "故人隔山海 山海有故人"
 template = "section.html"
 +++
 
-## 好朋友
-
+{{ <friends api="https://raw.githubusercontent.com/jhlzlove/friends/output/v2/data.json"/> }}
 
 {{ <friends/> }}

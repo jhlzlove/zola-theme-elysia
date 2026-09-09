@@ -2128,53 +2128,60 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
   gap:12px;
   flex:1;
 }
-.bookmark-card__icon{
-  width:44px;height:44px;flex:0 0 44px;
-  border-radius:10px;
-  background:var(--bg-muted);
-  border:1px solid var(--border);
-  display:grid;place-items:center;
-  overflow:hidden;
-  box-shadow:var(--shadow-sm);
-}
-.bookmark-card__icon img{width:100%;height:100%;object-fit:cover}
 .bookmark-card__body{flex:1;min-width:0;overflow:hidden}
 .bookmark-card__title{font-size:14px;font-weight:700;color:var(--fg);line-height:1.3;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.bookmark-card__desc{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.bookmark-card__url{font-size:11px;color:var(--muted-2);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bookmark-card__url::before{content:"↗ ";opacity:.6}
+.bookmark-card__star{color:#eab308;margin-right:5px;font-size:.9em}
+.bookmark-card__desc{position:relative;font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* desc 被截断时悬浮显示全文（is-overflow 由 JS 在确实溢出时添加） */
+.bookmark-card__desc.is-overflow:hover::after{
+  content:attr(data-full);
+  position:absolute;bottom:calc(100% + 8px);left:0;
+  width:max-content;max-width:100%;
+  padding:8px 10px;border-radius:8px;
+  background:var(--fg);color:var(--bg-soft);
+  border:1px solid var(--border-strong);
+  box-shadow:var(--shadow);
+  font-size:12.5px;line-height:1.6;white-space:normal;
+  z-index:5;pointer-events:none;
+}
 
 /* Friends grid & card - distinct from links */
 .friends-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(200px,1fr));
-  gap:14px;
+  grid-template-columns:1fr;
+  gap:12px;
   margin:16px 0;
 }
 .friend-card{
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
-  padding:22px 14px 16px;
+  align-items:stretch;
+  gap:20px;
+  padding:8px 18px;
   border:1px solid var(--border);
   border-radius:var(--radius);
   background:var(--bg-soft);
+}
+.friend-card__side{
+  flex:0 0 200px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  min-width:0;
+}
+.friend-card__head{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:0;
+  min-width:0;
   text-decoration:none;
   color:inherit;
-  transition:all .2s ease;
-  position:relative;
-  overflow:hidden;
 }
-.friend-card::before{
-  content:"";position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg, var(--accent), transparent);
-  opacity:0;transition:opacity .2s;
-}
-.friend-card:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-3px);text-decoration:none}
-.friend-card:hover::before{opacity:1}
 .friend-card__avatar{
-  width:64px;height:64px;
+  width:64px;height:64px;flex:0 0 64px;
   border-radius:50%;
   overflow:hidden;
   border:3px solid var(--border);
@@ -2187,9 +2194,36 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
 }
 .friend-card:hover .friend-card__avatar{transform:scale(1.04);border-color:var(--accent)}
 .friend-card__avatar img{width:100%;height:100%;object-fit:cover}
+/* Section 正文复用 article__content 时，卡片内图片不受正文 img 全局样式（margin/border）影响，避免头像被裁切 */
+.article__content .bookmark-card__cover img,
+.article__content .friend-card__avatar img{margin:0;border:none;border-radius:0;box-shadow:none}
 .friend-card__name{font-size:15px;font-weight:700;color:var(--fg);line-height:1.2;overflow-wrap:anywhere}
-.friend-card__desc{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.8em}
-.friend-card__url{font-size:11px;color:var(--muted-2);margin-top:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;padding:4px 10px;background:var(--bg-muted);border-radius:999px;border:1px solid var(--border)}
+.friend-card__head:hover .friend-card__name{color:var(--accent)}
+/* 卡片在正文区内，不使用正文外链图标与下划线，保持卡片干净 */
+.article__content .friend-card__head{text-decoration:none}
+.article__content .friend-card__head::after{display:none}
+.article__content .friend-card__post-list a{text-decoration:none}
+.article__content .friend-card__post-list a::after{display:none}
+.friend-card__desc{width:100%;text-align:center;font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.8em}
+.friend-card__posts{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;justify-content:center;
+  margin-top:0;border-top:none;
+  border-left:1px dashed var(--border);
+  padding-top:0;padding-left:20px;
+}
+.friend-card__post-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.friend-card__post-list li{display:flex;flex-direction:column;gap:3px;min-width:0}
+.friend-card__post-list a{font-size:15px;font-weight:500;line-height:1.55;color:var(--fg-soft);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.friend-card__post-list a:hover{color:var(--accent)}
+.friend-card__post-list time{font-size:12px;color:var(--muted-2)}
+.friend-card__rss-empty{font-size:12.5px;color:var(--muted-2);margin:auto 0}
+/* 窄屏回落为上下结构 */
+@media (max-width:640px){
+  .friend-card{flex-direction:column;padding:10px 14px}
+  .friend-card__side{flex:none}
+  .friend-card__posts{margin-top:12px;border-top:1px dashed var(--border);border-left:none;padding-top:10px;padding-left:0}
+}
 
 /* Tabs */
 .tabs{
@@ -2698,8 +2732,8 @@ html[data-theme="dark"] .heatmap__cell[data-level="4"]{background:#39d353}
   .icon-btn{width:28px; height:28px}
   .icon-btn svg{width:16px; height:16px}
   .links-grid{grid-template-columns:1fr}
-  .friends-grid{grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px}
-  .friend-card{padding:16px 10px 12px}
+  .friends-grid{grid-template-columns:1fr; gap:10px}
+  .friend-card{padding:8px 12px}
   .heatmap{padding:12px 10px}
   .heatmap__grid{gap:2px}
   .comment-wrap, .giscus-wrap, .artalk-wrap, .waline-wrap{padding:16px 0 0}
@@ -2740,7 +2774,7 @@ html[data-theme="dark"] .heatmap__cell[data-level="4"]{background:#39d353}
   .content-area__primary{container-type:inline-size; container-name:primary}
   @container primary (max-width: 560px){
     .links-grid{grid-template-columns:1fr}
-    .friends-grid{grid-template-columns:1fr 1fr}
+    .friends-grid{grid-template-columns:1fr}
   }
   @container primary (max-width: 380px){
     .friends-grid{grid-template-columns:1fr}

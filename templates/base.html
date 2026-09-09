@@ -45,7 +45,7 @@
   {% set_global search_ph_key = "search_placeholder" %}
   {% if config.extra.search is defined and config.extra.search.placeholder is defined and config.extra.search.placeholder != "" %}{% set_global search_ph_key = config.extra.search.placeholder %}{% endif %}
   {% set_global search_ph = trans(key=search_ph_key, lang=lang | default(value=config.default_language)) %}
-  {# Pagefind bundle 目录（`pagefind --site public` 输出位置，默认 pagefind/；经 get_url 拼接 base_url 子路径） #}
+  {# Pagefind bundle 目录（`pagefind_extended --site public` 输出位置，默认 pagefind/；经 get_url 拼接 base_url 子路径） #}
   {% set_global pf_dir = "pagefind/" %}
   {% if config.extra.pagefind is defined and config.extra.pagefind.path is defined and config.extra.pagefind.path != "" %}{% set_global pf_dir = config.extra.pagefind.path %}{% endif %}
   {% if not pf_dir is ending_with(pat="/") %}{% set_global pf_dir = pf_dir ~ "/" %}{% endif %}
@@ -408,6 +408,7 @@
 <script>window.ELYSIA_ICONS_URL="{{ get_url(path="icons.svg") | safe }}?v=20260907";</script>
 <script src="{{ get_url(path="js/site-decrypt.js") | safe }}?v=20260907" defer></script>
 <script src="{{ get_url(path="js/main.js") | safe }}?v=20260907" defer></script>
+<script src="{{ get_url(path="js/friends.js") | safe }}?v=20260909" defer></script>
 {% if search_use_algolia %}
 <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" defer></script>
 <script src="{{ get_url(path="js/search.js") | safe }}" defer></script>
