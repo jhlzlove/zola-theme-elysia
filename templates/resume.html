@@ -8,8 +8,15 @@
   <link rel="canonical" href="{{ page.permalink | safe }}">
 
   <style>
-    /* BelResume-inspired palette — higher contrast, less washed-out */
+    /* 字体全部来自 zola.toml [extra.style.fonts]，禁止硬编码，与 base.html 保持同源 */
     :root{
+      {% if config.extra.style and config.extra.style.fonts %}
+        {% if config.extra.style.fonts.body_family %}--font-body:{{ config.extra.style.fonts.body_family | join(sep=", ") | safe }};{% endif %}
+        {% if config.extra.style.fonts.code_block_family %}--font-code:{{ config.extra.style.fonts.code_block_family | join(sep=", ") | safe }};{% endif %}
+        {% if config.extra.style.fonts.root_size %}--font-size-root:{{ config.extra.style.fonts.root_size }};{% endif %}
+        {% if config.extra.style.fonts.body_size %}--font-size-body:{{ config.extra.style.fonts.body_size }};{% endif %}
+        {% if config.extra.style.fonts.code_block_size %}--font-size-code:{{ config.extra.style.fonts.code_block_size }};{% endif %}
+      {% endif %}
       --resume-bg:#ffffff;
       --resume-fg:#1f2937;          /* was #1e293b — darker, like BelResume --text */
       --resume-muted:#374151;        /* was #64748b — gray-700, solid like BelResume body */
@@ -24,8 +31,6 @@
       --resume-green-soft:#ecfdf5;
       --resume-radius:12px;
       --resume-radius-sm:8px;
-      --font-body:system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      --font-code:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     html[data-theme="dark"]{
       --resume-bg:#0f172a;

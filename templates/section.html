@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-{# Wiki 子目录直接按目录结构展示章节导航，不需要额外配置 #}
+{# Wiki 子目录统一走文章结构，与 page.html 共用 article 字体样式，不再按篇数分叉 #}
 {% set is_wiki_subsection = false %}
-{% if section.pages | length > 1 and "wiki" in section.path %}
+{% if "wiki" in section.path %}
   {% if section.path != "/wiki/" and section.path != "wiki/" and section.path != "/wiki/_index.md" and section.path != "wiki/_index.md" %}
     {% set_global is_wiki_subsection = true %}
   {% endif %}
