@@ -384,11 +384,10 @@ developer:
     feed: https://example.com/atom.xml
 ```
 
-- `title` / `url`: display name and homepage (clicking the card opens it).
-- `icon`: site icon; falls back to the first letter of the title when empty.
-- `description`: one-line intro, shown below the name.
-- `feed`: subscription URL; the latest 3 posts are fetched at build time and shown on the right side of the card.
-  Empty shows a "no feed configured" note and sorts later; an unreachable feed shows an "unavailable" note without breaking the build.
+- `title` / `url` / `icon`: required (strings). `title` is the display name, `url` the homepage (clicking the card opens it), `icon` the site icon (may be an empty string; falls back to the first letter of the title when empty).
+- `description`: optional one-line intro, shown below the name; missing/non-string values are treated as empty.
+- `feed`: optional subscription URL; the latest 3 posts are fetched at build time and shown on the right side of the card.
+  Missing, empty, or non-string values show a "no feed configured" note and sort later; an unreachable feed shows an "unavailable" note without breaking the build.
 - The card no longer shows the raw site URL; top-level keys are groups, use `group` to render one group only.
 
 The `api` parameter fetches remote data with pure client-side rendering: nothing is requested

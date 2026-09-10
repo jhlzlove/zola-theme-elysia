@@ -1,11 +1,12 @@
 # 友链数据（分组名可自定义，模板可用 group 参数只渲染某一组；无 feed 的靠后排序）
 # 字段说明（仅以下字段，无需兼容旧格式）：
-# - title:       友链标题（必填）
-# - url:         友链地址，点击头像 / 标题后跳转（必填）
-# - icon:        网站图标，为空时显示标题首字母
-# - description: 一句话简介，显示在卡片上方
-# - feed:        订阅地址；构建时自动抓取最近 3 篇文章展示在卡片中
-#                为空则卡片显示"暂未配置 feed 订阅"且排序靠后；抓取失败显示"订阅暂不可用"
+# - title:       友链标题（必填，字符串）
+# - url:         友链地址，点击头像 / 标题后跳转（必填，字符串）
+# - icon:        网站图标，为空时显示标题首字母（必填，可空字符串）
+# - description: 一句话简介，显示在卡片上方（可空，非字符串按空处理）
+# - feed:        订阅地址；构建时自动抓取最近 3 篇文章展示在卡片中（可空）
+#                为空/缺失/非字符串则卡片显示"暂未配置 feed 订阅"且排序靠后，不影响构建；
+#                抓取失败显示"订阅暂不可用"
 developer:
   - title: GitHub
     url: https://github.com
@@ -19,12 +20,12 @@ developer:
     feed: ""
   - title: Elysia
     url: https://example.com
-    icon: ""
+    icon:
     description: 简单的描述太过单调 如果我是比较长的自我描述呢？你能完全显示出来？不服咱们就试上一试
     feed: https://blog.elysiamoon.com/zola-theme-elysia/atom.xml
 design:
   - title: shadcn
     url: https://ui.shadcn.com
-    icon: ""
-    description: 设计灵感
-    feed: ""
+    icon:
+    description:
+    feed:

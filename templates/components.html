@@ -96,16 +96,42 @@
 {% set data = load_data(path="data/friends.yaml", required=false) -%}
 {% if not data %}{% set data = load_data(path="data/friends.yml", required=false) %}{% endif -%}
 {% if not data %}{% set data = load_data(path="data/friends.json", required=false) %}{% endif -%}
-{# ── 归一化：静态（title/url/icon/description/feed）── #}
+{# ── 归一化：title/url/icon 必填（字符串），description/feed 可为空；非字符串一律按空处理，避免 trim 炸构建 ── #}
 {% set_global raw = [] -%}
 {% if group and data and data[group] is defined -%}
 {% for item in data[group] -%}
-{% set_global raw = [...raw, {"title": item.title | default(value=""), "url": item.url | default(value="#"), "icon": item.icon | default(value=""), "description": item.description | default(value=""), "feed": item.feed | default(value="") | trim, "posts": []}] -%}
+{% set _title = "" -%}
+{% if item.title is defined and item.title is string %}{% set _title = item.title | trim %}{% endif -%}
+{% set _url = "#" -%}
+{% if item.url is defined and item.url is string -%}
+{% set _tmp_url = item.url | trim -%}
+{% if _tmp_url != "" %}{% set _url = _tmp_url %}{% endif -%}
+{% endif -%}
+{% set _icon = "" -%}
+{% if item.icon is defined and item.icon is string %}{% set _icon = item.icon | trim %}{% endif -%}
+{% set _desc = "" -%}
+{% if item.description is defined and item.description is string %}{% set _desc = item.description | trim %}{% endif -%}
+{% set _feed = "" -%}
+{% if item.feed is defined and item.feed is string %}{% set _feed = item.feed | trim %}{% endif -%}
+{% set_global raw = [...raw, {"title": _title, "url": _url, "icon": _icon, "description": _desc, "feed": _feed, "posts": []}] -%}
 {% endfor -%}
 {% elif not group and data -%}
 {% for k, v in data -%}
 {% for item in v -%}
-{% set_global raw = [...raw, {"title": item.title | default(value=""), "url": item.url | default(value="#"), "icon": item.icon | default(value=""), "description": item.description | default(value=""), "feed": item.feed | default(value="") | trim, "posts": []}] -%}
+{% set _title = "" -%}
+{% if item.title is defined and item.title is string %}{% set _title = item.title | trim %}{% endif -%}
+{% set _url = "#" -%}
+{% if item.url is defined and item.url is string -%}
+{% set _tmp_url = item.url | trim -%}
+{% if _tmp_url != "" %}{% set _url = _tmp_url %}{% endif -%}
+{% endif -%}
+{% set _icon = "" -%}
+{% if item.icon is defined and item.icon is string %}{% set _icon = item.icon | trim %}{% endif -%}
+{% set _desc = "" -%}
+{% if item.description is defined and item.description is string %}{% set _desc = item.description | trim %}{% endif -%}
+{% set _feed = "" -%}
+{% if item.feed is defined and item.feed is string %}{% set _feed = item.feed | trim %}{% endif -%}
+{% set_global raw = [...raw, {"title": _title, "url": _url, "icon": _icon, "description": _desc, "feed": _feed, "posts": []}] -%}
 {% endfor -%}
 {% endfor -%}
 {% endif -%}
@@ -127,7 +153,8 @@
 {% set fname = item.title | default(value=furl) -%}
 {% set avatar = item.icon | default(value="") -%}
 {% set desc = item.description | default(value="") -%}
-{% set feed_url = item.feed | default(value="") | trim -%}
+{% set feed_url = "" -%}
+{% if item.feed is defined and item.feed is string %}{% set feed_url = item.feed | trim %}{% endif -%}
 {% set initial = fname | truncate(length=1, end="") | upper -%}
 <article class="friend-card">
 <div class="friend-card__side">
