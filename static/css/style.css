@@ -1808,6 +1808,8 @@ html[data-theme="dark"] .callout--black{background:var(--bg-muted);border-color:
   border-top:1px dashed #e9ecef;
   border-bottom:1px dashed #e9ecef;
   box-shadow:none;
+  /* 单换行即换行：Markdown 单个 \n 在 HTML 里仍是 \n，用 pre-line 直接渲染为换行；空一行仍为分段，两者都兼容 */
+  white-space:pre-line;
 }
 .poetry__body::before{ display:none; }
 .poetry__body p{
@@ -1816,6 +1818,7 @@ html[data-theme="dark"] .callout--black{background:var(--bg-muted);border-color:
   padding:4px 0;
   border-bottom:none;
   text-align:center;
+  white-space:pre-line;
 }
 .poetry__body p:last-child{ border-bottom:none; }
 .poetry__body br{content:""; display:block; margin:0;}
