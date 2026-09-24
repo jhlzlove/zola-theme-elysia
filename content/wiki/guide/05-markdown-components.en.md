@@ -386,8 +386,8 @@ developer:
 
 - `title` / `url` / `icon`: required (strings). `title` is the display name, `url` the homepage (clicking the card opens it), `icon` the site icon (may be an empty string; falls back to the first letter of the title when empty).
 - `description`: optional one-line intro, shown below the name; missing/non-string values are treated as empty.
-- `feed`: optional subscription URL; the latest 3 posts are fetched at build time and shown on the right side of the card.
-  Missing, empty, or non-string values show a "no feed configured" note and sort later; an unreachable feed shows an "unavailable" note without breaking the build.
+- `feed`: optional subscription URL; nothing is fetched at build time — the latest 3 posts are fetched by `friends.js` when a visitor opens the page and shown on the right side of the card.
+  Missing, empty, or non-string values show a "no feed configured" note and sort later; an unreachable feed (or one disallowing cross-origin access) shows an "unavailable" note without breaking the build.
 - The card no longer shows the raw site URL; top-level keys are groups, use `group` to render one group only.
 
 The `api` parameter fetches remote data with pure client-side rendering: nothing is requested
@@ -440,39 +440,110 @@ Everywhere I hear birds.
 {% raw %}
 ````jinja
 {% <tabs> %}
-<!-- tab bash -->
-
+{% <tab title="bash"> %}
 ```bash
 echo "hello"
 ```
+{% </tab> %}
 
-<!-- tab powershell -->
+{% <tab title="powershell"> %}
 ```powershell
 Write-Output "hello"
 ```
-
+{% </tab> %}
 {% </tabs> %}
 ````
 {% endraw %}
 
-Separate panels with `<!-- tab label -->` comments; labels are lowercased.
+Wrap each panel in {% raw %}`{% <tab title="label"> %}...{% </tab> %}`{% endraw %}; labels are lowercased. Panels can nest (a `tabs` inside a `tab`, or any other block component).
 
 **Rendered:**
 
 {% <tabs> %}
-<!-- tab bash -->
+{% <tab title="bash"> %}
 ```bash
 echo "hello"
 ```
-<!-- tab powershell -->
+{% </tab> %}
+
+{% <tab title="powershell"> %}
 ```powershell
 Write-Output "hello"
 ```
-<!-- tab javascript -->
+{% </tab> %}
+
+{% <tab title="javascript"> %}
 ```javascript
 console.log("hello")
 ```
+{% </tab> %}
 {% </tabs> %}
+
+**Rendered (nested):**
+
+{% <tabs> %}
+{% <tab title="outer"> %}
+
+Outer text.
+
+{% <tabs> %}
+{% <tab title="inner-a"> %}
+Inner A.
+{% </tab> %}
+
+{% <tab title="inner-b"> %}
+Inner B.
+{% </tab> %}
+{% </tabs> %}
+
+{% </tab> %}
+
+{% <tab title="note"> %}
+{% <note title="Tip" color="blue"> %}
+A `note` inside a `tab`.
+{% </note> %}
+{% </tab> %}
+{% </tabs> %}
+
+### columns
+
+**Syntax:**
+
+{% raw %}
+````jinja
+{% <columns layout="h"> %}
+{% <column color="green" width="1"> %}
+Left column, full Markdown supported, other block components can nest inside.
+{% </column> %}
+
+{% <column color="red" width="2"> %}
+Right column, `width="2"` takes two shares of the row.
+{% </column> %}
+{% </columns> %}
+````
+{% endraw %}
+
+- Outer `columns`: `layout="h"` for horizontal (default), `layout="v"` for vertical stacking.
+- Inner `column`: `color` sets the whole card background, accepting `blue` / `green` / `yellow` / `orange` / `red` / `black` (defaults to a neutral card); `width` is a flex ratio from `1` to `6` (defaults to `1`, invalid values fall back to `1`).
+- Other block components (e.g. `poetry`) and inline components (e.g. `link`) can nest inside; keep blank lines between outer and inner blocks; on narrow screens (≤640px) columns stack vertically and `width` is ignored.
+
+**Rendered:**
+
+{% <columns layout="h"> %}
+{% <column color="green" width="1"> %}
+Left column, `width="1"`.
+
+{% <poetry title="Spring Dawn" author="Meng Haoran"> %}
+`poetry` nested inside a `column`.
+{% </poetry> %}
+{% </column> %}
+
+{% <column color="red" width="2"> %}
+Right column, `width="2"`, takes two shares.
+
+{{ <link href="https://www.getzola.org/" title="Zola" desc="Inline components nest too" /> }}
+{% </column> %}
+{% </columns> %}
 
 ## Wiki sections
 

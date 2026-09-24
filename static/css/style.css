@@ -70,7 +70,7 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--accent);outline-of
   --sidebar-w:260px;
   --toc-w:280px;
   --content-max:900px;
-  --code-bg:#fafafa;
+  --code-bg:var(--bg-muted);
   --code-border:#e4e4e7;
 }
 
@@ -93,7 +93,7 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--accent);outline-of
     --selection-bg:#52525b;
     --selection-fg:#fafafa;
     --code-selection-bg:#52525b;
-    --code-bg:#111113;
+    --code-bg:var(--bg-muted);
     --code-border:#27272a;
   }
 }
@@ -114,7 +114,7 @@ html[data-theme="dark"]{
   --selection-bg:#52525b;
   --selection-fg:#fafafa;
   --code-selection-bg:#52525b;
-  --code-bg:#111113;
+  --code-bg:var(--bg-muted);
   --code-border:#27272a;
 }
 html[data-theme="light"]{
@@ -134,7 +134,7 @@ html[data-theme="light"]{
   --selection-bg:#c8c8cc;
   --selection-fg:#18181b;
   --code-selection-bg:#d4d4d8;
-  --code-bg:#fafafa;
+  --code-bg:var(--bg-muted);
   --code-border:#e4e4e7;
 }
 
@@ -1212,75 +1212,61 @@ html[data-theme="dark"] .article-expiry__icon{color:var(--muted-2)}
 .code-wrap{
   position:relative;
   margin:18px 0;
-  border:1px solid var(--code-border);
-  border-radius:10px;
+  border:none;
+  border-radius:var(--radius-sm);
   background:var(--code-bg);
   overflow:hidden;
-  box-shadow:var(--shadow-sm);
+  box-shadow:none;
 }
 .code-wrap__header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-  padding:7px 10px 7px 12px;
-  border-bottom:1px solid var(--border);
-  background:linear-gradient(180deg, var(--bg-soft) 0%, var(--bg-muted) 100%);
+  gap:8px;
+  padding:8px 8px 8px 12px;
+  border-bottom:none;
+  background:transparent;
   font-family:var(--font-code);
 }
+/* 语言居左：plain 小写 */
 .code-wrap__lang{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:2px 8px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  background:var(--bg-soft);
-  font-size:11px;
-  font-weight:650;
-  letter-spacing:.04em;
+  font-size:12px;
+  font-weight:600;
   text-transform:lowercase;
-  color:var(--muted);
+  color:var(--fg-soft);
   line-height:1;
+  white-space:nowrap;
 }
-.code-wrap__lang::before{
-  content:"";
-  width:6px; height:6px;
-  border-radius:50%;
-  background:var(--accent);
-  opacity:.9;
-  flex:0 0 6px;
-}
+/* 文件名居中：浅底徽章盒 */
 .code-wrap__filename{
   position:absolute;
   left:50%; transform:translateX(-50%);
   max-width:42%;
   padding:3px 10px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  background:var(--bg-soft);
-  font-size:11px;
-  font-weight:500;
-  color:var(--fg-soft);
-  line-height:1;
+  border-radius:6px;
+  background:var(--border);
+  font-size:13px;
+  font-weight:600;
+  color:var(--fg);
+  line-height:1.4;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  box-shadow:var(--shadow-sm);
 }
+/* 复制居右：ghost，hover 显示 */
 .code-wrap__copy{
-  width:28px; height:28px;
+  width:26px; height:26px;
   display:grid; place-items:center;
-  border:1px solid var(--border);
-  border-radius:999px;
-  background:var(--bg-soft);
+  border:none;
+  border-radius:6px;
+  background:transparent;
   color:var(--muted);
   cursor:pointer;
   transition:all .15s;
-  flex:0 0 28px;
+  flex:0 0 26px;
   padding:0;
 }
-.code-wrap__copy:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+.code-wrap__copy:hover{ color:var(--fg); background:var(--bg-muted); }
 .code-wrap__copy:active{ transform:scale(.96); }
-.code-wrap__copy svg{ width:14px; height:14px; display:block; }
+.code-wrap__copy svg{ width:15px; height:15px; display:block; }
 /* 重构：行号与代码同为等高行，彻底对齐 — 统一行高与盒模型 */
 .code-wrap{
   overflow:hidden;
@@ -1289,7 +1275,7 @@ html[data-theme="dark"] .article-expiry__icon{color:var(--muted-2)}
   display:grid;
   grid-template-columns:auto 1fr;
   overflow:auto;
-  background:var(--code-bg);
+  background:transparent;
   scrollbar-width:thin;
   -webkit-overflow-scrolling:touch;
   align-items:start;
@@ -1301,7 +1287,6 @@ html[data-theme="dark"] .article-expiry__icon{color:var(--muted-2)}
 pre.giallo.z-code{
   background:transparent !important;
   background-color:transparent !important;
-  color:var(--fg-soft) !important;
   margin:0 !important;
   border:none !important;
 }
@@ -1321,16 +1306,15 @@ pre.code-wrap__pre.has-giallo{
   user-select:none;
   -webkit-user-select:none;
   color:var(--muted-2);
-  background:var(--code-bg);
-  border-right:1px solid var(--border);
+  background:transparent;
   display:block;
-  min-width:3.2em;
+  min-width:2.6em;
   font-variant-numeric:tabular-nums;
   box-sizing:border-box;
 }
 .code-wrap__gutter .gutter-line{
   display:block;
-  padding:0 12px;
+  padding:0 10px 0 8px;
   white-space:pre;
   line-height:1.65;
   font-variant-numeric:tabular-nums;
@@ -1363,15 +1347,16 @@ pre.code-wrap__pre.has-giallo{
   background:transparent !important;
   border:none !important;
   padding:0 !important;
-  color:var(--fg-soft);
   white-space:pre;
   display:block;
+  width:100%;
+  min-width:0;
   line-height:inherit !important;
-  min-width:max-content;
   box-sizing:border-box;
 }
 .giallo-l{
   display:block;
+  width:100%;
   margin:0;
   padding:0 16px;
   white-space:pre !important;
@@ -1452,85 +1437,57 @@ html[data-code-line-numbers="false"] .code-wrap__pre{ padding-left:14px !importa
   .giallo-l{ font-size:12.5px !important; }
 }
 
-/* ── Code block highlighted lines (Zola hl_lines → giallo z-hl) — 仅背景，无竖线 ── */
+/* ── Code block highlighted lines — 淡黄整行，含行号区 ──
+   单主题输出 .z-hl，双主题输出 .z-l-hl/.z-d-hl（均保留以兼容配置切换） */
 .giallo-l.z-hl,
+.giallo-l.z-l-hl,
+.giallo-l.z-d-hl,
 .giallo-l.hll,
 .code-wrap .hll,
-.z-hl{
-  background:color-mix(in srgb, var(--accent) 10%, var(--code-bg));
+.z-hl,
+.z-l-hl,
+.z-d-hl{
+  background:#fef3c7;
 }
-.giallo-l.z-hl .giallo-ln{
-  background:var(--accent-soft);
-  color:var(--accent);
-  font-weight:700;
-}
-.code-wrap__gutter .gutter-line.hl{
-  background:var(--accent-soft);
-  color:var(--accent);
+.giallo-l.z-hl .giallo-ln,
+.giallo-l.z-l-hl .giallo-ln,
+.giallo-l.z-d-hl .giallo-ln{
+  background:transparent;
+  color:inherit;
   font-weight:400;
 }
-html[data-theme="dark"] .giallo-l.z-hl{
-  background:color-mix(in srgb, var(--accent) 14%, var(--code-bg));
+.code-wrap__gutter .gutter-line.hl{
+  background:#fef3c7;
+  color:inherit;
+  font-weight:400;
+}
+html[data-theme="dark"] .giallo-l.z-hl,
+html[data-theme="dark"] .giallo-l.z-l-hl,
+html[data-theme="dark"] .giallo-l.z-d-hl,
+html[data-theme="dark"] .giallo-l.hll,
+html[data-theme="dark"] .code-wrap .hll,
+html[data-theme="dark"] .z-hl,
+html[data-theme="dark"] .z-l-hl,
+html[data-theme="dark"] .z-d-hl,
+html[data-theme="dark"] .code-wrap__gutter .gutter-line.hl{
+  background:#3a2f0e;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .giallo-l.z-hl,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .giallo-l.z-l-hl,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .giallo-l.z-d-hl,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .giallo-l.hll,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .code-wrap .hll,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .z-hl,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .z-l-hl,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .z-d-hl,
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .code-wrap__gutter .gutter-line.hl{
+    background:#3a2f0e;
+  }
 }
 
-/* ── Syntax highlight — 字符串与亮色可读性优化 ──
-   catppuccin-mocha 原生在亮色 --code-bg (#fafafa) 下对比度不足（≈1.2–2.7），
-   字符串绿 #A6E3A1 在亮色下几乎不可辨、在暗色下过饱和刺眼。
-   此处分主题覆盖：亮色统一加深至 AA 对比度，字符串单独用暖琥珀色系，易辨认且护眼。 */
-html[data-theme="light"] .z-7{
-  color:#a16207 !important; /* 暖琥珀棕 — 亮色下对比度 4.7，护眼不刺眼 */
-}
-html[data-theme="dark"] .z-7{
-  color:#fbbf24 !important; /* 暖麦黄 — 暗色下对比度 11.3，柔和可辨 */
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .z-7{ color:#fbbf24 !important; }
-}
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="light"]):not([data-theme="dark"]) .z-7{ color:#a16207 !important; }
-}
-/* 亮色下其余 token 统一加深，保证在 #fafafa 上可读（保留色相区分） */
-html[data-theme="light"] .z-1{ color:#0e7490 !important; }
-html[data-theme="light"] .z-2{ color:#1d4ed8 !important; }
-html[data-theme="light"] .z-3{ color:#0f766e !important; }
-html[data-theme="light"] .z-4{ color:#6b7280 !important; }
-html[data-theme="light"] .z-5{ color:#0e7490 !important; }
-html[data-theme="light"] .z-6{ color:#475569 !important; }
-html[data-theme="light"] .z-8{ color:#4f46e5 !important; }
-html[data-theme="light"] .z-9{ color:#7c3aed !important; }
-html[data-theme="light"] .z-10{ color:#be123c !important; }
-html[data-theme="light"] .z-11{ color:#991b1b !important; }
-html[data-theme="light"] .z-12{ color:#dc2626 !important; }
-html[data-theme="light"] .z-13{ color:#a21caf !important; }
-html[data-theme="light"] .z-14{ color:#881337 !important; }
-html[data-theme="light"] .z-15{ color:#92400e !important; }
-html[data-theme="light"] .z-16{ color:#9a3412 !important; }
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-1{ color:#0e7490 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-2{ color:#1d4ed8 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-3{ color:#0f766e !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-4{ color:#6b7280 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-5{ color:#0e7490 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-6{ color:#475569 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-8{ color:#4f46e5 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-9{ color:#7c3aed !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-10{ color:#be123c !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-11{ color:#991b1b !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-12{ color:#dc2626 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-13{ color:#a21caf !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-14{ color:#881337 !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-15{ color:#92400e !important; }
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-16{ color:#9a3412 !important; }
-}
-/* 亮色下代码行号与基础文字加深 */
-html[data-theme="light"] .z-code{ color:#24292f !important; }
-html[data-theme="dark"] .z-code{ color:#cdd6f4 !important; }
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-code{ color:#24292f !important; }
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="dark"]):not([data-theme="light"]) .z-code{ color:#cdd6f4 !important; }
-}
+/* ── Syntax tokens — token 与基色全部由 Zola 生成的 giallo-light/dark.css 提供（随 zola.toml 双主题），
+   此处不再覆盖，仅保留布局/行号/高亮行/选中等结构样式 ── */
 
 /* KaTeX — 数学公式，沉静不抢阅读 */
 .katex-display{ margin:16px 0; overflow:auto hidden; padding:4px 0; }
@@ -2259,10 +2216,45 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
   background:var(--bg-soft);
   box-shadow:inset 0 -2px 0 var(--accent);
 }
-.tabs__panel{padding:16px;display:none}
-.tabs__panel.is-active{display:block}
+.tabs__panel{padding:16px}
+.tabs.has-nav .tabs__panel{display:none}
+.tabs.has-nav .tabs__panel.is-active{display:block}
 .tabs__panel :where(p, ul, ol, pre){margin:10px 0}
 .tabs__panel :where(p:first-child){margin-top:0}
+
+/* Columns (nestable: columns > column, supports other block components inside) */
+.cols{
+  display:flex;
+  gap:12px;
+  margin:18px 0;
+}
+.cols--h{flex-direction:row;align-items:stretch;flex-wrap:wrap}
+.cols--v{flex-direction:column}
+.col-card{
+  flex:1 1 0;
+  min-width:0;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--bg-soft);
+  padding:12px 14px;
+  font-size:14px;
+  line-height:1.7;
+  overflow:hidden;
+}
+.col-card > :first-child{margin-top:0}
+.col-card > :last-child{margin-bottom:0}
+/* color = 整卡背景色（与 note 的左侧竖条样式区分） */
+.col-card--blue{background:#eef3fb;border-color:#b9cff0}
+.col-card--red{background:#ffebe9;border-color:#f0b8b5}
+.col-card--green{background:#f0faf0;border-color:#b3ddb8}
+.col-card--yellow{background:#fff8c5;border-color:#e3cf7a}
+.col-card--orange{background:#fff1e6;border-color:#f2c19b}
+.col-card--black{background:var(--bg-muted);border-color:var(--border-strong)}
+html[data-theme="dark"] .col-card--blue{background:#0f1f38;border-color:#274b7a}
+html[data-theme="dark"] .col-card--red{background:#2b1518;border-color:#7a2e35}
+html[data-theme="dark"] .col-card--green{background:#0f2418;border-color:#2a5a3a}
+html[data-theme="dark"] .col-card--yellow{background:#2a230f;border-color:#7a6200}
+html[data-theme="dark"] .col-card--orange{background:#2a1a10;border-color:#7a4a20}
 
 /* ─────────────────────────────────────────
    9. Archive / Taxonomy / Heatmap
@@ -2717,6 +2709,8 @@ html[data-theme="dark"] .heatmap__cell[data-level="4"]{background:#39d353}
   .archive-item time{flex:none}
   .cat-dir__list{padding:4px}
   .links-grid{gap:10px}
+  .cols--h{flex-direction:column}
+  .cols--h .col-card{flex:1 1 auto !important}
 }
 /* Phone — 开放式，去除卡片容器，与正文一体化 */
 @media (max-width: 480px){
@@ -2768,7 +2762,7 @@ html[data-theme="dark"] .heatmap__cell[data-level="4"]{background:#39d353}
 }
 /* High contrast & forced colors */
 @media (forced-colors: active){
-  .post-card, .article, .comment-wrap, .waline-wrap, .toc, .video-wrap, .link-card, .bookmark-card, .friend-card{
+  .post-card, .article, .comment-wrap, .waline-wrap, .toc, .video-wrap, .link-card, .bookmark-card, .friend-card, .col-card{
     border:2px solid CanvasText;
   }
 }
@@ -2778,6 +2772,8 @@ html[data-theme="dark"] .heatmap__cell[data-level="4"]{background:#39d353}
   @container primary (max-width: 560px){
     .links-grid{grid-template-columns:1fr}
     .friends-grid{grid-template-columns:1fr}
+    .cols--h{flex-direction:column}
+    .cols--h .col-card{flex:1 1 auto !important}
   }
   @container primary (max-width: 380px){
     .friends-grid{grid-template-columns:1fr}

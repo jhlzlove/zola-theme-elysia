@@ -65,7 +65,7 @@ style = "class"
 - `render_emoji` enables `:smile:` shortcuts.
 - `github_alerts` enables `> [!NOTE]` / `> [!TIP]` / `> [!WARNING]`.
 - `bottom_footnotes` collects footnotes at the bottom.
-- `style = "class"` outputs highlighting as CSS classes combined with `giallo.css` and light/dark overrides.
+- `style = "class"` outputs highlighting as CSS classes; dual `light_theme` / `dark_theme` generate `giallo-light.css` / `giallo-dark.css` at build time, enabled on demand by the site theme toggle (a single `theme` only generates `giallo.css`).
 
 ## Extra — identity and footer
 

@@ -381,8 +381,8 @@ developer:
 
 - `title` / `url` / `icon`：必填（字符串）。`title` 为显示名称，`url` 为主页链接（点击卡片跳转），`icon` 为网站图标（可空字符串，为空时显示标题首字母）。
 - `description`：可空，一句话简介，显示在名称下方；缺失/非字符串按空处理。
-- `feed`：可空，订阅地址；构建时自动抓取最近 3 篇文章展示在卡片右侧。
-  缺失、为空或非字符串显示"暂未配置 feed 订阅"且排序靠后；地址无效或抓取失败显示"订阅暂不可用"，不影响构建。
+- `feed`：可空，订阅地址；构建期不抓取，访客进页面后由 `friends.js` 自动抓取最近 3 篇文章展示在卡片右侧。
+  缺失、为空或非字符串显示"暂未配置 feed 订阅"且排序靠后；地址无效、抓取失败或对方不允许跨域时显示"订阅暂不可用"，不影响构建。
 - 卡片不再显示网站链接地址；顶层键为分组名，可用 `group` 参数只渲染某一组。
 
 支持 `api` 参数调用远程接口获取数据。`api` 为纯前端实时渲染：构建时不请求，
@@ -435,39 +435,124 @@ developer:
 {% raw %}
 ````jinja
 {% <tabs> %}
-<!-- tab bash -->
-
+{% <tab title="bash"> %}
 ```bash
 echo "hello"
 ```
+{% </tab> %}
 
-<!-- tab powershell -->
+{% <tab title="powershell"> %}
 ```powershell
 Write-Output "hello"
 ```
-
+{% </tab> %}
 {% </tabs> %}
 ````
 {% endraw %}
 
-`<!-- tab 名称 -->` 为面板分隔符，标签名会自动小写显示。
 
 **效果：**
 
 {% <tabs> %}
-<!-- tab bash -->
+{% <tab title="bash"> %}
 ```bash
 echo "hello"
 ```
-<!-- tab powershell -->
+{% </tab> %}
+
+{% <tab title="powershell"> %}
 ```powershell
 Write-Output "hello"
 ```
-<!-- tab javascript -->
+{% </tab> %}
+
+{% <tab title="javascript"> %}
 ```javascript
 console.log("hello")
 ```
+{% </tab> %}
 {% </tabs> %}
+
+**效果（嵌套）：**
+
+{% <tabs> %}
+{% <tab title="outer"> %}
+
+外层文字。
+
+{% <tabs> %}
+{% <tab title="inner-a"> %}
+内层 A。
+{% </tab> %}
+
+{% <tab title="inner-b"> %}
+内层 B。
+{% </tab> %}
+{% </tabs> %}
+
+{% </tab> %}
+
+{% <tab title="note"> %}
+{% <note title="提示" color="blue"> %}
+面板里套 `note`。
+{% </note> %}
+{% </tab> %}
+{% </tabs> %}
+
+### columns 多列卡片
+
+**写法：**
+
+{% raw %}
+````jinja
+{% <columns layout="h"> %}
+{% <column color="green" width="1"> %}
+左列内容，支持完整 Markdown，可嵌套其它块组件。
+{% </column> %}
+
+{% <column color="red" width="2"> %}
+右列内容，`width="2"` 表示占两份宽。
+{% </column> %}
+{% </columns> %}
+````
+{% endraw %}
+
+- 外层 `columns`：`layout="h"` 横排（默认），`layout="v"` 竖排。
+- 内层 `column`：`color` 为整卡背景色，可选 `blue` / `green` / `yellow` / `orange` / `red` / `black`（缺省为无色中性卡）；`width` 为 flex 比例数字 `1`–`6`（缺省 `1`，非法值回落 `1`）。
+- 支持嵌套其它块组件（如 `note`）与行组件（如 `link`）；内外层之间留空行；窄屏（≤640px）自动竖排堆叠，此时 `width` 失效。
+
+**效果：**
+
+{% <columns layout="h"> %}
+{% <column color="green"> %}
+func test() {
+}
+
+```go
+func test() {
+    // ...
+}
+```
+
+左列，`width="1"`。
+
+{% <poetry title="春晓" author="孟浩然"> %}
+春眠不觉晓，处处闻啼鸟。
+
+夜来风雨声，花落知多少。
+{% </poetry> %}
+
+{% <note title="提示" color="green"> %}
+`note` 嵌套在 `column` 里。
+{% </note> %}
+{% </column> %}
+
+{% <column color="red"> %}
+右列，`width="2"`，占两份宽。
+
+{{ <link href="https://www.getzola.org/" title="Zola" desc="行组件也能嵌套" /> }}
+{% </column> %}
+{% </columns> %}
 
 ## Wiki 章节
 

@@ -16,8 +16,11 @@
     {% endfor %}
   {% endif %}
 
-  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20260907">
-  <link rel="stylesheet" href="{{ get_url(path="giallo.css") | safe }}?v=20260824-5">
+  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20260924">
+  {# 代码高亮：双主题（zola.toml light_theme/dark_theme）生成 giallo-light/dark.css，按 data-theme 启用其一 #}
+  <link id="giallo-light" rel="stylesheet" href="{{ get_url(path="giallo-light.css") | safe }}?v=20260924">
+  <link id="giallo-dark" rel="stylesheet" href="{{ get_url(path="giallo-dark.css") | safe }}?v=20260924">
+  <script>try{var _t=localStorage.getItem('elysia-theme');if(_t!=='dark'&&_t!=='light')_t='light';document.getElementById(_t==='dark'?'giallo-light':'giallo-dark').disabled=true;}catch(_e){try{document.getElementById('giallo-dark').disabled=true;}catch(_e2){}}</script>
   {% if config.extra.katex and config.extra.katex.enable %}
   <link rel="stylesheet" href="{{ config.extra.katex.css_url | default(value="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css") | safe }}" crossorigin="anonymous">
   {% endif %}
@@ -407,7 +410,7 @@
 
 <script>window.ELYSIA_ICONS_URL="{{ get_url(path="icons.svg") | safe }}?v=20260907";</script>
 <script src="{{ get_url(path="js/site-decrypt.js") | safe }}?v=20260907" defer></script>
-<script src="{{ get_url(path="js/main.js") | safe }}?v=20260907" defer></script>
+  <script src="{{ get_url(path="js/main.js") | safe }}?v=20260924" defer></script>
 <script src="{{ get_url(path="js/friends.js") | safe }}?v=20260909" defer></script>
 {% if search_use_algolia %}
 <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" defer></script>

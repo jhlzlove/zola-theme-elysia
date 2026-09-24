@@ -69,7 +69,7 @@ style = "class"
 - `render_emoji`：支持 `:smile:` 简码。
 - `github_alerts`：支持 `> [!NOTE]` / `> [!TIP]` / `> [!WARNING]` 等。
 - `bottom_footnotes`：脚注沉底。
-- `highlighting.style = "class"`：以 CSS class 输出高亮，配合 `giallo.css` 与主题亮/暗覆写；`theme` 为构建期语法色。
+- `highlighting.style = "class"`：以 CSS class 输出高亮；`light_theme` / `dark_theme` 双主题构建期生成 `giallo-light.css` / `giallo-dark.css`，由站内亮暗切换按需启用（单 `theme` 只生成 `giallo.css`）。
 
 ## Extra — 站点身份与页脚
 

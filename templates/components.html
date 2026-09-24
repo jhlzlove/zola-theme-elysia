@@ -166,51 +166,8 @@
 </div>
 <div class="friend-card__posts">
 {% if feed_url != "" -%}
-{% set feed = load_data(url=feed_url, format="xml", required=false) -%}
-{% set_global posts = [] -%}
-{% if feed and feed.rss and feed.rss.channel and feed.rss.channel.item -%}
-{% set feed_raw = feed.rss.channel.item -%}
-{% if feed_raw[0] is defined %}{% set feed_items = feed_raw %}{% else %}{% set feed_items = [feed_raw] %}{% endif -%}
-{% for it in feed_items -%}{% if loop.index0 > 2 %}{% break %}{% endif -%}
-{% set t = it.title | default(value="") -%}
-{% if t is string %}{% set title = t %}{% else %}{% set title = t["#text"] | default(value="") %}{% endif -%}
-{% set l = it.link | default(value="") -%}
-{% if l is string %}{% set href = l %}{% else %}{% set href = l["#text"] | default(value="") %}{% endif -%}
-{% set d = it.pubDate | default(value="") -%}
-{% if d is string %}{% set fdate = d %}{% else %}{% set fdate = d["#text"] | default(value="") %}{% endif -%}
-{% set fdate = fdate | truncate(length=16, end="") -%}
-{% set_global posts = [...posts, {"title": title, "href": href, "date": fdate}] -%}
-{% endfor -%}
-{% elif feed and feed.feed and feed.feed.entry -%}
-{% set feed_raw = feed.feed.entry -%}
-{% if feed_raw[0] is defined %}{% set feed_items = feed_raw %}{% else %}{% set feed_items = [feed_raw] %}{% endif -%}
-{% for it in feed_items -%}{% if loop.index0 > 2 %}{% break %}{% endif -%}
-{% set t = it.title | default(value="") -%}
-{% if t is string %}{% set title = t %}{% else %}{% set title = t["#text"] | default(value="") %}{% endif -%}
-{% set l = it.link | default(value="") -%}
-{% if l is string -%}
-{% set href = l -%}
-{% elif l[0] is defined -%}
-{% set f = l | first | default(value="") -%}
-{% if f is string %}{% set href = "" %}{% else %}{% set href = f["@href"] | default(value="") %}{% endif -%}
-{% else -%}
-{% set href = l["@href"] | default(value="") -%}
-{% endif -%}
-{% set d = it.updated | default(value=it.published) | default(value="") -%}
-{% if d is string %}{% set fdate = d %}{% else %}{% set fdate = d["#text"] | default(value="") %}{% endif -%}
-{% set fdate = fdate | split(pat="T") | first -%}
-{% set_global posts = [...posts, {"title": title, "href": href, "date": fdate}] -%}
-{% endfor -%}
-{% endif -%}
-{% if posts | length > 0 -%}
-<ul class="friend-card__post-list">
-{% for p in posts -%}
-<li><a href="{{ p.href }}" target="_blank" rel="noopener">{{ p.title }}</a>{% if p.date %}<time>{{ p.date }}</time>{% endif %}</li>
-{% endfor -%}
-</ul>
-{% else -%}
-<p class="friend-card__rss-empty">订阅暂不可用</p>
-{% endif -%}
+{# 构建期不再抓取：只输出地址，访客进页面后由 friends.js 懒抓并填充 #}
+<div data-feed-url="{{ feed_url }}"><p class="friend-card__rss-empty">加载中…</p></div>
 {% else -%}
 <p class="friend-card__rss-empty">暂未配置 feed 订阅</p>
 {% endif -%}
@@ -228,7 +185,43 @@
 <div class="poetry" data-component="poetry">{% if title %}<div class="poetry__title">{{ title }}</div>{% endif %}{% if author %}<div class="poetry__author">— {{ author }}</div>{% endif %}<div class="poetry__body">{{ body | markdown | safe }}</div></div>
 {% endcomponent poetry -%}
 
-{% component tabs() -%}{% set raw = body | trim -%}{% set parts = raw | split(pat="<!-- tab ") -%}<div class="tabs" data-component="tabs" role="tablist"><div class="tabs__nav" role="tablist">{% for part in parts %}{% if loop.index0 == 0 %}{% continue %}{% endif %}{% set seg = part | split(pat="-->") %}{% set label = seg[0] | trim %}<button class="tabs__btn {% if loop.index == 2 %}is-active{% endif %}" role="tab" aria-selected="{% if loop.index == 2 %}true{% else %}false{% endif %}" data-index="{{ loop.index0 }}">{{ label | lower }}</button>{% endfor %}</div><div class="tabs__panels">{% for part in parts %}{% if loop.index0 == 0 %}{% continue %}{% endif %}{% set seg = part | split(pat="-->") %}{% set label = seg[0] | trim %}{% set content = seg[1] | default(value="") | trim %}<div class="tabs__panel {% if loop.index == 2 %}is-active{% endif %}" role="tabpanel">{{ content | markdown | safe }}</div>{% endfor %}</div></div>{% endcomponent tabs -%}
+{% component tabs() -%}
+<div class="tabs" data-component="tabs"><div class="tabs__nav" role="tablist"></div><div class="tabs__panels">{{ body | markdown | safe }}</div></div>
+{% endcomponent tabs -%}
+
+{% component tab(title = "Tab") -%}
+{% set t = title | trim -%}
+{% if t == "" %}{% set t = "Tab" %}{% endif -%}
+<div class="tabs__panel" data-component="tab" data-title="{{ t }}" role="tabpanel">{{ body | markdown | safe }}</div>
+{% endcomponent tab -%}
+
+{% component columns(layout = "h") -%}
+{% set l = layout | lower | trim -%}
+{% set dir = "h" -%}
+{% if l == "v" %}{% set dir = "v" -%}{% endif -%}
+<div class="cols cols--{{ dir }}" data-component="columns">{{ body | markdown | safe }}</div>
+{% endcomponent columns -%}
+
+{% component column(color = "", width = "1") -%}
+{% set c = color | lower | trim -%}
+{% set cls = "" -%}
+{% if c == "red" %}{% set cls = "red" -%}
+{% elif c == "green" %}{% set cls = "green" -%}
+{% elif c == "yellow" %}{% set cls = "yellow" -%}
+{% elif c == "orange" %}{% set cls = "orange" -%}
+{% elif c == "black" %}{% set cls = "black" -%}
+{% elif c == "blue" %}{% set cls = "blue" -%}
+{% endif -%}
+{% set w = width | trim -%}
+{% set flex = "1" -%}
+{% if w == "2" %}{% set flex = "2" -%}
+{% elif w == "3" %}{% set flex = "3" -%}
+{% elif w == "4" %}{% set flex = "4" -%}
+{% elif w == "5" %}{% set flex = "5" -%}
+{% elif w == "6" %}{% set flex = "6" -%}
+{% endif -%}
+<div class="col-card{% if cls %} col-card--{{ cls }}{% endif %}" data-component="column" style="flex:{{ flex }} {{ flex }} 0">{{ body | markdown | safe }}</div>
+{% endcomponent column -%}
 
 {# ── Icon：全站 UI 图标统一经由 static/icons.svg sprite 渲染 ──────────
   用法：{{ <icon name="search" class="search__icon" /> }}

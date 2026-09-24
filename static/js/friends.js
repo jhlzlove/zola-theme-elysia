@@ -96,6 +96,101 @@
     return html;
   }
 
+  /* Static cards: fetch each card's RSS/Atom at visit time (build no longer fetches).
+   * Mirrors the old Tera logic: RSS channel/item first, then Atom feed/entry, max 3.
+   * Note: cross-origin feeds without CORS headers fail in browsers and fall back
+   * to "unavailable" — same-origin feeds always work. */
+  function rssText(el, tag) {
+    var n = el.getElementsByTagName(tag)[0];
+    return (n && n.textContent) ? n.textContent.trim() : '';
+  }
+
+  function rssLink(entry) {
+    /* RSS: <link>url</link>; Atom: <link href="url"> (possibly multiple). */
+    var links = entry.getElementsByTagName('link');
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href');
+      if (href) return href.trim();
+      var t = links[i].textContent ? links[i].textContent.trim() : '';
+      if (t) return t;
+    }
+    return '';
+  }
+
+  function parseFeedXml(xmlText) {
+    var doc;
+    try {
+      doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    } catch (_) { return []; }
+    if (!doc || doc.getElementsByTagName('parsererror').length) return [];
+    var items = doc.getElementsByTagName('item');
+    var isAtom = false;
+    if (!items.length) {
+      items = doc.getElementsByTagName('entry');
+      isAtom = true;
+    }
+    var posts = [];
+    for (var i = 0; i < items.length && posts.length < 3; i++) {
+      var it = items[i];
+      var date = rssText(it, 'pubDate') || rssText(it, 'updated') || rssText(it, 'published');
+      if (isAtom && date.indexOf('T') > 0) date = date.split('T')[0];
+      else if (date) date = date.substring(0, 16);
+      posts.push({ title: rssText(it, 'title'), href: rssLink(it), date: date });
+    }
+    return posts;
+  }
+
+  function renderFeedPosts(posts, hasFeed) {
+    if (posts.length > 0) {
+      var html = '<ul class="friend-card__post-list">';
+      for (var i = 0; i < posts.length; i++) {
+        var p = posts[i];
+        html += '<li><a href="' + escapeHtml(safeUrl(p.href, '#')) + '" target="_blank" rel="noopener">' + escapeHtml(p.title) + '</a>';
+        if (p.date) html += '<time>' + escapeHtml(p.date) + '</time>';
+        html += '</li>';
+      }
+      return html + '</ul>';
+    }
+    return hasFeed
+      ? '<p class="friend-card__rss-empty">订阅暂不可用</p>'
+      : '<p class="friend-card__rss-empty">暂未配置 feed 订阅</p>';
+  }
+
+  function loadFeedBox(box, url) {
+    var ctrl = null, timer = 0;
+    try {
+      if (typeof AbortController !== 'undefined') {
+        ctrl = new AbortController();
+        timer = setTimeout(function () { try { ctrl.abort(); } catch (_) {} }, TIMEOUT_MS);
+      }
+    } catch (_) { ctrl = null; }
+    fetch(url, { signal: ctrl ? ctrl.signal : undefined })
+      .then(function (res) {
+        if (!res.ok) throw new Error('http ' + res.status);
+        return res.text();
+      })
+      .then(function (text) {
+        box.innerHTML = renderFeedPosts(parseFeedXml(text), true);
+      })
+      .catch(function (err) {
+        console.warn('[elysia] friends feed failed', url, err);
+        box.innerHTML = renderFeedPosts([], true);
+      })
+      .then(function () { if (timer) clearTimeout(timer); });
+  }
+
+  function initStaticFeeds() {
+    if (typeof fetch === 'undefined' || typeof DOMParser === 'undefined') return;
+    var boxes = document.querySelectorAll('[data-feed-url]');
+    for (var i = 0; i < boxes.length; i++) {
+      (function (box) {
+        var url = (box.getAttribute('data-feed-url') || '').trim();
+        if (!url) return;
+        loadFeedBox(box, url);
+      })(boxes[i]);
+    }
+  }
+
   /* api 失败或空数据：整个远端网格直接隐藏，不留错误/空态。 */
   function hideGrid(grid, err) {
     if (err) console.warn('[elysia] friends api failed', err);
@@ -134,6 +229,7 @@
 
   function init() {
     if (typeof fetch === 'undefined') return;
+    initStaticFeeds();
     var grids = document.querySelectorAll('[data-friends-api]');
     for (var i = 0; i < grids.length; i++) {
       (function (grid) {

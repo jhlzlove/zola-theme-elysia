@@ -22,7 +22,8 @@ github_alerts = true
 bottom_footnotes = true
 
 [markdown.highlighting]
-theme = "catppuccin-mocha"
+light_theme = "ayu-light"
+dark_theme = "ayu-dark"
 style = "class"
 
 [extra]
