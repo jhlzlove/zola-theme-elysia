@@ -2024,8 +2024,10 @@ html[data-theme="dark"] .poetry__body{
   border-radius:var(--radius);
   background:var(--bg-soft);
   transition:all .18s;
-  margin:16px 0;
+  margin:16px auto;
   overflow:hidden;
+  width:100%;
+  max-width:560px;
 }
 .link-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
 .link-card__link{
@@ -2092,7 +2094,7 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
   gap:12px;
   margin:16px 0;
 }
-.links-grid .link-card{margin:0}
+.links-grid .link-card{margin:0;max-width:none}
 
 
 /* Bookmark card for links (with cover) */
