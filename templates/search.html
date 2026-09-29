@@ -23,7 +23,7 @@
 </div>
 
 <div class="notice" style="margin-top:18px">
-  <p class="muted" style="font-size:13px;margin:0">提示：按 <kbd>/</kbd> 快速聚焦侧边栏搜索；本页支持 <code>?q=关键词</code> 直达。本地索引在每次构建后运行 <code>pagefind_extended --site public</code> 生成（中文必须用 extended，普通版不支持中文分词）。</p>
+  <p class="muted" style="font-size:0.8125rem;margin:0">提示：按 <kbd>/</kbd> 快速聚焦侧边栏搜索；本页支持 <code>?q=关键词</code> 直达。本地索引在每次构建后运行 <code>pagefind_extended --site public</code> 生成（中文必须用 extended，普通版不支持中文分词）。</p>
 </div>
 {% elif search_use_algolia %}
 <div class="search-page" data-algolia-page
@@ -43,18 +43,18 @@
 </div>
 
 <div class="notice" style="margin-top:18px">
-  <p class="muted" style="font-size:13px;margin:0">提示：按 <kbd>/</kbd> 快速聚焦侧边栏搜索；本页支持 <code>?q=关键词</code> 直达。</p>
+  <p class="muted" style="font-size:0.8125rem;margin:0">提示：按 <kbd>/</kbd> 快速聚焦侧边栏搜索；本页支持 <code>?q=关键词</code> 直达。</p>
 </div>
 {% else %}
 <div class="notice">
   <p><strong>搜索未启用</strong></p>
-  <p class="muted" style="font-size:13px"><code>[extra.search] provider</code> 为 <code>none</code>（或 <code>algolia</code> 但缺少 key），侧边栏与本站均不显示搜索框。本地搜索请在 <code>zola.toml</code> 中配置：</p>
-  <pre style="background:var(--bg-muted);border:1px solid var(--border);padding:12px;border-radius:8px;overflow:auto;font-size:12px"><code>[extra.search]
+  <p class="muted" style="font-size:0.8125rem"><code>[extra.search] provider</code> 为 <code>none</code>（或 <code>algolia</code> 但缺少 key），侧边栏与本站均不显示搜索框。本地搜索请在 <code>zola.toml</code> 中配置：</p>
+  <pre style="background:var(--bg-muted);border:1px solid var(--border);padding:12px;border-radius:8px;overflow:auto;font-size:0.75rem"><code>[extra.search]
 enable = true
 provider = "pagefind"   # pagefind | algolia | none
 hits_per_page = 8
 placeholder = "search_placeholder"   # 翻译 key，见 [translations]</code></pre>
-  <p class="muted" style="font-size:13px">使用 <code>pagefind</code> 时，每次构建后运行 <code>pagefind_extended --site public</code> 生成索引（中文必须用 extended）；使用 <code>algolia</code> 时，需另行配置 <code>[extra.algolia]</code> 并将 <code>content</code> 推送至对应 index。</p>
+  <p class="muted" style="font-size:0.8125rem">使用 <code>pagefind</code> 时，每次构建后运行 <code>pagefind_extended --site public</code> 生成索引（中文必须用 extended）；使用 <code>algolia</code> 时，需另行配置 <code>[extra.algolia]</code> 并将 <code>content</code> 推送至对应 index。</p>
 </div>
 {% endif %}
 

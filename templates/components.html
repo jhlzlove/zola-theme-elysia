@@ -63,7 +63,7 @@
 {% endcomponent image -%}
 
 {% component link(href, title = "", icon = "", desc = "") -%}{% set lhref = href -%}{% set lhref_q = href | split(pat="?") -%}{% set lhref_h = href | split(pat="#") -%}{% if href is starting_with(pat="/") and not href is starting_with(pat="//") and lhref_q | length == 1 and lhref_h | length == 1 -%}{% if href is ending_with(pat="/") -%}{% set lhref = get_url(path=href, trailing_slash=true) -%}{% else -%}{% set lhref = get_url(path=href) -%}{% endif -%}{% endif -%}{% set licon = icon -%}{% if icon is starting_with(pat="/") and not icon is starting_with(pat="//") -%}{% set licon = get_url(path=icon) -%}{% endif -%}
-<div class="link-card" data-component="link"><a class="link-card__link" href="{{ lhref | safe }}" {% if href is starting_with(pat="http") %}target="_blank" rel="noopener"{% endif %} style="display:flex;gap:14px;text-decoration:none;color:inherit;width:100%">{% if icon %}<div class="link-card__icon">{% if icon is starting_with(pat="http") or icon is starting_with(pat="/") %}<img src="{{ licon | safe }}" alt="" loading="lazy">{% else %}<span style="font-size:20px">{{ icon }}</span>{% endif %}</div>{% endif %}<div class="link-card__body"><div class="link-card__title">{{ title | default(value=href) }}</div>{% if desc %}<div class="link-card__desc">{{ desc }}</div>{% endif %}</div></a></div>
+<div class="link-card" data-component="link"><a class="link-card__link" href="{{ lhref | safe }}" {% if href is starting_with(pat="http") %}target="_blank" rel="noopener"{% endif %} style="display:flex;gap:14px;text-decoration:none;color:inherit;width:100%">{% if icon %}<div class="link-card__icon">{% if icon is starting_with(pat="http") or icon is starting_with(pat="/") %}<img src="{{ licon | safe }}" alt="" loading="lazy">{% else %}<span style="font-size:1.25rem">{{ icon }}</span>{% endif %}</div>{% endif %}<div class="link-card__body"><div class="link-card__title">{{ title | default(value=href) }}</div>{% if desc %}<div class="link-card__desc">{{ desc }}</div>{% endif %}</div></a></div>
 {% endcomponent link -%}
 
 {% component links(group) -%}
@@ -80,7 +80,7 @@
 </a>
 {% endfor %}</div>
 {% else -%}
-<div class="muted" style="font-size:13px;padding:12px;border:1px dashed var(--border);border-radius:10px">Links group “{{ group }}” not found in data/links.yaml</div>
+<div class="muted" style="font-size:0.8125rem;padding:12px;border:1px dashed var(--border);border-radius:10px">Links group “{{ group }}” not found in data/links.yaml</div>
 {% endif -%}
 {% endcomponent links -%}
 
@@ -176,7 +176,7 @@
 {% endfor -%}
 </div>
 {% else -%}
-<div class="muted" style="font-size:13px;padding:12px;border:1px dashed var(--border);border-radius:10px">Friends group “{{ group }}” not found</div>
+<div class="muted" style="font-size:0.8125rem;padding:12px;border:1px dashed var(--border);border-radius:10px">Friends group “{{ group }}” not found</div>
 {% endif -%}
 {% endif -%}
 {% endcomponent friends -%}

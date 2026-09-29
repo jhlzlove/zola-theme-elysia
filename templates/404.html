@@ -2,8 +2,8 @@
 {% block title %}404 — {{ config.title }}{% endblock title %}
 {% block content %}
 <div style="text-align:center;padding:48px 16px">
-  <div style="font-size:64px;font-weight:800;letter-spacing:-.04em;color:var(--border-strong)">404</div>
-  <h1 style="font-size:22px;margin:10px 0 8px">页面未找到</h1>
+  <div style="font-size:4rem;font-weight:800;letter-spacing:-.04em;color:var(--border-strong)">404</div>
+  <h1 style="font-size:1.375rem;margin:10px 0 8px">页面未找到</h1>
   <p class="muted" style="margin-bottom:18px">你访问的页面不存在或已被移动。</p>
   <a class="nav-btn" href="{{ get_url(path="/", trailing_slash=true) | safe }}" style="display:inline-flex">← 返回首页</a>
 </div>

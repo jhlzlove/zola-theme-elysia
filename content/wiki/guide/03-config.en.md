@@ -149,7 +149,7 @@ default_theme = "auto"      # auto | light | dark
 default_palette = "default" # default | lime | orange | violet
 
 [extra.style.fonts]
-root_size = "16px"
+base_size = "16px"
 body_size = "16px"
 code_block_size = "14px"
 body_family = ["Inter", "system-ui", "sans-serif"]
@@ -158,7 +158,7 @@ code_block_family = ["JetBrains Mono", "ui-monospace", "monospace"]
 
 - `inject.head` loads web fonts or custom CSS.
 - `default_theme` / `default_palette` are first-paint defaults; toggles persist to `localStorage`.
-- Font arrays become CSS stacks; resume page does not inherit body font settings.
+- Font arrays become CSS stacks; `base_size` is the site-wide base size (all UI text except body/code/resume scales with it), `body_size` drives article body text on all screens, `code_block_size` drives code blocks. The resume page uses a fixed print layout and follows none of these. Giscus/Artalk comments render in external iframes and ignore `base_size` (Waline follows it).
 
 Palettes:
 

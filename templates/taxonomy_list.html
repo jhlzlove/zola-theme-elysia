@@ -94,7 +94,7 @@
         <span class="cat-dir__file-meta">
           {% if page.taxonomies.tags %}
             <span class="cat-dir__file-tags">
-              {% for t in page.taxonomies.tags[:3] %}<span class="tag" style="font-size:10px;padding:1px 6px">{{ t }}</span>{% endfor %}
+              {% for t in page.taxonomies.tags[:3] %}<span class="tag" style="font-size:0.625rem;padding:1px 6px">{{ t }}</span>{% endfor %}
             </span>
           {% endif %}
           <time datetime="{{ page.date | date(format="%Y-%m-%d") }}">{{ page.date | date(format="%Y-%m-%d") }}</time>
@@ -106,7 +106,7 @@
 {% endfor %}
 </div>
 
-<p class="muted" style="margin-top:18px;font-size:13px">提示：点击文件夹标题展开/收起，点击右箭头进入分类独立页。</p>
+<p class="muted" style="margin-top:18px;font-size:0.8125rem">提示：点击文件夹标题展开/收起，点击右箭头进入分类独立页。</p>
 
 {% else %}
 {# —— 标签：仅显示一种，去重后带数量 —— #}

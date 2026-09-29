@@ -11,7 +11,7 @@
   {% endif %}
 {% endfor %}
 <div class="page-header">
-  <p style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">{{ taxonomy.name }}</p>
+  <p style="font-size:0.8125rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">{{ taxonomy.name }}</p>
   <h1>{% if taxonomy.name == "categories" %}<span style="text-transform:uppercase">{{ term.name }}</span>{% else %}<span style="text-transform:lowercase">{{ term.name }}</span>{% endif %}</h1>
   <p>共 {{ blog_term | length }} 篇文章 · 已过滤 wiki</p>
 </div>

@@ -157,7 +157,7 @@ default_theme = "auto"      # auto | light | dark
 default_palette = "default" # default | lime | orange | violet
 
 [extra.style.fonts]
-root_size = "16px"
+base_size = "16px"
 body_size = "16px"
 code_block_size = "14px"
 body_family = ["LXGW WenKai Screen", "Inter", "system-ui", "sans-serif"]
@@ -166,7 +166,7 @@ code_block_family = ["JetBrains Mono", "ui-monospace", "monospace"]
 
 - `inject.head`：任意 `<link>` / `<script>` 注入，用于加载网络字体或自定义 CSS。
 - `default_theme` / `default_palette`：首屏默认值，`auto` 跟随系统，用户切换后持久化到 `localStorage`。
-- `fonts`：数组即 CSS 字体栈；`root_size` 为 `html` 字号，`body_size` 为正文字号，`code_block_size` 为代码块字号。简历页不继承正文字体设置。
+- `fonts`：数组即 CSS 字体栈；`base_size` 为全站基准字号（除正文/代码/简历外的 UI 文字都以此缩放），`body_size` 为文章正文字号（全端生效），`code_block_size` 为代码块字号。简历页为定宽打印版式，不跟随这三项。Giscus/Artalk 评论为外部 iframe，不受 `base_size` 影响（Waline 跟随）。
 
 调色盘：
 

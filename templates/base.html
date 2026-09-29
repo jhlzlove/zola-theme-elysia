@@ -29,7 +29,7 @@
       {% if config.extra.style and config.extra.style.fonts %}
         {% if config.extra.style.fonts.body_family %}--font-body:{{ config.extra.style.fonts.body_family | join(sep=", ") | safe }};{% endif %}
         {% if config.extra.style.fonts.code_block_family %}--font-code:{{ config.extra.style.fonts.code_block_family | join(sep=", ") | safe }};{% endif %}
-        {% if config.extra.style.fonts.root_size %}--font-size-root:{{ config.extra.style.fonts.root_size }};{% endif %}
+        {% if config.extra.style.fonts.base_size %}--font-size-base:{{ config.extra.style.fonts.base_size }};{% endif %}
         {% if config.extra.style.fonts.body_size %}--font-size-body:{{ config.extra.style.fonts.body_size }};{% endif %}
         {% if config.extra.style.fonts.code_block_size %}--font-size-code:{{ config.extra.style.fonts.code_block_size }};{% endif %}
       {% endif %}

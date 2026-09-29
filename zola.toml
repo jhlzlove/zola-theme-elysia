@@ -132,14 +132,15 @@ default_theme = "auto"
 default_palette = "default"
 
 # ── Fonts ──
-# root_size: global html font-size; body_size: article/body; code_block_size: code
+# base_size: 全站基准字号（html rem 锚点；除正文/代码/简历外的 UI 文字都以此缩放）
+# body_size: 文章正文；code_block_size: 代码块
 # body_family / code_block_family: full font stack as array (include defaults so source stays simple)
 [extra.style.fonts]
-root_size = "16px"
-body_size = "16px"
-code_block_size = "14px"
+base_size = "16px"
+body_size = "1.125rem"
+code_block_size = "0.865rem"
 body_family = ["LXGW WenKai Screen", "Maple Mono NF CN", "Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"]
-code_block_family = ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
+code_block_family = ["JetBrains Mono", "Maple Mono NF CN", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
 
 # ── Comments ──
 # enable 在 [extra.comments] 统一控制；各系统不再单独设 enable

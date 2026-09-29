@@ -16,6 +16,10 @@ sticky = true
 [hexo-theme-stellar]: https://github.com/xaoxuu/hexo-theme-stellar
 [hugo-theme-reimu]: https://github.com/D-Sketon/hugo-theme-reimu
 
+> [!note]
+> 随着换机的折腾还有开发的经验，Windows 下推荐使用 [vfox](https://vfox.dev/zh-hans/)/[mise](https://mise.jdx.dev/) 和 [wsl](https://learn.microsoft.com/zh-cn/windows/wsl) 配置开发环境。这是非常好用的组合方式。如果喜欢远程开发，那么这种方式绝对值得一试！
+
+
 ## zola 0.23+ 版本
 
 0.23+ 是个破坏性更新，可以理解为大版本的更新，移除了 shortcode 的支持，所有类似的功能通过 component 组件进行支持。

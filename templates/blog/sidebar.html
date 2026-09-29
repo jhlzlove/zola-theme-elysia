@@ -121,7 +121,7 @@
         {% elif s.icon == "mail" %}
           {{ <icon name="mail"/> }}
         {% else %}
-          <span style="font-size:13px">{{ s.icon }}</span>
+          <span style="font-size:0.8125rem">{{ s.icon }}</span>
         {% endif %}
       </a>
     {% endfor %}
@@ -169,10 +169,10 @@
             {% endfor %}
           {% endif %}
           <a class="palette__option {% if _cur == "zh" %}is-active{% endif %}" href="{{ _zh_href | safe }}" role="option" aria-selected="{% if _cur == "zh" %}true{% else %}false{% endif %}">
-            <span style="font-size:14px">🇨🇳</span><span class="palette__label">中文</span><span class="palette__check" aria-hidden="true">✓</span>
+            <span style="font-size:0.875rem">🇨🇳</span><span class="palette__label">中文</span><span class="palette__check" aria-hidden="true">✓</span>
           </a>
           <a class="palette__option {% if _cur == "en" %}is-active{% endif %}" href="{{ _en_href | safe }}" role="option" aria-selected="{% if _cur == "en" %}true{% else %}false{% endif %}">
-            <span style="font-size:14px">🇺🇸</span><span class="palette__label">English</span><span class="palette__check" aria-hidden="true">✓</span>
+            <span style="font-size:0.875rem">🇺🇸</span><span class="palette__label">English</span><span class="palette__check" aria-hidden="true">✓</span>
           </a>
         </div>
       </div>
