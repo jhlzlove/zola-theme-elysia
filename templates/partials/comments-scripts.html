@@ -1,0 +1,68 @@
+{# ############################################################################
+   # Shared: 评论区脚本（artalk / waline 按需加载；giscus 已在正文同步渲染）
+   # 上下文：需 page 已定义
+   ############################################################################ #}
+{% set _provider = "" %}
+{% set _comments_enabled = true %}
+{% if config.extra.comments and config.extra.comments.enable is defined and config.extra.comments.enable == false %}{% set_global _comments_enabled = false %}{% endif %}
+{% if config.extra.comments and config.extra.comments.provider is defined and config.extra.comments.provider != "" %}
+  {% set_global _provider = config.extra.comments.provider | lower %}
+{% elif config.extra.artalk and config.extra.artalk.server is defined and config.extra.artalk.server != "" %}
+  {% set_global _provider = "artalk" %}
+{% elif config.extra.waline and config.extra.waline.serverURL is defined and config.extra.waline.serverURL != "" %}
+  {% set_global _provider = "waline" %}
+{% elif config.extra.giscus and config.extra.giscus.repo is defined and config.extra.giscus.repo != "" and config.extra.giscus.repo != "user/repo" %}
+  {% set_global _provider = "giscus" %}
+{% else %}
+  {% set_global _provider = "none" %}
+{% endif %}
+{% if not _comments_enabled %}{% set_global _provider = "none" %}{% endif %}
+{% set _page_comments_off = false %}
+{% if page.extra.comments is defined and page.extra.comments == false %}{% set_global _page_comments_off = true %}{% endif %}
+{% if not _page_comments_off and _comments_enabled %}
+  {% if _provider == "artalk" and config.extra.artalk and config.extra.artalk.server is defined and config.extra.artalk.server != "" %}
+<link rel="stylesheet" href="https://unpkg.com/artalk@2/dist/Artalk.css">
+<script src="https://unpkg.com/artalk@2/dist/Artalk.js" defer></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', function(){
+  if(window.Artalk && window.ARTALK_CONFIG){
+    try{
+      var cfg = window.ARTALK_CONFIG;
+      Artalk.init({
+        el: '#artalk',
+        pageKey: cfg.pageKey || location.pathname,
+        pageTitle: document.title,
+        server: cfg.server,
+        site: cfg.site || document.title,
+        placeholder: cfg.placeholder || '',
+        noComment: cfg.noComment || '',
+        gravatar: { mirror: cfg.gravatarMirror || '' },
+        avatarURL: cfg.avatarMirror || ''
+      });
+    }catch(e){ console.error('Artalk init failed', e); }
+  }
+});
+</script>
+  {% elif _provider == "waline" and config.extra.waline and config.extra.waline.serverURL is defined and config.extra.waline.serverURL != "" %}
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+<script type="module">
+import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+document.addEventListener('DOMContentLoaded', function(){
+  var c = window.WALINE_CONFIG || {};
+  try{
+    init({
+      el: '#waline',
+      serverURL: c.serverURL,
+      lang: c.lang || 'zh-CN',
+      dark: c.dark === 'auto' ? 'html[data-theme="dark"]' : c.dark,
+      emoji: c.emoji,
+      meta: c.meta,
+      requiredMeta: c.requiredMeta,
+      login: c.login || 'enable',
+      placeholder: c.placeholder || undefined
+    });
+  }catch(e){ console.error('Waline init failed', e); }
+});
+</script>
+  {% endif %}
+{% endif %}

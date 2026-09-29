@@ -3,8 +3,8 @@ title = "Elysia 使用指南"
 description = "从安装、配置到写作，快速搭建一个基于 Zola 的 Elysia 博客。"
 sort_by = "weight"
 weight = 2
-template = "section.html"
-page_template = "page.html"
+template = "wiki/doc.html"
+page_template = "wiki/page.html"
 +++
 
 Elysia 是一个基于 [Zola](https://www.getzola.org/) 的博客主题，提供博客列表、Wiki 目录、归档、分类、标签、热力图、搜索、评论、简历页与一组 Markdown 组件。

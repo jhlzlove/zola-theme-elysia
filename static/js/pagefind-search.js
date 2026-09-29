@@ -145,14 +145,18 @@ function bindSidebar(ctx) {
   // Warm up the index on first focus so typing feels instant.
   input.addEventListener('focus', function () { pf(ctx.bundle); }, { once: true });
 
+  // 清除按钮：仅有内容时显示，空白时隐藏（即时切换，不等防抖）
+  function syncClear() { if (clear) clear.hidden = !input.value.trim(); }
+  syncClear();
+
   const run = debounce(function () {
     const q = input.value.trim();
-    if (clear) clear.hidden = !q;
+    syncClear();
     activeIndex = -1;
     doSearch(q, ctx, results);
   }, 260);
 
-  input.addEventListener('input', run);
+  input.addEventListener('input', function () { syncClear(); run(); });
   // Enter without an arrow selection goes to the full search page.
   input.addEventListener('keydown', function (e) {
     const hits = results.querySelectorAll('.search__hit');

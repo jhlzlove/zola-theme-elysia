@@ -1,0 +1,53 @@
+{# ############################################################################
+   # Wiki: 根目录（/wiki/ 项目导航枢纽；双列圆角卡片网格；侧栏为 blog 菜单）
+   # 路由：content/wiki/_index.md template 指向此文件
+   ############################################################################ #}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ section.title }}</h1>
+  {% if section.description %}<p>{{ section.description }}</p>{% endif %}
+  {% if section.content %}<div class="article__content" style="margin-top:10px;padding-top:0">{{ section.content | safe }}</div>{% endif %}
+</div>
+
+{# # Wiki: 子项目 + 直属页面统一卡片 #}
+{% set pages = section.pages %}
+{% if paginator %}{% set pages = paginator.pages %}{% endif %}
+
+<div class="wiki-grid" id="postList">
+  {% if section.subsections %}
+  {% for sub in section.subsections %}
+    {% set s = get_section(path=sub) %}
+    {% if s.title %}
+    <article class="wiki-card">
+      <div class="wiki-card__head">
+        <h2 class="wiki-card__title"><a class="wiki-card__link" href="{{ s.permalink | safe }}">{{ s.title }}</a></h2>
+        <span class="wiki-card__count">{{ s.pages | length }} 篇</span>
+      </div>
+      {% if s.description %}
+      <p class="wiki-card__desc">{{ s.description }}</p>
+      {% elif s.content %}
+      <p class="wiki-card__desc">{{ s.content | striptags | truncate(length=80) | safe }}</p>
+      {% endif %}
+    </article>
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+  {% for page in pages %}
+  <article class="wiki-card">
+    <div class="wiki-card__head">
+      <h2 class="wiki-card__title"><a class="wiki-card__link" href="{{ page.permalink | safe }}">{{ page.title }}</a></h2>
+    </div>
+    {% set sum = page.summary | default(value="", boolean=true) %}
+    {% if sum == "" %}{% set sum = page.description | default(value="", boolean=true) %}{% endif %}
+    {# 加密文章不渲染摘要防泄漏 #}
+    {% if not page.extra.encrypted | default(value=false) %}
+    {% if sum != "" %}
+      <p class="wiki-card__desc">{{ sum | striptags | truncate(length=80) | safe }}</p>
+    {% endif %}
+    {% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% endblock content %}

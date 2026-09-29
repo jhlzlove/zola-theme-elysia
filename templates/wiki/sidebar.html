@@ -1,0 +1,57 @@
+{# ############################################################################
+   # Wiki: 左侧目录（仅目录，无品牌/搜索/底部链接）
+   # 自包含判定：page 取父项目 section，section 取自身；wiki 根散篇回退为空
+   # 调用方（wiki/page.html、wiki/doc.html）直接 include，无需预设变量
+   ############################################################################ #}
+{% set _wiki_root_url = get_url(path="wiki/", lang=cur_lang, trailing_slash=true) %}
+{% set wiki_nav_section = "" %}
+{% if page is defined and page.ancestors is defined and page.ancestors | length > 0 %}
+  {% set _parent_path = page.ancestors | last %}
+  {% if _parent_path is starting_with(pat="wiki/") and _parent_path != "wiki/_index.md" and "wiki/_index." not in _parent_path %}
+    {% set _parent_sec = get_section(path=_parent_path) %}
+    {% if _parent_sec %}{% set_global wiki_nav_section = _parent_sec %}{% endif %}
+  {% endif %}
+{% elif section is defined and section.path is defined %}
+  {% if section.path is starting_with(pat="/wiki/") and not section.path is ending_with(pat="/wiki/") %}
+    {% set_global wiki_nav_section = section %}
+  {% endif %}
+{% endif %}
+{% if wiki_nav_section %}
+<nav class="wiki-side-nav" aria-label="Wiki 目录">
+  <a class="wiki-side-nav__back" href="{{ _wiki_root_url | safe }}">← 返回 Wiki</a>
+  <div class="wiki-side-nav__head">
+    <a class="wiki-side-nav__title" href="{{ wiki_nav_section.permalink | safe }}" title="回到 {{ wiki_nav_section.title }} 主页">{{ wiki_nav_section.title }}</a>
+    <span class="wiki-side-nav__count">{{ wiki_nav_section.pages | length }} 篇</span>
+  </div>
+  <ol class="wiki-side-nav__list">
+    {% if wiki_nav_section.subsections %}
+      {% for sub in wiki_nav_section.subsections %}
+        {% set _s = get_section(path=sub) %}
+        {% if _s.title %}
+        {% set _is_cur_sub = false %}
+        {% if section is defined and section.permalink is defined and _s.permalink == section.permalink %}{% set _is_cur_sub = true %}{% endif %}
+        <li class="wiki-side-nav__item wiki-side-nav__item--sub {% if _is_cur_sub %}is-current{% endif %}">
+          <a href="{{ _s.permalink | safe }}">
+            <span class="wiki-side-nav__index wiki-side-nav__index--folder">📁</span>
+            <span class="wiki-side-nav__item-title">{{ _s.title }}</span>
+          </a>
+        </li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% for p in wiki_nav_section.pages %}
+      {% set _is_cur = false %}
+      {% if page is defined and p.permalink == page.permalink %}{% set _is_cur = true %}{% endif %}
+      {% if section is defined and p.permalink == section.permalink %}{% set _is_cur = true %}{% endif %}
+      {% if not _is_cur and current_path is defined and p.path is defined and current_path == p.path %}{% set _is_cur = true %}{% endif %}
+      <li class="wiki-side-nav__item {% if _is_cur %}is-current{% endif %}">
+        <a href="{{ p.permalink | safe }}" {% if _is_cur %}aria-current="page"{% endif %}>
+          <span class="wiki-side-nav__index">{{ loop.index }}</span>
+          <span class="wiki-side-nav__item-title">{{ p.title }}</span>
+          {% if _is_cur %}<span class="wiki-side-nav__here">· 在读</span>{% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+</nav>
+{% endif %}

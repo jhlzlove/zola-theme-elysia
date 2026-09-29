@@ -1,0 +1,17 @@
+{# ############################################################################
+   # Friends: 友链单版式（标题 + 描述 + 正文 shortcode；无 post-list / 无分页）
+   # 路由：content/friends/_index.md template 指向此文件
+   ############################################################################ #}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+  <h1>{{ section.title }}</h1>
+  {% if section.description %}<p>{{ section.description }}</p>{% endif %}
+</div>
+{% if section.content %}
+<div class="article__content" id="articleContent">
+  {{ section.content | safe }}
+</div>
+{% endif %}
+{% endblock content %}

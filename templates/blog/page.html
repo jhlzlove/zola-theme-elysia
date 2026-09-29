@@ -1,7 +1,6 @@
 {# ############################################################################
-   # DEPRECATED 兼容垫片：与 blog/page.html 同步，保持默认 page_template 可用
-   # 新内容请用 template="blog/page.html"；wiki 请用 "wiki/page.html"
-   # Blog: 文章页（桌面右侧大纲 + 窄屏悬浮按钮）
+   # Blog: 文章页（侧栏默认 blog 菜单；含置顶/加密/过期提示 + 上一篇/下一篇 + 评论）
+   # 路由：content/_index.md page_template 指向此文件；wiki 不用此文件
    ############################################################################ #}
 {% extends "base.html" %}
 
@@ -115,7 +114,7 @@
       {% endif %}
     </article>
 
-    {# # Blog: 许可声明（正文末，随内容进 RSS；与 blog/page.html 同步） #}
+    {# # Blog: 许可声明（正文末，随内容进 RSS） #}
     {% include "partials/license.html" %}
 
     {# # Blog: 上一篇 / 下一篇 #}

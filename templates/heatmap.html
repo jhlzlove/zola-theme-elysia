@@ -5,15 +5,17 @@
   <p>统计每日发布数量 · 横轴月份 · 纵轴周一至周五（周末合并） · 点位深浅表示数量</p>
 </div>
 
-{# Provide data as JSON — 仅博客，排除 wiki；按当前语言获取 #}
+{# # Blog: 仅博客，排除 wiki/resume（按路径判定；非默认语言先对齐 /<lang>/ 前缀）；按当前语言获取 #}
 {% set _lang = lang | default(value=config.default_language) %}
 {% if section is defined and section.lang %}{% set _lang = section.lang %}{% endif %}
+{% set _wiki_pat = "/wiki/" %}{% set _resume_pat = "/resume" %}
+{% if _lang != config.default_language %}{% set _wiki_pat = "/" ~ _lang ~ "/wiki/" %}{% set _resume_pat = "/" ~ _lang ~ "/resume" %}{% endif %}
 {% set root = get_section(path="_index.md", lang=_lang) %}
 {% set raw_all = root.pages %}
 {% if raw_all | length == 0 %}{% set raw_all = section.pages %}{% endif %}
 {% set_global all_pages = [] %}
 {% for p in raw_all %}
-  {% if p.path is not starting_with(pat="/wiki/") and p.path is not starting_with(pat="/resume") and p.extra.style | default(value="blog") != "wiki" and p.extra.style | default(value="blog") != "resume" %}
+  {% if p.path is not starting_with(pat=_wiki_pat) and p.path is not starting_with(pat=_resume_pat) %}
     {% set_global all_pages = [...all_pages, p] %}
   {% endif %}
 {% endfor %}

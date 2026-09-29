@@ -1,0 +1,24 @@
+{# ############################################################################
+   # Shared: 文章大纲列表（三级），悬浮面板唯一内容源
+   # 上下文：调用方需预设 toc（page.toc 或 section.toc）；无标题头，只输出 ol
+   ############################################################################ #}
+<ol class="toc__list">
+  {% for h1 in toc %}
+    <li>
+      <a href="{{ h1.permalink | safe }}">{{ h1.title }}</a>
+      {% if h1.children %}
+        <ol class="toc__list toc__list--h3">
+          {% for h2 in h1.children %}
+            <li><a href="{{ h2.permalink | safe }}">{{ h2.title }}</a>
+              {% if h2.children %}
+                <ol class="toc__list toc__list--h4">
+                  {% for h3 in h2.children %}<li><a href="{{ h3.permalink | safe }}">{{ h3.title }}</a></li>{% endfor %}
+                </ol>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ol>

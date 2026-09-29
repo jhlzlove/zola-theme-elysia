@@ -58,20 +58,21 @@ github_alerts = true
 bottom_footnotes = true
 
 [markdown.highlighting]
-theme = "catppuccin-mocha"
+light_theme = "ayu-light"
+dark_theme = "ayu-dark"
 style = "class"
 ```
 
 - `render_emoji` enables `:smile:` shortcuts.
 - `github_alerts` enables `> [!NOTE]` / `> [!TIP]` / `> [!WARNING]`.
 - `bottom_footnotes` collects footnotes at the bottom.
-- `style = "class"` outputs highlighting as CSS classes; dual `light_theme` / `dark_theme` generate `giallo-light.css` / `giallo-dark.css` at build time, enabled on demand by the site theme toggle (a single `theme` only generates `giallo.css`).
+- `highlighting`: `style` must be `"class"`; dual `light_theme` / `dark_theme` generate `giallo-light.css` / `giallo-dark.css` at build time, enabled on demand by the site theme toggle. A single `theme` leaves dark-mode highlighting unstyled.
 
 ## Extra — identity and footer
 
 ```toml
 [extra]
-avatar = "/avatar.jpeg"
+avatar = "/avatar.jpg"
 avatar_alt = "Site avatar"
 site_motto = "Notes, sharing, and reading"
 footer = "© 2026 My Blog"
@@ -196,9 +197,9 @@ placeholder = "search_placeholder"   # translation key for the input placeholder
 path = "pagefind/"         # Pagefind bundle output dir (relative to site root)
 ```
 
-- `pagefind`: zero config; run `pagefind_extended --site public` after each build to generate the index (a `pagefind_extended` binary ships in the repo root, CI runs it automatically). `[extra.pagefind].path` controls the bundle output dir. The search page embeds Pagefind's own UI; the sidebar uses a theme-styled dropdown.
+- `pagefind`: no API key needed; run `pagefind_extended --site public` after each build to generate the index (download the matching `pagefind_extended` package from [Pagefind Releases](https://github.com/Pagefind/pagefind/releases); CI downloads it automatically). `[extra.pagefind].path` controls the bundle output dir. The search page embeds Pagefind's own UI; the sidebar uses a theme-styled dropdown.
 > [!warning]
-> Sites with Chinese content must use `pagefind_extended` instead of the regular `pagefind` binary: the regular build has no Chinese segmentation and Chinese queries will largely return nothing. On Windows use the `pagefind_extended.exe` in the repo root; on Linux/macOS download the matching `pagefind_extended` archive from [Pagefind Releases](https://github.com/Pagefind/pagefind/releases).
+> Sites with Chinese content must use `pagefind_extended` instead of the regular `pagefind` binary: the regular build has no Chinese segmentation and Chinese queries will largely return nothing.
 - `algolia`: uses `[extra.algolia]` below (`app_id + api_key + index_name` required), plus pushing content to the index.
 - `placeholder` is a key in `[translations]` (e.g. the default `search_placeholder`), rendered in the current language; a custom key must be defined in every language's translations (same rule as menu `name_key`), otherwise the build fails.
 - `search/_index.md` is the standalone search page; `/` focuses the sidebar input, `?q=` deep-links the search page.
@@ -365,11 +366,10 @@ description = "Summary"
 categories = ["Tech"]
 tags = ["zola"]
 [extra]
-sticky = true          # pinned: sticky / top / pinned
+sticky = true          # pinned: any of sticky / top / pinned set to true
 encrypted = true
-password = "1234"
+password = "blog"      # password alias matching a key in encrypt.toml [passwords]; never the real password
 password_hint = "hint"
-style = "blog"        # marker only, layout is determined by template
 expiry = false
 expiry_days = 60
 expiry_text = "Custom {date} {days} {diff}"
@@ -378,4 +378,6 @@ comments = false
 ```
 
 - `categories` / `tags` must be under `[taxonomies]` and quoted.
-- `weight` orders Wiki chapters; `style` is conventional, layout comes from `template`.
+- Layout comes from file location plus the `_index.md` `template` / `page_template` (`content/blog/` is blog, `content/wiki/` subdirectories are Wiki). Do not set `extra.style`.
+- `weight` only orders Wiki sections using `sort_by = "weight"`; blog order uses `date`.
+- `password` is an alias, see chapter 04 for the encryption flow.

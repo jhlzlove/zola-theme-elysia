@@ -1,7 +1,7 @@
 +++
 title = "Friends"
 description = "Friends"
-template = "section.html"
+template = "friends.html"
 +++
 
 ## Friends

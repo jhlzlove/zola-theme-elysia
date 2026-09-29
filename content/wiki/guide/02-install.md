@@ -42,7 +42,7 @@ zola build
 ```bash
 git init my-blog
 cd my-blog
-git submodule add https://github.com/yourname/elysia-ztheme.git themes/elysia
+git submodule add https://github.com/jhlzlove/zola-theme-elysia.git themes/elysia
 ```
 
 然后复制或参考主题根目录的 `zola.toml`，并确保站点配置包含：
@@ -60,7 +60,9 @@ description = "我的个人网站"
 default_language = "zh"
 ```
 
-主题文件在 `themes/elysia/`，自己的文章和配置放在站点根目录。站点根目录中的 `templates/`、`static/` 和 `content/` 可以覆盖主题对应文件。
+主题文件在 `themes/elysia/`，自己的文章和配置放在站点根目录。站点根目录中的 `templates/`、`static/` 和 `content/` 可以覆盖主题对应文件。`theme` 的值必须与 `themes/` 下的目录名一致。
+
+版式由文件位置决定，无需额外标记：`content/blog/` 下为博客文章，`content/wiki/` 子目录下为 Wiki 文章，`content/resume.md` 为简历页，`content/archive/`、`heatmap/`、`search/`、`friends/`、`links/` 为对应功能页。
 
 ## 最小内容结构
 
@@ -68,13 +70,33 @@ default_language = "zh"
 my-blog/
 ├── zola.toml
 ├── content/
-│   ├── _index.md
+│   ├── _index.md          # 首页：template = "index.html"，page_template = "blog/page.html"
 │   └── blog/
-│       ├── _index.md
+│       ├── _index.md      # 博客入口：transparent = true，直通首页
 │       └── first-post.md
 ├── static/
 └── themes/
     └── elysia/
+```
+
+`content/_index.md`：
+
+```toml
++++
+title = "我的博客"
+sort_by = "date"
+paginate_by = 8
+template = "index.html"
+page_template = "blog/page.html"
++++
+```
+
+`content/blog/_index.md`：
+
+```toml
++++
+transparent = true
++++
 ```
 
 创建文章时，在 Markdown 文件顶部写 Front Matter：
@@ -88,6 +110,8 @@ description = "文章摘要"
 
 正文从这里开始。
 ```
+
+Wiki 与功能页的 `_index.md` 写法见第 05 章（`wiki/grid.html` / `wiki/doc.html` / `wiki/page.html`、`archive.html`、`heatmap.html`、`search.html`、`friends.html`、`links.html`、`resume.html`）。
 
 ## 常见问题
 

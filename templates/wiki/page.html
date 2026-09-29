@@ -1,7 +1,6 @@
 {# ############################################################################
-   # DEPRECATED 兼容垫片：与 blog/page.html 同步，保持默认 page_template 可用
-   # 新内容请用 template="blog/page.html"；wiki 请用 "wiki/page.html"
-   # Blog: 文章页（桌面右侧大纲 + 窄屏悬浮按钮）
+   # Wiki: 文章页（左侧纯目录 + 移动端折叠目录 + 本页大纲；无上一篇/下一篇）
+   # 路由：各 wiki 子目录 _index.md 的 page_template 指向此文件
    ############################################################################ #}
 {% extends "base.html" %}
 
@@ -14,27 +13,17 @@
   {% if page.description %}<meta property="og:description" content="{{ page.description }}">{% endif %}
 {% endblock head %}
 
+{% block sidebar %}
+{% include "wiki/sidebar.html" %}
+{% endblock sidebar %}
+
 {% block content %}
-{# # Blog: 加密判定提前（移动端 TOC / 大纲抑制与正文锁共用） #}
+{# # Wiki: 加密判定提前（大纲抑制与正文锁共用） #}
 {% set is_encrypted = page.extra.encrypted | default(value=false) %}
 <div class="content-area">
   <div class="content-area__primary">
     <article class="article">
       <header class="article__header" data-pagefind-body>
-        <div class="article__kicker">
-          {% if page.extra.sticky or page.extra.top or page.extra.pinned %}
-            <span class="post-card__pin">{{ <icon name="pin" width="14" height="14"/> }} 置顶</span>
-          {% endif %}
-          {% if page.extra.encrypted %}
-            <span class="badge">{{ <icon name="lock" width="12" height="12"/> }} 加密</span>
-          {% endif %}
-          {% if page.taxonomies.categories %}
-            {% for cat in page.taxonomies.categories %}<span class="tag tag--category">{{ cat }}</span>{% endfor %}
-          {% endif %}
-          {% if page.taxonomies.tags %}
-            {% for tag in page.taxonomies.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
-          {% endif %}
-        </div>
         <h1 class="article__title">{{ page.title }}</h1>
         <div class="article__meta">
           {% if page.date %}<span>{{ <icon name="clock" width="14" height="14"/> }} {{ page.date | date(format="%Y-%m-%d") }}</span>{% endif %}
@@ -44,56 +33,20 @@
         </div>
       </header>
 
-      {# # Blog: 过期提示（[extra.article_expiry] + translations.article_expiry） #}
-      {% set _expiry_enable = false %}
-      {% if config.extra.article_expiry is defined and config.extra.article_expiry.enable is defined %}
-        {% set_global _expiry_enable = config.extra.article_expiry.enable %}
-      {% endif %}
-      {% if page.extra.expiry is defined %}
-        {% if page.extra.expiry == false %}
-          {% set_global _expiry_enable = false %}
-        {% elif page.extra.expiry == true %}
-          {% set_global _expiry_enable = true %}
+      {# # Wiki: 移动端折叠目录（桌面端左侧栏已展示） #}
+      {% if page.ancestors | length > 0 %}
+        {% set _m_parent_path = page.ancestors | last %}
+        {% if _m_parent_path is starting_with(pat="wiki/") and _m_parent_path != "wiki/_index.md" and "wiki/_index." not in _m_parent_path %}
+          {% set _m_parent = get_section(path=_m_parent_path) %}
+          {% if _m_parent %}
+            {% set wm_section = _m_parent %}
+            {% set wm_current = page.permalink %}
+            {% include "partials/wiki-mobile.html" %}
+          {% endif %}
         {% endif %}
-      {% endif %}
-      {% if _expiry_enable and page.date %}
-        {% set _expiry_days = 90 %}
-        {% if config.extra.article_expiry is defined and config.extra.article_expiry.days is defined %}
-          {% set_global _expiry_days = config.extra.article_expiry.days %}
-        {% endif %}
-        {% if page.extra.expiry_days is defined %}
-          {% set_global _expiry_days = page.extra.expiry_days %}
-        {% endif %}
-        {% set _expiry_date = page.date %}
-        {% if page.updated is defined and page.updated %}
-          {% set_global _expiry_date = page.updated %}
-        {% endif %}
-        {% set _expiry_date_str = _expiry_date | date(format="%Y-%m-%d") %}
-        {% set _expiry_ts = _expiry_date | date(format="%s") | int %}
-        {% set _cur_lang = lang | default(value=config.default_language) %}
-        {% if page.lang is defined and page.lang %}{% set_global _cur_lang = page.lang %}{% endif %}
-        {% set _expiry_raw = "" %}
-        {% if page.extra.expiry_text is defined and page.extra.expiry_text %}
-          {% set_global _expiry_raw = page.extra.expiry_text %}
-        {% else %}
-          {% set_global _expiry_raw = trans(key="article_expiry", lang=_cur_lang) %}
-        {% endif %}
-        {% set _now_ts = now() | date(format="%s") | int %}
-        {% set _diff_build_f = (_now_ts - _expiry_ts) / 86400 %}
-        {% set _diff_build_s = (_diff_build_f ~ "") | split(pat=".") | first %}
-        {% set _diff_build = _diff_build_s | int %}
-        {% if _diff_build < 0 %}{% set_global _diff_build = 0 %}{% set_global _diff_build_s = "0" %}{% endif %}
-        {% set _expiry_days_s = _expiry_days ~ "" %}
-        {% set _expiry_rendered = _expiry_raw | replace(from="{days}", to=_expiry_days_s) | replace(from="{date}", to=_expiry_date_str) | replace(from="{diff}", to=_diff_build_s) %}
-        <div id="articleExpiry" class="article-expiry" {% if _diff_build < _expiry_days %}hidden{% endif %} data-expiry-days="{{ _expiry_days }}" data-expiry-ts="{{ _expiry_ts }}" data-expiry-date="{{ _expiry_date_str }}" data-expiry-text="{{ _expiry_raw | escape_xml | safe }}" data-lang="{{ _cur_lang }}" role="status" aria-live="polite">
-          <div class="article-expiry__icon" aria-hidden="true">
-            {{ <icon name="alert" width="18" height="18"/> }}
-          </div>
-          <div class="article-expiry__body">{{ _expiry_rendered }}</div>
-        </div>
       {% endif %}
 
-      {# # Blog: 加密锁 / 正文 #}
+      {# # Wiki: 加密锁 / 正文 #}
       {% if is_encrypted %}
         <div class="encrypted" id="encryptedBox" data-password-key="{{ page.extra.password | default(value="") | safe }}" data-hint="{{ page.extra.password_hint | default(value="") | safe }}">
           <div class="encrypted__icon">🔒</div>
@@ -115,20 +68,17 @@
       {% endif %}
     </article>
 
-    {# # Blog: 许可声明（正文末，随内容进 RSS；与 blog/page.html 同步） #}
+    {# # Wiki: 许可声明（正文末，随内容进 RSS） #}
     {% include "partials/license.html" %}
 
-    {# # Blog: 上一篇 / 下一篇 #}
-    {% include "partials/pager-blog.html" %}
-
-    {# # Blog: 评论区 #}
+    {# # Wiki: 评论区（与 blog 共用 partial） #}
     {% include "partials/comments.html" %}
   </div>
 </div>
 {% endblock content %}
 
 {% block toc_float %}
-{# # Blog: 悬浮大纲（仅窄屏显示；桌面端走下方右侧 aside） #}
+{# # Wiki: 悬浮大纲（仅窄屏显示；桌面端走下方右侧 aside；左侧 wiki 目录不受影响） #}
 {% set toc_locked = page.extra.encrypted | default(value=false) %}
 {% if not toc_locked and config.extra.features.toc | default(value=true) and page.toc | length > 0 %}
 {% set toc = page.toc %}
@@ -137,7 +87,7 @@
 {% endblock toc_float %}
 
 {% block toc %}
-{# # Blog: 桌面端右侧大纲（窄屏隐藏，走悬浮按钮；行内 details 已移除） #}
+{# # Wiki: 桌面端右侧大纲（窄屏隐藏，走悬浮按钮） #}
 <aside class="toc-aside" id="tocAside" aria-label="Table of contents">
     {% set toc_locked = page.extra.encrypted | default(value=false) %}
     {% if not toc_locked and config.extra.features.toc | default(value=true) and page.toc | length > 0 %}

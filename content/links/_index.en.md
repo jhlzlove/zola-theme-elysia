@@ -1,7 +1,7 @@
 +++
 title = "Tools"
 description = "Useful tools and links"
-template = "section.html"
+template = "links.html"
 +++
 
 {{ <links group="github" /> }}

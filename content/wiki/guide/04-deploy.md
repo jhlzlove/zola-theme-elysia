@@ -9,113 +9,26 @@ Zola 会把站点构建成纯静态文件。部署时只需要把 `public/` 发�
 
 ## GitHub Pages
 
-在站点仓库中创建 `.github/workflows/deploy.yml`：
+在站点仓库中创建 `.github/workflows/deploy.yml`（与本仓库同名文件一致，可直接复制）：
 
 ```yaml
-name: Deploy Zola site
+name: ci
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
 
-permissions:
-  contents: write
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-          fetch-depth: 0
-      - uses: shalzz/zola-deploy-action@master
-        env:
-          PAGES_BRANCH: 部署的分支
-          REPOSITORY: 部署的仓库
-          TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
-```
-
-然后：
-
-1. 将 `base_url` 改成实际地址。项目站点通常是 `https://用户名.github.io/仓库名/`，用户站点则是 `https://用户名.github.io/`。
-2. 推送到 `main` 分支。
-3. 在 GitHub 的 **Settings → Pages** 中选择 Action 或构建输出分支。
-4. 等待 Actions 完成后打开站点地址。
-
-> [!warning]
-> 如果站点启用了文章加密（见下文），不能使用上面这种构建+部署一步完成的一键脚本，必须拆成手动三步：build → 加密 → 部署。
-
-## 手动构建
-
-```bash
-zola build --force
-```
-
-把 `public/` 上传到 Nginx、Apache、对象存储或其他静态托管服务。例如使用 rsync：
-
-```bash
-rsync -avz --delete public/ user@example.com:/var/www/html/
-```
-
-本地检查构建结果：
-
-```bash
-npx serve public
-```
-
-## 文章加密（可选）
-
-本主题支持加密文章，在文章 front matter 中标记即可：
-
-```toml
-[extra]
-encrypted = true
-password = "blog"   # 密码别名，真密码只放在加密配置里，不要写在这里
-```
-
-加密由 [ssg-encrypt](https://github.com/jhlzlove/ssg-encrypt) 对构建产物做后处理（AES-256-GCM），流程固定为：
-
-```text
-zola build → ssg-encrypt 加密 public/ → 部署
-```
-
-> [!warning]
-> 加密必须发生在构建之后、部署之前。一旦启用加密，就不能再使用构建+部署一步完成的官方一键脚本（如 `shalzz/zola-deploy-action`），必须手动拆成 build → 加密 → 部署三步。
-
-加密后订阅源（atom.xml / rss.xml）中对应条目的正文会被替换为占位文本，不会泄漏原文。
-
-### 手动部署
-
-1. 到 [ssg-encrypt Releases](https://github.com/jhlzlove/ssg-encrypt/releases) 下载对应平台的二进制文件，放到站点根目录。
-2. 在站点根目录准备 `encrypt.toml`（真密码只写在这里；该文件已在 `.gitignore` 中，不会提交到仓库），`[passwords]` 的别名与文章 `extra.password` 对应：
-
-```toml
-[passwords]
-blog = "真正的密码写这里"
-```
-
-3. 构建、加密、建索引、再部署：
-
-```bash
-zola build
-./ssg-encrypt -c encrypt.toml   # -c 指定配置文件；public/ 为默认输入目录，可省略 --input
-./pagefind_extended --site public   # 生成本地搜索索引（provider = "pagefind" 时必需；中文站必须用 extended，普通版 pagefind 不含中文分词）
-# 然后把 public/ 发布到任意平台：Nginx、对象存储、GitHub Pages 分支……
-```
-
-可用 `--dry-run` 先扫描校验而不写文件，确认规则命中后再正式执行。
-
-### GitHub Action 自动部署
-
-参考本仓库 `.github/workflows/deploy.yml`：在 `zola build` 之后、上传部署产物之前插入加密步骤，真密码通过 Secrets 传入：
-
-```yaml
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
+        # 如果使用 git submodules 使用本主题需要开启此项
+        # with:
+        #   submodules: true
 
       - name: Install Zola
         uses: taiki-e/install-action@v2
@@ -123,7 +36,7 @@ jobs:
           tool: zola
 
       - name: Build Zola
-        run: zola build
+        run: zola build --minify
 
       - name: Encrypt private content
         uses: jhlzlove/ssg-encrypt@main
@@ -134,12 +47,11 @@ jobs:
           SITE_ENCRYPT_PASSWORDS: {% raw %}${{ secrets.ENCRYPT_PASSWORDS }}{% endraw %}
 
       - name: Build Pagefind index
-        env:
-          GH_TOKEN: {% raw %}${{ github.token }}{% endraw %}
         run: |
-          gh release download v1.5.2 --repo CloudCannon/pagefind --pattern '*extended*x86_64-unknown-linux-musl.tar.gz' --dir /tmp --clobber
-          tar -xzf /tmp/pagefind-*.tar.gz -C /tmp
-          /tmp/pagefind_extended --site public   # 中文站必须用 extended，普通版 pagefind 不含中文分词
+          wget -O pagefind.tar.gz \
+            https://github.com/Pagefind/pagefind/releases/download/v1.5.2/pagefind_extended-v1.5.2-x86_64-unknown-linux-musl.tar.gz
+          tar -xzf pagefind.tar.gz
+          ./pagefind_extended --site public
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
@@ -161,10 +73,77 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
-要点：
+然后：
 
-- 在仓库 **Settings → Secrets and variables → Actions** 中添加 `ENCRYPT_PASSWORDS`，内容为 TOML 格式的 `别名 = "密码"`（可多行，如 `blog = "……"`）。
-- 顺序不能错：先 `zola build`，再加密，再 `pagefind_extended --site public` 建索引，最后才上传/部署产物。仓库里已有可直接抄的完整流程，见 `.github/workflows/deploy.yml`。
+1. 将 `base_url` 改成实际地址。项目站点通常是 `https://用户名.github.io/仓库名/`，用户站点则是 `https://用户名.github.io/`。
+2. 使用 Git 子模块时，`checkout` 必须加 `submodules: true`，否则 `themes/elysia` 为空目录，构建产物无样式。
+3. 无加密文章时删除 `Encrypt private content` 步骤；有加密文章时按一下“文章加密”一节配置 `ENCRYPT_PASSWORDS`。
+4. 在 GitHub 的 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**。
+5. 推送到 `main` 分支，等待 Actions 完成后打开站点地址。
+
+## 手动构建
+
+```bash
+zola build --force
+./pagefind_extended --site public   # provider = "pagefind"（默认）时必需；中文站必须用 extended，普通版 pagefind 不含中文分词
+```
+
+把 `public/` 上传到 Nginx、Apache、对象存储或其他静态托管服务。例如使用 rsync：
+
+```bash
+rsync -avz --delete public/ user@example.com:/var/www/html/
+```
+
+本地检查构建结果：
+
+```bash
+npx serve public
+```
+
+启用加密时，先加密再建索引再部署，顺序见“文章加密”一节。
+
+## 文章加密（可选）
+
+本主题支持加密文章，在文章 front matter 中标记即可：
+
+```toml
+[extra]
+encrypted = true
+password = "blog"   # 密码别名，真密码只放在加密配置里，不要写在这里
+```
+
+加密由 [ssg-encrypt](https://github.com/jhlzlove/ssg-encrypt) 对构建产物做后处理（AES-256-GCM），顺序固定且只有一种，错一步就会导致加密失效或索引泄漏原文：
+
+```text
+zola build → ssg-encrypt 加密 public/ → pagefind_extended 建索引 → 部署
+```
+
+加密后订阅源（atom.xml）中对应条目的正文会被替换为占位文本，不会泄漏原文。
+
+### 手动部署
+
+1. 到 [ssg-encrypt Releases](https://github.com/jhlzlove/ssg-encrypt/releases) 下载对应平台的二进制文件，放到站点根目录。
+2. 在站点根目录准备 `encrypt.toml`（真密码只写在这里；该文件已在 `.gitignore` 中，不会提交到仓库），`[passwords]` 的别名与文章 `extra.password` 对应：
+
+```toml
+[passwords]
+blog = "真正的密码写这里"
+```
+
+3. 按固定顺序执行：
+
+```bash
+zola build
+./ssg-encrypt -c encrypt.toml   # -c 指定配置文件；public/ 为默认输入目录，可省略 --input
+./pagefind_extended --site public
+# 然后把 public/ 发布到任意平台：Nginx、对象存储、GitHub Pages……
+```
+
+可用 `--dry-run` 先扫描校验而不写文件，确认规则命中后再正式执行。
+
+### GitHub Action 自动部署
+
+直接复用上节 `.github/workflows/deploy.yml`，无需另写流程，只需在仓库 **Settings → Secrets and variables → Actions** 中添加 `ENCRYPT_PASSWORDS`，内容为 TOML 格式的 `别名 = "密码"`（可多行，如 `blog = "……"`）。
 
 ## Netlify、Vercel 和 Cloudflare Pages
 
@@ -172,11 +151,13 @@ jobs:
 
 | 平台 | 构建命令 | 发布目录 |
 | --- | --- | --- |
-| Netlify | `zola build` | `public` |
-| Vercel | `zola build` | `public` |
-| Cloudflare Pages | `zola build` | `public` |
+| Netlify | `zola build && ./pagefind_extended --site public` | `public` |
+| Vercel | `zola build && ./pagefind_extended --site public` | `public` |
+| Cloudflare Pages | `zola build && ./pagefind_extended --site public` | `public` |
 
-如果平台没有预装 Zola，请指定 `ZOLA_VERSION=0.23.4` 或使用对应的 Zola 构建镜像。
+- 构建命令包含建索引是因为默认 `provider = "pagefind"`；若改为 `provider = "none"`，构建命令只需 `zola build`。
+- 启用加密时同样遵守“先加密再建索引”的顺序。
+- 如果平台没有预装 Zola，请指定 `ZOLA_VERSION=0.23.4` 或使用对应的 Zola 构建镜像。
 
 ## 自定义域名
 

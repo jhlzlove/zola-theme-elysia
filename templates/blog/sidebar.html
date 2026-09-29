@@ -1,0 +1,188 @@
+{# ############################################################################
+   # Blog: 左侧栏（品牌 + 菜单导航 + 搜索 + 年进度 + 底部链接）
+   # 上下文：依赖 base.html  vooraf 计算的 cur_lang；search_* 全局变量来自 <head>
+   # Wiki 不用此文件，见 wiki/sidebar.html
+   ############################################################################ #}
+<div class="brand">
+  {% if config.extra.avatar %}
+    <img class="brand__avatar" src="{{ get_url(path=config.extra.avatar) | safe }}" alt="{{ config.extra.avatar_alt | default(value=config.title) }}" loading="lazy" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='grid'">
+    <div id="avatarFallback" class="brand__avatar brand__avatar--placeholder" style="display:none">{{ config.title | truncate(length=2, end="") | upper }}</div>
+  {% else %}
+    <div class="brand__avatar brand__avatar--placeholder">{{ config.title | truncate(length=2, end="") | upper }}</div>
+  {% endif %}
+  <div class="brand__title"><a href="{{ get_url(path="/", lang=cur_lang, trailing_slash=true) | safe }}">{{ config.title }}</a></div>
+  {% if config.extra.site_motto %}<div class="brand__motto">{{ config.extra.site_motto }}</div>{% endif %}
+</div>
+{# # Blog: 主菜单 — 仅维护一套 [[extra.menus]]，名称经 translations 翻译 #}
+{% set_global menus = config.extra.menus %}
+{% if menus %}
+<nav class="nav-buttons" aria-label="Primary">
+  {% for item in menus %}
+    {% set display_name = trans(key=item.name_key, lang=cur_lang) %}
+    {% set raw = item.url %}
+    {# 外链原样输出；站内路径经 get_url 生成以支持 base_url 子路径部署 #}
+    {% set is_external = raw is starting_with(pat="http://") or raw is starting_with(pat="https://") or raw is starting_with(pat="//") or raw is starting_with(pat="mailto:") or raw is starting_with(pat="tel:") or raw is starting_with(pat="#") %}
+    {% set is_http = raw is starting_with(pat="http://") or raw is starting_with(pat="https://") or raw is starting_with(pat="//") %}
+    {% if is_external %}
+      {% set href = raw %}
+      {% set href_path = raw %}
+    {% else %}
+      {% set href_path = raw %}
+      {% if cur_lang != config.default_language and raw is starting_with(pat="/") %}
+        {% set parts = raw | split(pat="/") %}
+        {% set first_seg = parts[1] | default(value="") %}
+        {% if first_seg != cur_lang %}
+          {% if raw == "/" %}
+            {% set href_path = "/" ~ cur_lang ~ "/" %}
+          {% else %}
+            {% set href_path = "/" ~ cur_lang ~ raw %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+      {% if href_path is ending_with(pat="/") %}
+        {% set href = get_url(path=href_path, trailing_slash=true) %}
+      {% else %}
+        {% set href = get_url(path=href_path) %}
+      {% endif %}
+    {% endif %}
+    {% set is_active = current_path is defined and current_path == href_path %}
+    <a class="nav-btn {% if is_active %}is-active{% endif %}" href="{{ href | safe }}" {% if is_http %}target="_blank" rel="noopener"{% endif %}>
+      {% if item.icon %}<span class="nav-btn__icon">{{ item.icon }}</span>{% endif %}
+      <span>{{ display_name }}</span>
+    </a>
+  {% endfor %}
+</nav>
+{% endif %}
+
+{# # Blog: 搜索框（provider 见 [extra.search]） #}
+{% if search_use_algolia or search_use_pagefind %}
+<div class="search" id="searchRoot"
+  data-provider="{{ search_provider }}"
+  data-hits-per-page="{{ search_hits }}"
+  data-placeholder="{{ search_ph | safe }}"
+  data-bundle="{{ pf_js | safe }}"
+  data-site-root="{{ get_url(path="/", trailing_slash=true) | safe }}"
+  data-search-page="{{ get_url(path="search/", lang=cur_lang, trailing_slash=true) | safe }}"
+  {% if search_use_algolia %}data-app-id="{{ config.extra.algolia.app_id | safe }}"
+  data-api-key="{{ config.extra.algolia.api_key | safe }}"
+  data-index-name="{{ config.extra.algolia.index_name | safe }}"
+  data-powered="{{ search_powered }}"{% endif %}>
+  <label for="searchInput" class="sr-only">搜索</label>
+  <div class="search__input-wrap">
+    {{ <icon name="search" class="search__icon"/> }}
+    <input id="searchInput" class="search__input" type="search" placeholder="{{ search_ph }}" autocomplete="off" spellcheck="false" aria-autocomplete="list" aria-expanded="false" aria-controls="searchResults">
+    <button id="searchClear" class="search__clear" type="button" aria-label="清空搜索" hidden>✕</button>
+    <kbd class="search__kbd" aria-hidden="true">/</kbd>
+  </div>
+  <div id="searchResults" class="search__results" hidden role="listbox" aria-label="搜索结果"></div>
+  {% if search_use_algolia and search_powered %}
+  <div id="searchPowered" class="search__powered" hidden>Search by <a href="https://www.algolia.com" target="_blank" rel="noopener">Algolia</a></div>
+  {% endif %}
+</div>
+{% endif %}
+
+{# # Blog: 年进度条 #}
+{% if config.extra.features.year_progress | default(value=true) %}
+<div class="year-progress" id="yearProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Year progress" tabindex="0">
+  <div class="year-progress__bar" id="yearProgressBar" style="width:0%"></div>
+  <div class="year-progress__tooltip" id="yearProgressTip">—</div>
+</div>
+{% endif %}
+
+{# # Blog: 底部社交链接 / 调色 / 语言 / 主题 #}
+<div class="sidebar__footer">
+  {% if config.extra.socials %}
+  <div class="socials" aria-label="Social links">
+    {% for s in config.extra.socials %}
+      {% set _s_raw = s.url %}
+      {% set _s_is_external = _s_raw is starting_with(pat="http://") or _s_raw is starting_with(pat="https://") or _s_raw is starting_with(pat="//") or _s_raw is starting_with(pat="mailto:") or _s_raw is starting_with(pat="tel:") or _s_raw is starting_with(pat="#") %}
+      {% if _s_is_external %}
+        {% set _s_href = _s_raw %}
+      {% else %}
+        {% set _s_path = _s_raw %}
+        {% if cur_lang != config.default_language and _s_raw is starting_with(pat="/") %}
+          {% set _s_parts = _s_raw | split(pat="/") %}
+          {% set _s_first = _s_parts[1] | default(value="") %}
+          {% if _s_first != cur_lang %}
+            {% set _s_path = "/" ~ cur_lang ~ _s_raw %}
+          {% endif %}
+        {% endif %}
+        {% if _s_path is ending_with(pat="/") %}
+          {% set _s_href = get_url(path=_s_path, trailing_slash=true) %}
+        {% else %}
+          {% set _s_href = get_url(path=_s_path) %}
+        {% endif %}
+      {% endif %}
+      <a class="socials__link" href="{{ _s_href | safe }}" target="_blank" rel="noopener" aria-label="{{ s.name }}" title="{{ s.name }}">
+        {% if s.icon == "github" %}
+          {{ <icon name="github"/> }}
+        {% elif s.icon == "rss" %}
+          {{ <icon name="rss"/> }}
+        {% elif s.icon == "mail" %}
+          {{ <icon name="mail"/> }}
+        {% else %}
+          <span style="font-size:13px">{{ s.icon }}</span>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <div class="footer__actions">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="palette-wrap" id="paletteWrap">
+        <button class="icon-btn" id="paletteToggle" aria-label="调色盘" aria-expanded="false" aria-controls="paletteDropdown" title="调色盘">
+          {{ <icon name="palette"/> }}
+        </button>
+        <div class="palette-dropdown" id="paletteDropdown" hidden role="listbox" aria-label="选择配色">
+          <button class="palette__option is-active" data-palette="default" role="option" aria-selected="true"><span class="palette__dot" data-palette="default"></span><span class="palette__label">素雅黑</span><span class="palette__check" aria-hidden="true">✓</span></button>
+          <button class="palette__option" data-palette="lime" role="option" aria-selected="false"><span class="palette__dot" data-palette="lime"></span><span class="palette__label">鹅黄绿</span><span class="palette__check" aria-hidden="true">✓</span></button>
+          <button class="palette__option" data-palette="orange" role="option" aria-selected="false"><span class="palette__dot" data-palette="orange"></span><span class="palette__label">活力橙</span><span class="palette__check" aria-hidden="true">✓</span></button>
+          <button class="palette__option" data-palette="violet" role="option" aria-selected="false"><span class="palette__dot" data-palette="violet"></span><span class="palette__label">梦幻紫</span><span class="palette__check" aria-hidden="true">✓</span></button>
+        </div>
+      </div>
+      <div class="lang-wrap" id="langWrap">
+        <button class="icon-btn" id="langToggle" aria-label="切换语言" aria-expanded="false" aria-controls="langDropdown" title="English / 中文">
+          {{ <icon name="globe"/> }}
+        </button>
+        <div class="palette-dropdown lang-dropdown" id="langDropdown" hidden role="listbox" aria-label="选择语言">
+          {% set _cur = lang | default(value=config.default_language) %}
+          {% if current_path is defined %}
+            {% set _pp = current_path | split(pat="/") %}
+            {% set _pf = _pp[1] | default(value="") %}
+            {% if _pf and config.languages and config.languages[_pf] is defined %}
+              {% set _cur = _pf %}
+            {% endif %}
+          {% endif %}
+          {% set _zh_href = get_url(path="/", trailing_slash=true) %}
+          {% set _en_href = get_url(path="en/", trailing_slash=true) %}
+          {% if page is defined %}
+            {% if page.lang == "zh" %}{% set_global _zh_href = page.permalink | safe %}{% elif page.lang == "en" %}{% set_global _en_href = page.permalink | safe %}{% endif %}
+            {% for t in page.translations %}
+              {% if t.lang == "zh" %}{% set_global _zh_href = t.permalink | safe %}{% endif %}
+              {% if t.lang == "en" %}{% set_global _en_href = t.permalink | safe %}{% endif %}
+            {% endfor %}
+          {% elif section is defined %}
+            {% if section.lang == "zh" %}{% set_global _zh_href = section.permalink | safe %}{% elif section.lang == "en" %}{% set_global _en_href = section.permalink | safe %}{% endif %}
+            {% for t in section.translations %}
+              {% if t.lang == "zh" %}{% set_global _zh_href = t.permalink | safe %}{% endif %}
+              {% if t.lang == "en" %}{% set_global _en_href = t.permalink | safe %}{% endif %}
+            {% endfor %}
+          {% endif %}
+          <a class="palette__option {% if _cur == "zh" %}is-active{% endif %}" href="{{ _zh_href | safe }}" role="option" aria-selected="{% if _cur == "zh" %}true{% else %}false{% endif %}">
+            <span style="font-size:14px">🇨🇳</span><span class="palette__label">中文</span><span class="palette__check" aria-hidden="true">✓</span>
+          </a>
+          <a class="palette__option {% if _cur == "en" %}is-active{% endif %}" href="{{ _en_href | safe }}" role="option" aria-selected="{% if _cur == "en" %}true{% else %}false{% endif %}">
+            <span style="font-size:14px">🇺🇸</span><span class="palette__label">English</span><span class="palette__check" aria-hidden="true">✓</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="theme-controls">
+      <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
+        {{ <icon name="sun" id="iconSun" style="display:none"/> }}
+        {{ <icon name="moon" id="iconMoon" style="display:none"/> }}
+        {{ <icon name="monitor" id="iconMonitor" style="display:none"/> }}
+      </button>
+    </div>
+  </div>
+</div>

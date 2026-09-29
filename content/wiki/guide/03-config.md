@@ -62,14 +62,15 @@ github_alerts = true
 bottom_footnotes = true
 
 [markdown.highlighting]
-theme = "catppuccin-mocha"
+light_theme = "ayu-light"
+dark_theme = "ayu-dark"
 style = "class"
 ```
 
 - `render_emoji`：支持 `:smile:` 简码。
 - `github_alerts`：支持 `> [!NOTE]` / `> [!TIP]` / `> [!WARNING]` 等。
 - `bottom_footnotes`：脚注沉底。
-- `highlighting.style = "class"`：以 CSS class 输出高亮；`light_theme` / `dark_theme` 双主题构建期生成 `giallo-light.css` / `giallo-dark.css`，由站内亮暗切换按需启用（单 `theme` 只生成 `giallo.css`）。
+- `highlighting`：`style` 必须为 `"class"`；`light_theme` / `dark_theme` 双主题构建期生成 `giallo-light.css` / `giallo-dark.css`，由站内亮暗切换按需启用。只写单个 `theme` 会导致暗色切换无高亮样式。
 
 ## Extra — 站点身份与页脚
 
@@ -206,7 +207,7 @@ placeholder = "search_placeholder"   # 搜索框提示文案的翻译 key
 path = "pagefind/"         # Pagefind bundle 输出目录（站内相对路径）
 ```
 
-- `pagefind`：零配置；每次构建后运行 `pagefind_extended --site public` 生成索引（仓库根目录已附带 `pagefind_extended` 二进制，CI 会自动执行）。`[extra.pagefind].path` 为索引输出目录。搜索页直接使用 Pagefind 官方 UI，侧栏为主题定制下拉。
+- `pagefind`：无需申请 key；每次构建后运行 `pagefind_extended --site public` 生成索引（`pagefind_extended` 需到 [Pagefind Releases](https://github.com/Pagefind/pagefind/releases) 下载对应平台的包，CI 会自动下载执行）。`[extra.pagefind].path` 为索引输出目录。搜索页直接使用 Pagefind 官方 UI，侧栏为主题定制下拉。
 > [!warning]
 > 中文站必须使用 `pagefind_extended`（而非普通版 `pagefind`）：普通版不含中文分词，中文基本搜不出来。[Pagefind Releases](https://github.com/Pagefind/pagefind/releases) 下载对应平台的 `pagefind_extended` 包。
 - `algolia`：沿用下方 `[extra.algolia]`（需 `app_id + api_key + index_name`），并将文章数据推送至对应 index。
@@ -377,11 +378,10 @@ description = "摘要"
 categories = ["技术"]
 tags = ["zola"]
 [extra]
-sticky = true          # 置顶：sticky / top / pinned 任一
+sticky = true          # 置顶：sticky / top / pinned 任一为真即置顶
 encrypted = true
-password = "1234"
+password = "blog"      # 密码别名，对应 encrypt.toml [passwords] 的 key，真密码只写在那里
 password_hint = "提示"
-style = "blog"        # 仅作标记，版式由 template 决定
 expiry = false         # 关闭本篇过期提示
 expiry_days = 60
 expiry_text = "自定义 {date} {days} {diff}"
@@ -390,4 +390,6 @@ comments = false       # 关闭本篇评论
 ```
 
 - `categories` / `tags` 必须在 `[taxonomies]` 下且加引号。
-- `weight` 用于 Wiki 排序；`style` 为约定字段，真正版式由 `template` 决定。
+- 版式由文件位置与 `_index.md` 的 `template` / `page_template` 决定（`content/blog/` 为博客，`content/wiki/` 子目录为 Wiki），不要写 `extra.style`。
+- `weight` 仅用于 Wiki 排序（`sort_by = "weight"` 的目录）；博客排序只看 `date`。
+- `password` 是别名而非真密码，加密流程见第 04 章。

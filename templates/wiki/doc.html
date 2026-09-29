@@ -1,0 +1,72 @@
+{# ############################################################################
+   # Wiki: 子目录首页（阅读单元；左侧纯目录 + 正文；大纲只走悬浮按钮）
+   # 路由：各 wiki 子目录 _index.md template 指向此文件
+   ############################################################################ #}
+{% extends "base.html" %}
+
+{% block sidebar %}
+{% include "wiki/sidebar.html" %}
+{% endblock sidebar %}
+
+{% block content %}
+<div class="content-area">
+  <div class="content-area__primary">
+    <article class="article">
+      <header class="article__header">
+        <h1 class="article__title">{{ section.title }}</h1>
+        {% if section.description %}
+        <div class="article__meta">
+          <span style="color:var(--muted)">{{ section.description }}</span>
+        </div>
+        {% endif %}
+      </header>
+      {# # Wiki: 移动端折叠目录 #}
+      {% set wm_section = section %}
+      {% set wm_current = "" %}
+      {% include "partials/wiki-mobile.html" %}
+      <div class="article__content" id="articleContent">
+        {{ section.content | safe }}
+      </div>
+    </article>
+  </div>
+</div>
+{% endblock content %}
+
+{% block toc_float %}
+{# # Wiki: 悬浮大纲（仅窄屏显示；桌面端走下方右侧 aside；左侧 wiki 目录不受影响） #}
+{% if section.toc | length > 0 %}
+{% set toc = section.toc %}
+{% include "partials/toc-list.html" %}
+{% endif %}
+{% endblock toc_float %}
+
+{% block toc %}
+{# # Wiki: 桌面端右侧大纲（窄屏隐藏，走悬浮按钮） #}
+{% if section.toc | length > 0 %}
+<aside class="toc-aside is-visible" id="tocAside" aria-label="Table of contents">
+    <nav class="toc" id="toc">
+      <div class="toc__title">{{ <icon name="toc" width="14" height="14"/> }} {{ trans(key="toc_title", lang=lang) }}</div>
+      <ol class="toc__list">
+        {% for h1 in section.toc %}
+          <li>
+            <a href="{{ h1.permalink | safe }}">{{ h1.title }}</a>
+            {% if h1.children %}
+              <ol class="toc__list toc__list--h3">
+                {% for h2 in h1.children %}
+                  <li><a href="{{ h2.permalink | safe }}">{{ h2.title }}</a>
+                    {% if h2.children %}
+                      <ol class="toc__list toc__list--h4">
+                        {% for h3 in h2.children %}<li><a href="{{ h3.permalink | safe }}">{{ h3.title }}</a></li>{% endfor %}
+                      </ol>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ol>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+    </nav>
+  </aside>
+{% endif %}
+{% endblock toc %}

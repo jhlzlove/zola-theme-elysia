@@ -16,7 +16,7 @@
     {% endfor %}
   {% endif %}
 
-  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20260924">
+  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20260928-4">
   {# 代码高亮：双主题（zola.toml light_theme/dark_theme）生成 giallo-light/dark.css，按 data-theme 启用其一 #}
   <link id="giallo-light" rel="stylesheet" href="{{ get_url(path="giallo-light.css") | safe }}?v=20260924">
   <link id="giallo-dark" rel="stylesheet" href="{{ get_url(path="giallo-dark.css") | safe }}?v=20260924">
@@ -70,36 +70,21 @@
 </head>
 <body>
 <div class="shell">
-  {# ── Wiki 上下文判定：进入 wiki 子项目时左侧切为目录菜单 ── #}
-  {# 提前到 aside 之前，品牌区与面板共用：wiki 下隐藏品牌/搜索/年进度，目录顶格 #}
-  {% set_global is_wiki_context = false %}
-  {% set_global wiki_nav_section = "" %}
-  {% if page is defined and page.ancestors is defined and page.ancestors | length > 0 %}
-    {% set _parent_path = page.ancestors | last %}
-    {# wiki 只收录项目：父级为 wiki 根的散篇不纳入 wiki 上下文，按普通文章渲染 #}
-    {% if "wiki" in _parent_path and _parent_path != "wiki/_index.md" and "wiki/_index." not in _parent_path %}
-      {% set _parent_sec = get_section(path=_parent_path) %}
-      {% if _parent_sec %}
-        {% set_global is_wiki_context = true %}
-        {% set_global wiki_nav_section = _parent_sec %}
-      {% endif %}
-    {% endif %}
-  {% elif section is defined and section.path is defined %}
-    {% if "wiki" in section.path and not section.path is ending_with(pat="/wiki/") %}
-      {% set_global is_wiki_context = true %}
-      {% set_global wiki_nav_section = section %}
-    {% endif %}
-  {% endif %}
+  {# #########################################################################
+     # Shell: base 只留骨架；侧栏按模板命名空间分发（默认 blog，wiki 覆盖）
+     # - blog/*：{% include "blog/sidebar.html" %}（品牌+菜单+搜索+底部）
+     # - wiki/page.html、wiki/doc.html：覆盖 block sidebar → wiki/sidebar.html（纯目录）
+     # 历史 is_wiki_context 路径判定已删除（死代码），见 wiki/sidebar.html 自包含判定
+     ######################################################################### #}
   {# ── Sidebar ── #}
-  <aside class="sidebar{% if is_wiki_context %} is-wiki{% endif %}" id="sidebar" aria-label="Sidebar">
+  <aside class="sidebar" id="sidebar" aria-label="Sidebar">
     <button class="drawer-btn" id="drawerBtn" aria-expanded="false" aria-controls="sidebar" aria-label="Toggle menu">
       {{ <icon name="menu"/> }}
     </button>
 
     <div class="sidebar__panel" id="sidebarPanel">
-      {# cur_lang 提前计算：品牌首页、菜单、社交链接均需按语言 + base_url 生成 #}
+      {# # Shared: cur_lang 判定（品牌/菜单/社交按语言 + base_url 生成） #}
       {% set_global cur_lang = lang | default(value=config.default_language) %}
-      {# 优先以 URL 前缀判定（避免缺翻译时回退到默认语言导致菜单语言不一致） #}
       {% if current_path is defined %}
         {% set _parts = current_path | split(pat="/") %}
         {% set _first = _parts[1] | default(value="") %}
@@ -109,7 +94,6 @@
       {% endif %}
       {% if page is defined and page.lang is defined and page.lang %}{% set_global cur_lang = page.lang %}{% endif %}
       {% if section is defined and section.lang is defined and section.lang %}{% set_global cur_lang = section.lang %}{% endif %}
-      {# URL 前缀优先，覆盖 page.lang 的回退 #}
       {% if current_path is defined %}
         {% set _parts2 = current_path | split(pat="/") %}
         {% set _first2 = _parts2[1] | default(value="") %}
@@ -117,253 +101,10 @@
           {% set_global cur_lang = _first2 %}
         {% endif %}
       {% endif %}
-      {% if not is_wiki_context %}
-      <div class="brand">
-        {% if config.extra.avatar %}
-          <img class="brand__avatar" src="{{ get_url(path=config.extra.avatar) | safe }}" alt="{{ config.extra.avatar_alt | default(value=config.title) }}" loading="lazy" onerror="this.style.display='none';document.getElementById('avatarFallback').style.display='grid'">
-          <div id="avatarFallback" class="brand__avatar brand__avatar--placeholder" style="display:none">{{ config.title | truncate(length=2, end="") | upper }}</div>
-        {% else %}
-          <div class="brand__avatar brand__avatar--placeholder">{{ config.title | truncate(length=2, end="") | upper }}</div>
-        {% endif %}
-        <div class="brand__title"><a href="{{ get_url(path="/", lang=cur_lang, trailing_slash=true) | safe }}">{{ config.title }}</a></div>
-        {% if config.extra.site_motto %}<div class="brand__motto">{{ config.extra.site_motto }}</div>{% endif %}
-      </div>
-      {% endif %}
-      {# Menus — 基于 Zola translations 的多语言支持 #}
-      {# 仅维护一套 [[extra.menus]]（含 name_key/url/icon），名称通过 [translations] / [languages.<code>.translations] 翻译 #}
-      {# 增删菜单只需改一处，新增语言只需在对应 translations 中追加同名 key #}
-      {% set_global menus = config.extra.menus %}
-      {# Wiki 上下文判定已提前至 aside 之前，此处直接复用 is_wiki_context / wiki_nav_section #}
-      {# Wiki 根链接经 get_url 生成，自动携带 base_url 子路径（如 /repo/）与语言前缀 #}
-      {% set _wiki_root_url = get_url(path="wiki/", lang=cur_lang, trailing_slash=true) %}
-      {% if is_wiki_context and wiki_nav_section %}
-      <nav class="wiki-side-nav" aria-label="Wiki 目录">
-        <a class="wiki-side-nav__back" href="{{ _wiki_root_url | safe }}">← 返回 Wiki</a>
-        <div class="wiki-side-nav__head">
-          <a class="wiki-side-nav__title" href="{{ wiki_nav_section.permalink | safe }}" title="回到 {{ wiki_nav_section.title }} 主页">{{ wiki_nav_section.title }}</a>
-          <span class="wiki-side-nav__count">{{ wiki_nav_section.pages | length }} 篇</span>
-        </div>
-        <ol class="wiki-side-nav__list">
-          {% if wiki_nav_section.subsections %}
-            {% for sub in wiki_nav_section.subsections %}
-              {% set _s = get_section(path=sub) %}
-              {# 跳过透明中转目录（无标题）：其文章已上浮到当前目录的 pages 中，避免空白条目 #}
-              {% if _s.title %}
-              {% set _is_cur_sub = false %}
-              {% if section is defined and section.permalink is defined and _s.permalink == section.permalink %}{% set _is_cur_sub = true %}{% endif %}
-              <li class="wiki-side-nav__item wiki-side-nav__item--sub {% if _is_cur_sub %}is-current{% endif %}">
-                <a href="{{ _s.permalink | safe }}">
-                  <span class="wiki-side-nav__index wiki-side-nav__index--folder">📁</span>
-                  <span class="wiki-side-nav__item-title">{{ _s.title }}</span>
-                </a>
-              </li>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-          {% for p in wiki_nav_section.pages %}
-            {% set _is_cur = false %}
-            {% if page is defined and p.permalink == page.permalink %}{% set _is_cur = true %}{% endif %}
-            {% if section is defined and p.permalink == section.permalink %}{% set _is_cur = true %}{% endif %}
-            {# 回退：用 current_path 比对（permalink 末尾斜杠差异时兜底） #}
-            {% if not _is_cur and current_path is defined and p.path is defined and current_path == p.path %}{% set _is_cur = true %}{% endif %}
-            <li class="wiki-side-nav__item {% if _is_cur %}is-current{% endif %}">
-              <a href="{{ p.permalink | safe }}" {% if _is_cur %}aria-current="page"{% endif %}>
-                <span class="wiki-side-nav__index">{{ loop.index }}</span>
-                <span class="wiki-side-nav__item-title">{{ p.title }}</span>
-                {% if _is_cur %}<span class="wiki-side-nav__here">· 在读</span>{% endif %}
-              </a>
-            </li>
-          {% endfor %}
-        </ol>
-        <div class="wiki-side-nav__progress">
-          {% set_global _cur_idx = 0 %}
-          {% if page is defined %}
-            {% for p in wiki_nav_section.pages %}
-              {% if p.permalink == page.permalink %}{% set_global _cur_idx = loop.index %}{% endif %}
-            {% endfor %}
-          {% endif %}
-          <div class="wiki-side-nav__bar"><div class="wiki-side-nav__bar-fill" style="width: {% if wiki_nav_section.pages | length > 0 %}{{ _cur_idx * 100 / (wiki_nav_section.pages | length) }}%{% else %}0%{% endif %}"></div></div>
-          <span class="wiki-side-nav__step">{{ _cur_idx }} / {{ wiki_nav_section.pages | length }}</span>
-        </div>
-      </nav>
-      {% elif menus %}
-      <nav class="nav-buttons" aria-label="Primary">
-        {% for item in menus %}
-          {% set display_name = trans(key=item.name_key, lang=cur_lang) %}
-          {% set raw = item.url %}
-          {# 外链（http/mailto/tel/锚点/协议相对）原样输出；站内路径经 get_url 生成以支持 base_url 子路径部署（如 /repo/） #}
-          {% set is_external = raw is starting_with(pat="http://") or raw is starting_with(pat="https://") or raw is starting_with(pat="//") or raw is starting_with(pat="mailto:") or raw is starting_with(pat="tel:") or raw is starting_with(pat="#") %}
-          {% set is_http = raw is starting_with(pat="http://") or raw is starting_with(pat="https://") or raw is starting_with(pat="//") %}
-          {% if is_external %}
-            {% set href = raw %}
-            {% set href_path = raw %}
-          {% else %}
-            {# 站内绝对路径按当前语言自动加前缀；已带前缀的跳过（通用逻辑，支持任意语言） #}
-            {% set href_path = raw %}
-            {% if cur_lang != config.default_language and raw is starting_with(pat="/") %}
-              {% set parts = raw | split(pat="/") %}
-              {% set first_seg = parts[1] | default(value="") %}
-              {% if first_seg != cur_lang %}
-                {% if raw == "/" %}
-                  {% set href_path = "/" ~ cur_lang ~ "/" %}
-                {% else %}
-                  {% set href_path = "/" ~ cur_lang ~ raw %}
-                {% endif %}
-              {% endif %}
-            {% endif %}
-            {# 经 get_url 拼接 base_url 子路径；href_path 已含语言前缀，此处不再传 lang 以防双重前缀 #}
-            {% if href_path is ending_with(pat="/") %}
-              {% set href = get_url(path=href_path, trailing_slash=true) %}
-            {% else %}
-              {% set href = get_url(path=href_path) %}
-            {% endif %}
-          {% endif %}
-          {% set is_active = current_path is defined and current_path == href_path %}
-          <a class="nav-btn {% if is_active %}is-active{% endif %}" href="{{ href | safe }}" {% if is_http %}target="_blank" rel="noopener"{% endif %}>
-            {% if item.icon %}<span class="nav-btn__icon">{{ item.icon }}</span>{% endif %}
-            <span>{{ display_name }}</span>
-          </a>
-        {% endfor %}
-      </nav>
-      {% endif %}
-
-      {# Wiki 子项目页：隐藏搜索框与年份进度条，保持左侧纯目录 #}
-      {% if not is_wiki_context %}
-      {# Search — provider 由 [extra.search] 选择（默认 pagefind 本地索引） #}
-      {% if search_use_algolia or search_use_pagefind %}
-      <div class="search" id="searchRoot"
-        data-provider="{{ search_provider }}"
-        data-hits-per-page="{{ search_hits }}"
-        data-placeholder="{{ search_ph | safe }}"
-        data-bundle="{{ pf_js | safe }}"
-        data-site-root="{{ get_url(path="/", trailing_slash=true) | safe }}"
-        data-search-page="{{ get_url(path="search/", lang=cur_lang, trailing_slash=true) | safe }}"
-        {% if search_use_algolia %}data-app-id="{{ config.extra.algolia.app_id | safe }}"
-        data-api-key="{{ config.extra.algolia.api_key | safe }}"
-        data-index-name="{{ config.extra.algolia.index_name | safe }}"
-        data-powered="{{ search_powered }}"{% endif %}>
-        <label for="searchInput" class="sr-only">搜索</label>
-        <div class="search__input-wrap">
-          {{ <icon name="search" class="search__icon"/> }}
-          <input id="searchInput" class="search__input" type="search" placeholder="{{ search_ph }}" autocomplete="off" spellcheck="false" aria-autocomplete="list" aria-expanded="false" aria-controls="searchResults">
-          <button id="searchClear" class="search__clear" type="button" aria-label="清空搜索" hidden>✕</button>
-          <kbd class="search__kbd" aria-hidden="true">/</kbd>
-        </div>
-        <div id="searchResults" class="search__results" hidden role="listbox" aria-label="搜索结果"></div>
-        {% if search_use_algolia and search_powered %}
-        <div id="searchPowered" class="search__powered" hidden>Search by <a href="https://www.algolia.com" target="_blank" rel="noopener">Algolia</a></div>
-        {% endif %}
-      </div>
-      {% endif %}
-
-      {# Year progress — only percentage line, hover shows days #}
-      {% if config.extra.features.year_progress | default(value=true) %}
-      <div class="year-progress" id="yearProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Year progress" tabindex="0">
-        <div class="year-progress__bar" id="yearProgressBar" style="width:0%"></div>
-        <div class="year-progress__tooltip" id="yearProgressTip">—</div>
-      </div>
-      {% endif %}
-      {% endif %}
-
-
-      <div class="sidebar__footer">
-        {% if config.extra.socials %}
-        <div class="socials" aria-label="Social links">
-          {% for s in config.extra.socials %}
-            {# 站内路径（如 /atom.xml）经 get_url 生成以支持 base_url 子路径部署；外链原样输出 #}
-            {% set _s_raw = s.url %}
-            {% set _s_is_external = _s_raw is starting_with(pat="http://") or _s_raw is starting_with(pat="https://") or _s_raw is starting_with(pat="//") or _s_raw is starting_with(pat="mailto:") or _s_raw is starting_with(pat="tel:") or _s_raw is starting_with(pat="#") %}
-            {% if _s_is_external %}
-              {% set _s_href = _s_raw %}
-            {% else %}
-              {% set _s_path = _s_raw %}
-              {% if cur_lang != config.default_language and _s_raw is starting_with(pat="/") %}
-                {% set _s_parts = _s_raw | split(pat="/") %}
-                {% set _s_first = _s_parts[1] | default(value="") %}
-                {% if _s_first != cur_lang %}
-                  {% set _s_path = "/" ~ cur_lang ~ _s_raw %}
-                {% endif %}
-              {% endif %}
-              {% if _s_path is ending_with(pat="/") %}
-                {% set _s_href = get_url(path=_s_path, trailing_slash=true) %}
-              {% else %}
-                {% set _s_href = get_url(path=_s_path) %}
-              {% endif %}
-            {% endif %}
-            <a class="socials__link" href="{{ _s_href | safe }}" target="_blank" rel="noopener" aria-label="{{ s.name }}" title="{{ s.name }}">
-              {% if s.icon == "github" %}
-                {{ <icon name="github"/> }}
-              {% elif s.icon == "rss" %}
-                {{ <icon name="rss"/> }}
-              {% elif s.icon == "mail" %}
-                {{ <icon name="mail"/> }}
-              {% else %}
-                <span style="font-size:13px">{{ s.icon }}</span>
-              {% endif %}
-            </a>
-          {% endfor %}
-        </div>
-        {% endif %}
-        <div class="footer__actions">
-          <div style="display:flex; align-items:center; gap:8px;">
-            <div class="palette-wrap" id="paletteWrap">
-              <button class="icon-btn" id="paletteToggle" aria-label="调色盘" aria-expanded="false" aria-controls="paletteDropdown" title="调色盘">
-                {{ <icon name="palette"/> }}
-              </button>
-              <div class="palette-dropdown" id="paletteDropdown" hidden role="listbox" aria-label="选择配色">
-                <button class="palette__option is-active" data-palette="default" role="option" aria-selected="true"><span class="palette__dot" data-palette="default"></span><span class="palette__label">素雅黑</span><span class="palette__check" aria-hidden="true">✓</span></button>
-                <button class="palette__option" data-palette="lime" role="option" aria-selected="false"><span class="palette__dot" data-palette="lime"></span><span class="palette__label">鹅黄绿</span><span class="palette__check" aria-hidden="true">✓</span></button>
-                <button class="palette__option" data-palette="orange" role="option" aria-selected="false"><span class="palette__dot" data-palette="orange"></span><span class="palette__label">活力橙</span><span class="palette__check" aria-hidden="true">✓</span></button>
-                <button class="palette__option" data-palette="violet" role="option" aria-selected="false"><span class="palette__dot" data-palette="violet"></span><span class="palette__label">梦幻紫</span><span class="palette__check" aria-hidden="true">✓</span></button>
-              </div>
-            </div>
-            <div class="lang-wrap" id="langWrap">
-              <button class="icon-btn" id="langToggle" aria-label="切换语言" aria-expanded="false" aria-controls="langDropdown" title="English / 中文">
-                {{ <icon name="globe"/> }}
-              </button>
-              <div class="palette-dropdown lang-dropdown" id="langDropdown" hidden role="listbox" aria-label="选择语言">
-                {% set _cur = lang | default(value=config.default_language) %}
-                {% if current_path is defined %}
-                  {% set _pp = current_path | split(pat="/") %}
-                  {% set _pf = _pp[1] | default(value="") %}
-                  {% if _pf and config.languages and config.languages[_pf] is defined %}
-                    {% set _cur = _pf %}
-                  {% endif %}
-                {% endif %}
-                {# 当前页面的多语言对应链接，优先跳转到同页翻译，否则回退首页（经 get_url 生成，支持 base_url 子路径） #}
-                {% set _zh_href = get_url(path="/", trailing_slash=true) %}
-                {% set _en_href = get_url(path="en/", trailing_slash=true) %}
-                {% if page is defined %}
-                  {% if page.lang == "zh" %}{% set_global _zh_href = page.permalink | safe %}{% elif page.lang == "en" %}{% set_global _en_href = page.permalink | safe %}{% endif %}
-                  {% for t in page.translations %}
-                    {% if t.lang == "zh" %}{% set_global _zh_href = t.permalink | safe %}{% endif %}
-                    {% if t.lang == "en" %}{% set_global _en_href = t.permalink | safe %}{% endif %}
-                  {% endfor %}
-                {% elif section is defined %}
-                  {% if section.lang == "zh" %}{% set_global _zh_href = section.permalink | safe %}{% elif section.lang == "en" %}{% set_global _en_href = section.permalink | safe %}{% endif %}
-                  {% for t in section.translations %}
-                    {% if t.lang == "zh" %}{% set_global _zh_href = t.permalink | safe %}{% endif %}
-                    {% if t.lang == "en" %}{% set_global _en_href = t.permalink | safe %}{% endif %}
-                  {% endfor %}
-                {% endif %}
-                <a class="palette__option {% if _cur == "zh" %}is-active{% endif %}" href="{{ _zh_href | safe }}" role="option" aria-selected="{% if _cur == "zh" %}true{% else %}false{% endif %}">
-                  <span style="font-size:14px">🇨🇳</span><span class="palette__label">中文</span><span class="palette__check" aria-hidden="true">✓</span>
-                </a>
-                <a class="palette__option {% if _cur == "en" %}is-active{% endif %}" href="{{ _en_href | safe }}" role="option" aria-selected="{% if _cur == "en" %}true{% else %}false{% endif %}">
-                  <span style="font-size:14px">🇺🇸</span><span class="palette__label">English</span><span class="palette__check" aria-hidden="true">✓</span>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="theme-controls">
-            <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">
-              {{ <icon name="sun" id="iconSun" style="display:none"/> }}
-              {{ <icon name="moon" id="iconMoon" style="display:none"/> }}
-              {{ <icon name="monitor" id="iconMonitor" style="display:none"/> }}
-            </button>
-          </div>
-        </div>
-      </div>
+      {# # Shared: 侧栏分发点（默认 blog；wiki 模板覆盖此 block） #}
+      {% block sidebar %}
+      {% include "blog/sidebar.html" %}
+      {% endblock sidebar %}
     </div>
   </aside>
   <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
@@ -408,9 +149,18 @@
   {{ <icon name="chevron-up"/> }}
 </button>
 
+{# Floating article TOC — 面板内容由各文章模板经 block toc_float 直出，wiki 左侧目录不受影响 #}
+<button class="toc-float-btn" id="tocFloatBtn" aria-label="文章目录" aria-expanded="false" aria-controls="tocFloatPanel" hidden>
+  {{ <icon name="toc" width="18" height="18"/> }}
+</button>
+<div class="toc-float-panel" id="tocFloatPanel" hidden role="dialog" aria-label="文章目录">
+  <div class="toc-float-panel__title">{{ trans(key="toc_title", lang=lang | default(value=config.default_language)) }}</div>
+  <nav class="toc toc--float" id="tocFloatNav" aria-label="Table of contents">{% block toc_float %}{% endblock toc_float %}</nav>
+</div>
+
 <script>window.ELYSIA_ICONS_URL="{{ get_url(path="icons.svg") | safe }}?v=20260907";</script>
 <script src="{{ get_url(path="js/site-decrypt.js") | safe }}?v=20260907" defer></script>
-  <script src="{{ get_url(path="js/main.js") | safe }}?v=20260924" defer></script>
+  <script src="{{ get_url(path="js/main.js") | safe }}?v=20260928-4" defer></script>
 <script src="{{ get_url(path="js/friends.js") | safe }}?v=20260909" defer></script>
 {% if search_use_algolia %}
 <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" defer></script>

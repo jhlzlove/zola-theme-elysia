@@ -46,19 +46,17 @@ sticky = true
 - `weight`：Wiki 章节排序；`sticky` / `top` / `pinned` 置顶。
 - 分类与标签必须写在 `[taxonomies]` 下。
 
-加密文章：
+加密文章（`password` 为别名，对应 `encrypt.toml` `[passwords]` 的 key，真密码只写在那里并通过构建后加密生效，详见第 04 章）：
 
 ```toml
 +++
 title = "私密文章"
 [extra]
 encrypted = true
-password = "change-this-password"
+password = "blog"
 password_hint = "请输入密码"
 +++
 ```
-
-不要把真实密码提交到公开仓库，前端加密仅作轻量保护。
 
 ## 基础 Markdown
 
@@ -190,7 +188,7 @@ interface User {
 
 **效果：**
 
-```ts,linenos,name=example.ts,hl_lines=2 3
+```ts,name=example.ts,hl_lines=2 3
 interface User {
   name: string;
   age: number;
@@ -414,7 +412,6 @@ developer:
 ```jinja
 {% <poetry title="春晓" author="孟浩然"> %}
 春眠不觉晓，处处闻啼鸟。
-
 夜来风雨声，花落知多少。
 {% </poetry> %}
 ```
@@ -424,7 +421,6 @@ developer:
 
 {% <poetry title="春晓" author="孟浩然"> %}
 春眠不觉晓，处处闻啼鸟。
-
 夜来风雨声，花落知多少。
 {% </poetry> %}
 
@@ -556,28 +552,46 @@ func test() {
 
 ## Wiki 章节
 
-创建目录和 `_index.md`：
+Wiki 根目录（`/wiki/` 项目导航）与子目录（阅读单元）使用不同的模板，不要混用：
 
 ```text
-content/wiki/my-guide/
-├── _index.md
-├── 01-start.md
-└── 02-config.md
+content/wiki/
+├── _index.md          # Wiki 首页：template = "wiki/grid.html"，page_template = "wiki/page.html"
+└── my-guide/
+    ├── _index.md      # 阅读单元首页：template = "wiki/doc.html"，page_template = "wiki/page.html"
+    ├── 01-start.md
+    └── 02-config.md
 ```
 
-`_index.md`：
+`content/wiki/_index.md`：
+
+```toml
++++
+title = "Wiki"
+description = "知识库 · 文档式布局"
+sort_by = "date"
+template = "wiki/grid.html"
+page_template = "wiki/page.html"
+transparent = false
++++
+```
+
+`content/wiki/my-guide/_index.md`：
 
 ```toml
 +++
 title = "我的指南"
 description = "一句话介绍这个项目，显示在 Wiki 列表的卡片摘要中。"
 sort_by = "weight"
-template = "section.html"
-page_template = "page.html"
+weight = 2
+template = "wiki/doc.html"
+page_template = "wiki/page.html"
 +++
 ```
 
-章节文章使用 `weight` 排序；Wiki 导航来自目录结构。
+- 阅读单元的 `_index.md` 用 `wiki/doc.html`，其下文章自动使用 `wiki/page.html` 并显示左侧目录；Wiki 根目录用 `wiki/grid.html` 显示项目卡片网格。
+- 章节文章使用 `weight` 排序（`sort_by = "weight"`）；博客文章只看 `date`。
+- 版式由文件位置与上述 `template` / `page_template` 决定，不要写 `extra.style`。
 
 > [!NOTE]
 > Wiki 项目首页即 `_index.md` 是一个 Section，没有 `page.summary`，`<!-- more -->` 对它无效。

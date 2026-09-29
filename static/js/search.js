@@ -248,13 +248,17 @@
 
     root.style.display = ''; // ensure visible
 
+    // 清除按钮：仅有内容时显示，空白时隐藏（即时切换，不等防抖）
+    function syncClear(){ if(clear) clear.hidden = !input.value.trim(); }
+    syncClear();
+
     const debounced = debounce(function(){
       const q = input.value.trim();
-      if(clear) clear.hidden = !q;
+      syncClear();
       doSearch(q, cfg.hitsPerPage, results, null);
     }, 260);
 
-    input.addEventListener('input', debounced);
+    input.addEventListener('input', function(){ syncClear(); debounced(); });
     input.addEventListener('focus', function(){
       if(input.value.trim() && lastHits.length){
         showResults(results, powered);

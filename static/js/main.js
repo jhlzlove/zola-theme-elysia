@@ -701,30 +701,60 @@
     });
   }
 
-  // ── TOC spy ── 桌面与移动端共用，高亮同步
+  // ── Floating article TOC ── 仅窄屏显示（桌面端走右侧 aside）；面板内容服务端直出
+  // wiki 左侧目录不动；无大纲（加密/无标题）时按钮保持隐藏
+  function initFloatingToc(){
+    const btn=document.getElementById('tocFloatBtn');
+    const panel=document.getElementById('tocFloatPanel');
+    const nav=document.getElementById('tocFloatNav');
+    if(!btn||!panel||!nav) return;
+    if(!nav.querySelector('a')) return;
+    const narrow=window.matchMedia('(max-width: 1023px)');
+    function open(){ panel.hidden=false; btn.setAttribute('aria-expanded','true'); }
+    function close(){ panel.hidden=true; btn.setAttribute('aria-expanded','false'); sync(); }
+    function sync(){
+      if(!narrow.matches){ panel.hidden=true; btn.setAttribute('aria-expanded','false'); }
+      // 窄屏进详情即显示（无滚动阈值）
+      const show=narrow.matches;
+      btn.hidden=false;
+      btn.classList.toggle('is-visible', show);
+    }
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if(panel.hidden) open(); else close();
+    });
+    nav.addEventListener('click', (e)=>{
+      if(e.target && e.target.closest && e.target.closest('a')) close();
+    });
+    document.addEventListener('click', (e)=>{
+      if(panel.hidden) return;
+      if(panel.contains(e.target) || btn.contains(e.target)) return;
+      close();
+    });
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='Escape' && !panel.hidden) close();
+    });
+    if(narrow.addEventListener) narrow.addEventListener('change', sync);
+    else if(narrow.addListener) narrow.addListener(sync);
+    sync();
+  }
+
+  // ── TOC spy ── 桌面右侧栏 + 悬浮面板高亮同步（# Shared：blog/wiki 共用）
   function initTOC(){
     const toc=document.getElementById('toc');
-    const tocMobile=document.querySelector('.toc-mobile .toc');
-    const aside=document.getElementById('tocAside');
-    const seriesNav = aside ? aside.querySelector('.series-nav') : null;
-    if(seriesNav && aside){
-      aside.classList.add('is-visible');
-      aside.classList.add('has-series');
-    }
-    // 无任何 TOC 时仅处理 Wiki 目录导航
-    if(!toc && !tocMobile){
-      if(!seriesNav) return;
+    const nav=document.querySelector('#tocFloatNav');
+    // 无任何大纲时直接返回（加密页/无标题页不渲染 toc / toc_float）
+    if((!toc || !toc.querySelector('a')) && (!nav || !nav.querySelector('a'))){
       return;
     }
-    if(toc && aside) aside.classList.add('is-visible');
     const headings=document.querySelectorAll('#articleContent h1, #articleContent h2, #articleContent h3, #articleContent h4');
     if(!headings.length) return;
     const allLinks = [];
     if(toc) allLinks.push(...toc.querySelectorAll('a'));
-    if(tocMobile) allLinks.push(...tocMobile.querySelectorAll('a'));
+    if(nav) allLinks.push(...nav.querySelectorAll('a'));
     if(!allLinks.length) return;
     const map=new Map();
-    // 去重 id -> 多个 link（桌面+移动端）
+    // id -> 多链接（桌面右侧栏 + 悬浮面板同步高亮）
     allLinks.forEach(a=>{
       const href=a.getAttribute('href')||'';
       const id=href.split('#')[1];
@@ -1047,6 +1077,7 @@
     initCodeBlocks();
     initTabs();
     initEncryption();
+    initFloatingToc();
     initTOC();
     initInfinite();
     initTables();

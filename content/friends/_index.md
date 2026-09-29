@@ -1,7 +1,7 @@
 +++
 title = "山海故人"
 description = "故人隔山海 山海有故人"
-template = "section.html"
+template = "friends.html"
 +++
 
 > [!tip]

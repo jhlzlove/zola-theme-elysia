@@ -42,7 +42,7 @@ Add the theme to a separate Zola site:
 ```bash
 git init my-blog
 cd my-blog
-git submodule add https://github.com/yourname/elysia-ztheme.git themes/elysia
+git submodule add https://github.com/jhlzlove/zola-theme-elysia.git themes/elysia
 ```
 
 Copy or adapt the theme's `zola.toml`, and make sure the site configuration contains:
@@ -60,7 +60,9 @@ description = "My personal website"
 default_language = "en"
 ```
 
-Theme files live in `themes/elysia/`; your content and configuration live in the site root. Root-level `templates/`, `static/`, and `content/` files can override the corresponding theme files.
+Theme files live in `themes/elysia/`; your content and configuration live in the site root. Root-level `templates/`, `static/`, and `content/` files can override the corresponding theme files. The `theme` value must match the directory name under `themes/`.
+
+Layout is decided by file location, no extra flag needed: posts under `content/blog/` render as blog posts, pages under `content/wiki/` subdirectories render as Wiki pages, `content/resume.md` renders as the resume page, and `content/archive/`, `heatmap/`, `search/`, `friends/`, `links/` map to their feature templates.
 
 ## Minimal content layout
 
@@ -68,13 +70,33 @@ Theme files live in `themes/elysia/`; your content and configuration live in the
 my-blog/
 ├── zola.toml
 ├── content/
-│   ├── _index.md
+│   ├── _index.md          # home: template = "index.html", page_template = "blog/page.html"
 │   └── blog/
-│       ├── _index.md
+│       ├── _index.md      # blog entry: transparent = true, passed through to home
 │       └── first-post.md
 ├── static/
 └── themes/
     └── elysia/
+```
+
+`content/_index.md`:
+
+```toml
++++
+title = "My Blog"
+sort_by = "date"
+paginate_by = 8
+template = "index.html"
+page_template = "blog/page.html"
++++
+```
+
+`content/blog/_index.md`:
+
+```toml
++++
+transparent = true
++++
 ```
 
 Add Front Matter at the top of a post:
@@ -88,6 +110,8 @@ description = "A short summary"
 
 The post starts here.
 ```
+
+See chapter 05 for Wiki and feature `_index.md` files (`wiki/grid.html` / `wiki/doc.html` / `wiki/page.html`, `archive.html`, `heatmap.html`, `search.html`, `friends.html`, `links.html`, `resume.html`).
 
 ## Common issues
 

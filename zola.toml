@@ -1,6 +1,5 @@
 # Zola configuration — Elysia Theme (modern minimalist)
 base_url = "https://blog.elysiamoon.com/zola-theme-elysia/"
-# base_url = "http://localhost:1414"
 author="Elysia"
 title = "诗酒趁年华"
 description = "A modern, minimalist Zola theme — Reading is enjoyment."
@@ -235,6 +234,14 @@ show_reading_time = true
 enable = true
 days = 90
 
+# ── License — 文章许可声明（正文末）──
+# 文案优先级：单篇 extra.license_text > 此处 license_text > translations 的 license_text；
+# license_text 为 Markdown，支持占位符 {author} {title} {url}；
+# 单篇以 extra.license = false 关闭；英文默认文案在 [languages.en.translations] 中
+[extra.license]
+enable = true
+# license_text = "本文作者：{author} · 许可协议 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) · 转载请注明出处 [原文链接]({url})"
+
 # ── KaTeX ── 设 enable = true 即启用 $...$ / $$...$$ 数学公式
 [extra.katex]
 enable = true
@@ -259,6 +266,7 @@ article_expiry = "本文最后更新于 {date}，已超过 {days} 天未更新�
 toc_title = "目录"
 toc_on_this_page = "本页目录"
 search_placeholder = "搜索文章..."
+license_text = "本文作者：{author} · 许可协议 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) · 转载请注明出处 [原文链接]({url})"
 
 [languages.en]
 title = "Elysia EN"
@@ -283,6 +291,7 @@ article_expiry = "This article was last updated on {date} and has not been updat
 toc_title = "On this page"
 toc_on_this_page = "On this page"
 search_placeholder = "Search posts..."
+license_text = "Author: {author} · Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) · Please credit the [original article]({url}) when sharing"
 
 [slugify]
 paths = "on"

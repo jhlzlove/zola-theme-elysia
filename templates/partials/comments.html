@@ -1,0 +1,75 @@
+{# ############################################################################
+   # Shared: 评论区（provider 统一由 [extra.comments] 决定：giscus | artalk | waline | none）
+   # 上下文：需 page 已定义；单页可用 page.extra.comments = false 关闭
+   ############################################################################ #}
+{% set comments_disabled_by_page = false %}
+{% if page.extra.comments is defined and page.extra.comments == false %}{% set_global comments_disabled_by_page = true %}{% endif %}
+{% set comments_global_enabled = true %}
+{% if config.extra.comments and config.extra.comments.enable is defined and config.extra.comments.enable == false %}{% set_global comments_global_enabled = false %}{% endif %}
+{% if not comments_disabled_by_page and comments_global_enabled %}
+  {% if config.extra.comments and config.extra.comments.provider is defined and config.extra.comments.provider != "" %}
+    {% set provider = config.extra.comments.provider | lower %}
+  {% elif config.extra.artalk and config.extra.artalk.server is defined and config.extra.artalk.server != "" %}
+    {% set provider = "artalk" %}
+  {% elif config.extra.waline and config.extra.waline.serverURL is defined and config.extra.waline.serverURL != "" %}
+    {% set provider = "waline" %}
+  {% elif config.extra.giscus and config.extra.giscus.repo is defined and config.extra.giscus.repo != "" and config.extra.giscus.repo != "user/repo" %}
+    {% set provider = "giscus" %}
+  {% else %}
+    {% set provider = "none" %}
+  {% endif %}
+
+  {% if provider == "giscus" and config.extra.giscus and config.extra.giscus.repo is defined and config.extra.giscus.repo != "" %}
+  <div class="comment-wrap giscus-wrap">
+    {% if config.extra.comments and config.extra.comments.comment_title %}<div class="comment-title">{{ config.extra.comments.comment_title }}</div>{% endif %}
+    <div class="giscus" id="giscus-mount"></div>
+    <script src="https://giscus.app/client.js"
+            data-repo="{{ config.extra.giscus.repo }}"
+            data-repo-id="{{ config.extra.giscus.repo_id }}"
+            data-category="{{ config.extra.giscus.category }}"
+            data-category-id="{{ config.extra.giscus.category_id }}"
+            data-mapping="{{ config.extra.giscus.mapping | default(value="pathname") }}"
+            data-strict="{{ config.extra.giscus.strict | default(value="0") }}"
+            data-reactions-enabled="{{ config.extra.giscus.reactions_enabled | default(value="1") }}"
+            data-emit-metadata="{{ config.extra.giscus.emit_metadata | default(value="0") }}"
+            data-input-position="{{ config.extra.giscus.input_position | default(value="bottom") }}"
+            data-theme="{{ config.extra.giscus.theme | default(value="preferred_color_scheme") }}"
+            data-lang="{{ config.extra.giscus.lang | default(value="zh-CN") }}"
+            crossorigin="anonymous" async>
+    </script>
+  </div>
+  {% elif provider == "artalk" and config.extra.artalk and config.extra.artalk.server is defined and config.extra.artalk.server != "" %}
+  <div class="comment-wrap artalk-wrap">
+    {% if config.extra.comments and config.extra.comments.comment_title %}<div class="comment-title">{{ config.extra.comments.comment_title }}</div>{% endif %}
+    <div id="artalk"></div>
+    <script>
+      window.ARTALK_CONFIG = {
+        server: "{{ config.extra.artalk.server | safe }}",
+        site: "{{ config.extra.artalk.site | default(value=config.title) | safe }}",
+        placeholder: "{{ config.extra.artalk.placeholder | default(value="") | safe }}",
+        noComment: "{{ config.extra.artalk.no_comment | default(value="") | safe }}",
+        pageKey: "{{ config.extra.artalk.page_key | default(value="") | safe }}" || location.pathname,
+        gravatarMirror: "{{ config.extra.artalk.gravatar_mirror | default(value="") | safe }}",
+        avatarURL: "{{ config.extra.artalk.avatar_mirror | default(value="") | safe }}"
+      };
+    </script>
+  </div>
+  {% elif provider == "waline" and config.extra.waline and config.extra.waline.serverURL is defined and config.extra.waline.serverURL != "" %}
+  <div class="comment-wrap waline-wrap">
+    {% if config.extra.comments and config.extra.comments.comment_title %}<div class="comment-title">{{ config.extra.comments.comment_title }}</div>{% endif %}
+    <div id="waline"></div>
+    <script>
+      window.WALINE_CONFIG = {
+        serverURL: "{{ config.extra.waline.serverURL | safe }}",
+        lang: "{{ config.extra.waline.lang | default(value="zh-CN") | safe }}",
+        dark: "{{ config.extra.waline.dark | default(value="auto") | safe }}",
+        login: "{{ config.extra.waline.login | default(value="enable") | safe }}",
+        placeholder: "{{ config.extra.waline.placeholder | default(value="") | safe }}"
+      };
+      {% if config.extra.waline.emoji %}{% set ej = config.extra.waline.emoji %}window.WALINE_CONFIG.emoji = [{% for e in ej %}"{{ e | safe }}"{% if not loop.last %},{% endif %}{% endfor %}];{% endif %}
+      window.WALINE_CONFIG.meta = [{% for m in config.extra.waline.meta | default(value=["nick","mail","link"]) %}"{{ m }}"{% if not loop.last %},{% endif %}{% endfor %}];
+      window.WALINE_CONFIG.requiredMeta = [{% for m in config.extra.waline.requiredMeta | default(value=["nick","mail"]) %}"{{ m }}"{% if not loop.last %},{% endif %}{% endfor %}];
+    </script>
+  </div>
+  {% endif %}
+{% endif %}

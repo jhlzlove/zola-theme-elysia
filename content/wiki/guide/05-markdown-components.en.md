@@ -47,19 +47,17 @@ sticky = true
 - `sticky`, `top`, or `pinned` pins a post.
 - Categories and tags belong under `[taxonomies]`.
 
-Encrypted post:
+Encrypted post (`password` is an alias matching a key in `encrypt.toml` `[passwords]`; the real password lives only there and takes effect via post-build encryption, see chapter 04):
 
 ```toml
 +++
 title = "Private post"
 [extra]
 encrypted = true
-password = "change-this-password"
+password = "blog"
 password_hint = "Enter the password"
 +++
 ```
-
-Do not commit a real password to a public repository; client-side encryption only provides basic protection.
 
 ## Basic Markdown
 
@@ -547,28 +545,46 @@ Right column, `width="2"`, takes two shares.
 
 ## Wiki sections
 
-Create a directory and `_index.md`:
+The Wiki root (`/wiki/` project hub) and subdirectories (reading units) use different templates — do not mix them:
 
 ```text
-content/wiki/my-guide/
-├── _index.md
-├── 01-start.md
-└── 02-config.md
+content/wiki/
+├── _index.md          # Wiki home: template = "wiki/grid.html", page_template = "wiki/page.html"
+└── my-guide/
+    ├── _index.md      # reading unit home: template = "wiki/doc.html", page_template = "wiki/page.html"
+    ├── 01-start.md
+    └── 02-config.md
 ```
 
-The `_index.md`:
+`content/wiki/_index.md`:
+
+```toml
++++
+title = "Wiki"
+description = "Knowledge base"
+sort_by = "date"
+template = "wiki/grid.html"
+page_template = "wiki/page.html"
+transparent = false
++++
+```
+
+`content/wiki/my-guide/_index.md`:
 
 ```toml
 +++
 title = "My Guide"
 description = "One-line intro shown as the card summary in the Wiki list."
 sort_by = "weight"
-template = "section.html"
-page_template = "page.html"
+weight = 2
+template = "wiki/doc.html"
+page_template = "wiki/page.html"
 +++
 ```
 
-Use `weight` to order chapter pages. Do not add `extra.series`; Wiki navigation comes from the directory structure.
+- A reading unit's `_index.md` uses `wiki/doc.html`; its pages automatically use `wiki/page.html` with the left directory. The Wiki root uses `wiki/grid.html` for the project card grid.
+- Chapter pages order by `weight` (`sort_by = "weight"`); blog posts order by `date`.
+- Layout comes from file location plus the `template` / `page_template` above. Do not set `extra.style`.
 
 > [!NOTE]
 > A Wiki project homepage (`_index.md`) is a Section, so it has no `page.summary` and `<!-- more -->` does not work there.

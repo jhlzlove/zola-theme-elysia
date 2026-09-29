@@ -7,19 +7,23 @@
   {% if section.content %}<div class="prose" style="margin-top:10px;color:var(--muted);font-size:14.5px">{{ section.content | safe }}</div>{% endif %}
 </div>
 
-{# ── Collect pages for display — 仅博客，排除 wiki ── #}
+{# # Blog: 仅博客，排除 wiki/resume（按路径判定；非默认语言先对齐 /<lang>/ 前缀） #}
+{% set _lang = lang | default(value=config.default_language) %}
+{% if section is defined and section.lang %}{% set _lang = section.lang %}{% endif %}
+{% set _wiki_pat = "/wiki/" %}{% set _resume_pat = "/resume" %}
+{% if _lang != config.default_language %}{% set _wiki_pat = "/" ~ _lang ~ "/wiki/" %}{% set _resume_pat = "/" ~ _lang ~ "/resume" %}{% endif %}
 {% if paginator %}
   {% set raw_all = section.pages %}
   {% set raw_paged = paginator.pages %}
   {% set_global filtered_all = [] %}
   {% for p in raw_all %}
-    {% if p.path is not starting_with(pat="/wiki/") and p.path is not starting_with(pat="/resume") and p.extra.style | default(value="blog") != "wiki" and p.extra.style | default(value="blog") != "resume" %}
+    {% if p.path is not starting_with(pat=_wiki_pat) and p.path is not starting_with(pat=_resume_pat) %}
       {% set_global filtered_all = [...filtered_all, p] %}
     {% endif %}
   {% endfor %}
   {% set_global filtered_paged = [] %}
   {% for p in raw_paged %}
-    {% if p.path is not starting_with(pat="/wiki/") and p.path is not starting_with(pat="/resume") and p.extra.style | default(value="blog") != "wiki" and p.extra.style | default(value="blog") != "resume" %}
+    {% if p.path is not starting_with(pat=_wiki_pat) and p.path is not starting_with(pat=_resume_pat) %}
       {% set_global filtered_paged = [...filtered_paged, p] %}
     {% endif %}
   {% endfor %}
@@ -30,7 +34,7 @@
   {% set raw_all = section.pages %}
   {% set_global filtered = [] %}
   {% for p in raw_all %}
-    {% if p.path is not starting_with(pat="/wiki/") and p.path is not starting_with(pat="/resume") and p.extra.style | default(value="blog") != "wiki" and p.extra.style | default(value="blog") != "resume" %}
+    {% if p.path is not starting_with(pat=_wiki_pat) and p.path is not starting_with(pat=_resume_pat) %}
       {% set_global filtered = [...filtered, p] %}
     {% endif %}
   {% endfor %}
@@ -68,7 +72,6 @@
           置顶
         </span>
         {% if page.extra.encrypted %}<span class="post-card__lock" title="加密">{{ <icon name="lock" width="14" height="14"/> }} 加密</span>{% endif %}
-        {% if page.taxonomies.categories %}<span>·</span>{% for cat in page.taxonomies.categories %}<span style="text-transform:uppercase;letter-spacing:.06em;font-weight:600">{{ cat }}</span>{% if not loop.last %}<span style="margin:0 2px">·</span>{% endif %}{% endfor %}{% endif %}
       </div>
       <h2 class="post-card__title"><a href="{{ page.permalink | safe }}">{{ page.title }}</a></h2>
       {% set sum = page.summary | default(value="", boolean=true) %}
@@ -105,10 +108,11 @@
   {% set is_pinned = page.extra.sticky or page.extra.top or page.extra.pinned %}
   {% if is_pinned %}{% continue %}{% endif %}
   <article class="post-card">
+    {% if page.extra.encrypted %}
     <div class="post-card__top">
-      {% if page.extra.encrypted %}<span class="post-card__lock" title="加密">{{ <icon name="lock" width="14" height="14"/> }} 加密</span>{% endif %}
-      {% if page.taxonomies.categories %}{% for cat in page.taxonomies.categories %}<span style="text-transform:uppercase;letter-spacing:.06em;font-weight:600">{{ cat }}</span>{% if not loop.last %}<span style="margin:0 4px">·</span>{% endif %}{% endfor %}{% endif %}
+      <span class="post-card__lock" title="加密">{{ <icon name="lock" width="14" height="14"/> }} 加密</span>
     </div>
+    {% endif %}
     <h2 class="post-card__title"><a href="{{ page.permalink | safe }}">{{ page.title }}</a></h2>
     {% set sum2 = page.summary | default(value="", boolean=true) %}
     {% if sum2 == "" %}{% set sum2 = page.description | default(value="", boolean=true) %}{% endif %}
