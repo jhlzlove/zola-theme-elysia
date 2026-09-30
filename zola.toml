@@ -91,7 +91,7 @@ icon = "📄"
 [[extra.menus]]
 name_key = "menu_friends"
 url = "/friends/"
-icon = "🔗"
+icon = "👥"
 
 [[extra.menus]]
 name_key = "menu_links"
@@ -137,8 +137,8 @@ default_palette = "default"
 # body_family / code_block_family: full font stack as array (include defaults so source stays simple)
 [extra.style.fonts]
 base_size = "16px"
-body_size = "1.125rem"
-code_block_size = "0.865rem"
+body_size = "1rem"
+code_block_size = "0.875rem"
 body_family = ["LXGW WenKai Screen", "Maple Mono NF CN", "Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"]
 code_block_family = ["JetBrains Mono", "Maple Mono NF CN", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
 

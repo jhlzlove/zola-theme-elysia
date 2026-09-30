@@ -230,6 +230,12 @@ interface User {
 
 `color` 可选 `blue` / `green` / `yellow` / `orange` / `red` / `black`。
 
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `title` | 选填 | 标题栏文字，不写则不显示标题栏 |
+| `color` | 选填 | `blue`（默认）/ `green` / `yellow` / `orange` / `red` / `black`，非法值回落 `blue` |
+| 块内容 | 必填 | 提示正文，支持完整 Markdown |
+
 **效果：**
 
 {% <note title="提示" color="blue"> %}
@@ -253,6 +259,15 @@ interface User {
 ```
 
 参数：`bilibili` / `youtube` / `src` 三选一；`width` 宽度；`caption` 说明；`autoplay` 为 true 时自动播放。
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `bilibili` | 三选一必填 | B 站 BV 号，如 `BV1n8Q7B7Ekz` |
+| `youtube` | 三选一必填 | YouTube 视频 ID |
+| `src` | 三选一必填 | 直链视频地址（本地视频放在 `static/` 下） |
+| `width` | 选填 | 宽度，默认 `100%` |
+| `caption` | 选填 | 说明文字 |
+| `autoplay` | 选填 | `true` 自动播放，默认不播放 |
 
 **效果：**
 
@@ -288,6 +303,15 @@ Spotify（`type` 支持 `single` / `album` / `playlist`，`single` 对应 `track
 ```
 {% endraw %}
 
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `src` | 三选一必填 | 本地/远程音频直链 |
+| `netease` | 三选一必填 | 网易云音乐 ID |
+| `spotify` | 三选一必填 | Spotify ID |
+| `type` | 选填 | `single`（默认）/ `album` / `playlist`，仅网易云/Spotify 有效；Spotify 的 `single` 对应 `track` |
+| `caption` | 选填 | 说明文字（本地播放器显示为标题） |
+| `autoplay` | 选填 | `true` 自动播放，默认不播放 |
+
 **效果（本地播放器）：**
 
 {{ <audio src="https://www.kumeiwp.com/wj/531/2021/02/24/514624f352b5b765149dd19a279af7c6.mp3" caption="远程音频示例" autoplay="false" /> }}
@@ -315,14 +339,38 @@ Spotify（`type` 支持 `single` / `album` / `playlist`，`single` 对应 `track
 {% raw %}
 ```jinja
 {{ <image src="https://picsum.photos/seed/elysia/800/300" alt="示例图片" width="100%" caption="图片说明" /> }}
+{{ <image src="https://picsum.photos/seed/elysia/400/300" alt="示例图片" position="left" caption="左浮动，文字环绕" /> }}
+{{ <image src="https://picsum.photos/seed/elysia/400/300" alt="示例图片" position="right" caption="右浮动，文字环绕" /> }}
 ```
 {% endraw %}
 
 图片文件建议放在站点的 `static/` 目录。
 
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `src` | 必填 | 图片地址，`static/` 下的本地图片用 `/` 开头路径 |
+| `alt` | 选填 | 无障碍文本，缺省依次回落 `caption`、`src` |
+| `width` | 选填 | `center` 时作用于图片；`left`/`right` 时作用于整个图片块（含说明） |
+| `caption` | 选填 | 图片说明 |
+| `position` | 选填 | `center`（默认，独占一行居中）/ `left` / `right`，非法值回落 `center` |
+
+`position` 可选 `center`（默认，独占一行居中）/`left`（左浮动，文字在右侧环绕）/`right`（右浮动，文字在左侧环绕），非法值回落 `center`。`left`/`right` 未传 `width` 时自动限宽（`min(42%, 320px)`），传了 `width` 则按该宽度显示（建议 `30%~50%` 或 `200px~400px`，不要用 `100%`）；窄屏（≤640px）自动取消浮动、居中堆叠。浮动图片请独占一行使用，且只适合衔接正文段落，不适合紧贴标题、代码块、表格使用。
+
 **效果：**
 
 {{ <image src="https://picsum.photos/seed/elysia/800/300" alt="示例图片" width="100%" caption="图片说明" /> }}
+
+**效果（左浮动，文字环绕）：**
+
+{{ <image src="https://picsum.photos/seed/elysia/400/300" alt="示例图片" position="left" caption="左浮动示例" /> }}
+
+这是一段用于演示文字环绕的示例正文。当图片设置 `position="left"` 时，图片浮动在左侧，正文段落会自动环绕在图片右侧，适合在人物介绍、景点说明等场景下图文混排。图片未指定 `width` 时会自动限宽，避免占用过多版面；在窄屏下会自动恢复为居中独占一行，保证移动端阅读体验。
+
+**效果（右浮动，文字环绕）：**
+
+{{ <image src="https://picsum.photos/seed/elysia/400/300" alt="示例图片" position="right" caption="右浮动示例" /> }}
+
+这是一段用于演示文字环绕的示例正文。当图片设置 `position="right"` 时，图片浮动在右侧，正文段落会自动环绕在图片左侧，用法与 `left` 对称。如需指定尺寸，可写 `width="300px"` 或 `width="40%"`，此时宽度作用于整个图片块（含说明文字）。
 
 ### link 单个链接卡片
 
@@ -333,6 +381,13 @@ Spotify（`type` 支持 `single` / `album` / `playlist`，`single` 对应 `track
 {{ <link href="https://www.getzola.org/" title="Zola" icon="https://www.getzola.org/icons/apple-touch-icon.png" desc="Zola 官方网站" /> }}
 ```
 {% endraw %}
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `href` | 必填 | 链接地址；`/` 开头的站内地址自动拼接 `base_url`，`http` 开头的新窗口打开 |
+| `title` | 选填 | 卡片标题，缺省显示 `href` |
+| `icon` | 选填 | 图标：远程/本地图片地址，或 emoji/文字（图片地址按 `href` 同规则处理） |
+| `desc` | 选填 | 描述文字 |
 
 **效果：**
 
@@ -351,6 +406,21 @@ github:
 ```
 
 卡片只显示封面、标题与摘要，不显示链接地址与图标；`cover` 支持远程地址与本地图片（放在 `static/` 下，如 `/images/tool.jpg`，会自动拼接 `base_url`）；标题前方的 ★ 为个人精选标识；摘要超出两行被截断时，鼠标悬浮显示全文。
+
+组件参数：
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `group` | 必填 | `data/links.yaml` 中的顶层分组名 |
+
+数据字段（`data/links.yaml` 每项）：
+
+| 字段 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `title` | 选填 | 标题，缺省依次回落 `name`、`url` |
+| `url` | 选填 | 链接，缺省依次回落 `href`、`#` |
+| `cover` | 选填 | 封面图；`/` 开头自动拼接 `base_url`，缺省显示渐变占位 |
+| `desc` | 选填 | 摘要，缺省回落 `description`；超两行截断，悬浮显示全文 |
 
 **写法：**
 
@@ -382,6 +452,23 @@ developer:
 - `feed`：可空，订阅地址；构建期不抓取，访客进页面后由 `friends.js` 自动抓取最近 3 篇文章展示在卡片右侧。
   缺失、为空或非字符串显示"暂未配置 feed 订阅"且排序靠后；地址无效、抓取失败或对方不允许跨域时显示"订阅暂不可用"，不影响构建。
 - 卡片不再显示网站链接地址；顶层键为分组名，可用 `group` 参数只渲染某一组。
+
+组件参数：
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `group` | 选填 | 只渲染该分组；缺省渲染全部分组；与 `api` 混用时被忽略 |
+| `api` | 选填 | 远程接口地址，纯前端实时渲染（无 SEO，需接口允许跨域）；失败或无数据时整个网格隐藏 |
+
+数据字段（`data/friends.yaml` 每项，仅以下字段）：
+
+| 字段 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `title` | 必填（字符串） | 显示名称 |
+| `url` | 必填（字符串） | 主页链接，缺省 `#` |
+| `icon` | 必填（字符串，可空） | 网站图标，为空时显示标题首字母 |
+| `description` | 选填 | 一句话简介；缺失/非字符串按空处理 |
+| `feed` | 选填 | 订阅地址；无 feed 显示"暂未配置 feed 订阅"且排序靠后 |
 
 支持 `api` 参数调用远程接口获取数据。`api` 为纯前端实时渲染：构建时不请求，
 访客每次进入页面由 `friends.js` 拉取并渲染（查看源代码为空、无 SEO；需要接口允许跨域，
@@ -417,6 +504,12 @@ developer:
 ```
 {% endraw %}
 
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `title` | 选填 | 诗题 |
+| `author` | 选填 | 作者，显示为 `— 作者` |
+| 块内容 | 必填 | 诗句正文，支持 Markdown |
+
 **效果：**
 
 {% <poetry title="春晓" author="孟浩然"> %}
@@ -445,6 +538,14 @@ Write-Output "hello"
 {% </tabs> %}
 ````
 {% endraw %}
+
+`tabs` 无参数，块内容为一组 `tab`（必填，可嵌套其它块组件）。
+
+`tab` 参数：
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `title` | 选填 | 标签名，缺省 `Tab`，空白值回落 `Tab` |
 
 
 **效果：**
@@ -516,6 +617,21 @@ console.log("hello")
 - 外层 `columns`：`layout="h"` 横排（默认），`layout="v"` 竖排。
 - 内层 `column`：`color` 为整卡背景色，可选 `blue` / `green` / `yellow` / `orange` / `red` / `black`（缺省为无色中性卡）；`width` 为 flex 比例数字 `1`–`6`（缺省 `1`，非法值回落 `1`）。
 - 支持嵌套其它块组件（如 `note`）与行组件（如 `link`）；内外层之间留空行；窄屏（≤640px）自动竖排堆叠，此时 `width` 失效。
+
+`columns` 参数：
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `layout` | 选填 | `h` 横排（默认）/ `v` 竖排，非法值回落 `h`；窄屏自动竖排 |
+| 块内容 | 必填 | 一组 `column`，之间留空行 |
+
+`column` 参数：
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `color` | 选填 | 整卡背景色，`blue` / `green` / `yellow` / `orange` / `red` / `black`（缺省无色中性卡） |
+| `width` | 选填 | flex 比例 `1`–`6`（缺省 `1`，非法值回落 `1`）；窄屏失效 |
+| 块内容 | 必填 | 列正文，支持完整 Markdown，可嵌套其它块/行组件 |
 
 **效果：**
 

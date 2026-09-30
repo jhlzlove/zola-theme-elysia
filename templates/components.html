@@ -58,8 +58,14 @@
 </div>
 {% endcomponent audio -%}
 
-{% component image(src, width = "", alt = "", caption = "") -%}
-<figure class="figure" data-component="image"><img src="{{ src | safe }}" alt="{{ alt | default(value=caption) | default(value=src) }}" {% if width %}style="width:{{ width }};max-width:100%;"{% endif %} loading="lazy">{% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}</figure>
+{% component image(src, width = "", alt = "", caption = "", position = "center") -%}
+{% set p = position | default(value="center") | lower | trim -%}
+{% if p != "left" and p != "right" %}{% set p = "center" -%}{% endif -%}
+{% if p == "center" -%}
+<figure class="figure figure--{{ p }}" data-component="image"><img src="{{ src | safe }}" alt="{{ alt | default(value=caption) | default(value=src) }}" {% if width %}style="width:{{ width }};max-width:100%;"{% endif %} loading="lazy">{% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}</figure>
+{% else -%}
+<figure class="figure figure--{{ p }}" data-component="image"{% if width %} style="width:{{ width }};max-width:100%;"{% endif %}><img src="{{ src | safe }}" alt="{{ alt | default(value=caption) | default(value=src) }}" loading="lazy">{% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}</figure>
+{% endif -%}
 {% endcomponent image -%}
 
 {% component link(href, title = "", icon = "", desc = "") -%}{% set lhref = href -%}{% set lhref_q = href | split(pat="?") -%}{% set lhref_h = href | split(pat="#") -%}{% if href is starting_with(pat="/") and not href is starting_with(pat="//") and lhref_q | length == 1 and lhref_h | length == 1 -%}{% if href is ending_with(pat="/") -%}{% set lhref = get_url(path=href, trailing_slash=true) -%}{% else -%}{% set lhref = get_url(path=href) -%}{% endif -%}{% endif -%}{% set licon = icon -%}{% if icon is starting_with(pat="/") and not icon is starting_with(pat="//") -%}{% set licon = get_url(path=icon) -%}{% endif -%}

@@ -1959,6 +1959,15 @@ html[data-theme="dark"] .poetry__body{
 }
 .figure img{margin:0 auto;border-radius:var(--radius-sm);border:1px solid var(--border)}
 .figure figcaption{font-size:0.7813rem;color:var(--muted);margin-top:8px}
+/* Image position: center (default) keeps block layout; left/right float for text wrap */
+.figure--center{margin:18px 0;text-align:center}
+.figure--left{float:left;margin:6px 18px 12px 0;max-width:min(42%,320px);text-align:left}
+.figure--right{float:right;margin:6px 0 12px 18px;max-width:min(42%,320px);text-align:right}
+.figure--left img,.figure--right img{width:100%;height:auto;margin:0}
+@media (max-width:640px){
+  .figure--left,.figure--right{float:none;clear:both;display:block;width:auto !important;max-width:100%;margin:18px auto;text-align:center}
+  .figure--left img,.figure--right img{width:auto;max-width:100%;height:auto;margin:0 auto}
+}
 
 /* Link card */
 .link-card{
