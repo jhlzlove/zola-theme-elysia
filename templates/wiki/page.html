@@ -33,18 +33,8 @@
         </div>
       </header>
 
-      {# # Wiki: 移动端折叠目录（桌面端左侧栏已展示） #}
-      {% if page.ancestors | length > 0 %}
-        {% set _m_parent_path = page.ancestors | last %}
-        {% if _m_parent_path is starting_with(pat="wiki/") and _m_parent_path != "wiki/_index.md" and "wiki/_index." not in _m_parent_path %}
-          {% set _m_parent = get_section(path=_m_parent_path) %}
-          {% if _m_parent %}
-            {% set wm_section = _m_parent %}
-            {% set wm_current = page.permalink %}
-            {% include "partials/wiki-mobile.html" %}
-          {% endif %}
-        {% endif %}
-      {% endif %}
+      {# # Wiki: 移动端折叠目录（自包含寻根，与左侧栏同树） #}
+      {% include "partials/wiki-mobile.html" %}
 
       {# # Wiki: 加密锁 / 正文 #}
       {% if is_encrypted %}

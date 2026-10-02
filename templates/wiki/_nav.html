@@ -1,0 +1,87 @@
+{# Wiki grouped nav components (Tera v2, global, no import needed).
+   Convention: subsection with title = collapsible group; titleless (usually
+   transparent) = pass-through, its pages already bubble to nearest titled parent.
+   Grouping sections must be non-transparent, otherwise pages may duplicate.
+   Language: Zola 0.23 requires canonical path + lang for get_section, so every
+   component takes lang explicitly (component scope has no page language). #}
+{% component wiki_count(path, lang) -%}
+{% set s0 = get_section(path=path, lang=lang) -%}
+{% set_global _wikin = s0.pages | length -%}
+{% for a in s0.subsections -%}
+{% set sa = get_section(path=a, lang=lang) -%}
+{% if sa.title -%}{% set_global _wikin = _wikin + (sa.pages | length) -%}{% endif -%}
+{% for b in sa.subsections -%}
+{% set sb = get_section(path=b, lang=lang) -%}
+{% if sb.title -%}{% set_global _wikin = _wikin + (sb.pages | length) -%}{% endif -%}
+{% for c in sb.subsections -%}
+{% set sc = get_section(path=c, lang=lang) -%}
+{% if sc.title -%}{% set_global _wikin = _wikin + (sc.pages | length) -%}{% endif -%}
+{% for d in sc.subsections -%}
+{% set sd = get_section(path=d, lang=lang) -%}
+{% if sd.title -%}{% set_global _wikin = _wikin + (sd.pages | length) -%}{% endif -%}
+{% endfor -%}
+{% endfor -%}
+{% endfor -%}
+{% endfor -%}
+{{ _wikin -}}
+{% endcomponent wiki_count -%}
+
+{% component wiki_nav_pages(path, lang, current = "") -%}
+{% set s = get_section(path=path, lang=lang) -%}
+{% for p in s.pages -%}
+<li class="wiki-side-nav__item{% if p.permalink == current %} is-current{% endif %}">
+  <a href="{{ p.permalink | safe }}"{% if p.permalink == current %} aria-current="page"{% endif %}>
+    <span class="wiki-side-nav__index">{{ loop.index }}</span>
+    <span class="wiki-side-nav__item-title">{{ p.title }}</span>
+    {% if p.permalink == current %}<span class="wiki-side-nav__here">· 在读</span>{% endif %}
+  </a>
+</li>
+{% endfor -%}
+{% for sub in s.subsections -%}
+{% set g = get_section(path=sub, lang=lang) -%}
+{% if g.title -%}
+<li class="wiki-side-nav__group{% if current is starting_with(pat=g.permalink) %} is-current{% endif %}">
+  <details class="wiki-group" open>
+    <summary class="wiki-group__head">
+      <a class="wiki-group__title" href="{{ g.permalink | safe }}">{{ g.title }}</a>
+      <span class="wiki-group__count">{{ <wiki_count path={sub} lang={lang} /> }} 篇</span>
+    </summary>
+    <ol class="wiki-side-nav__list wiki-side-nav__list--nested">
+      {{ <wiki_nav_pages path={sub} lang={lang} current={current} /> }}
+    </ol>
+  </details>
+</li>
+{% else -%}
+{{ <wiki_nav_pages path={sub} lang={lang} current={current} /> }}
+{% endif -%}
+{% endfor -%}
+{% endcomponent wiki_nav_pages -%}
+
+{% component wiki_nav(path, lang, current = "", variant = "side", back_url = "") -%}
+{% set s = get_section(path=path, lang=lang) -%}
+{% if variant == "mobile" -%}
+<details class="wiki-mobile" id="wikiMobile">
+  <summary class="toc-mobile__summary">
+    <span class="toc-mobile__label">📚 {{ s.title }}</span>
+    <span class="toc-mobile__count">{{ <wiki_count path={path} lang={lang} /> }} 篇</span>
+  </summary>
+  <nav class="wiki-mobile__nav" aria-label="Wiki 目录">
+    <a class="wiki-mobile__back" href="{{ back_url | safe }}">← 返回 Wiki</a>
+    <ol class="wiki-side-nav__list">
+      {{ <wiki_nav_pages path={path} lang={lang} current={current} /> }}
+    </ol>
+  </nav>
+</details>
+{% else -%}
+<nav class="wiki-side-nav" aria-label="Wiki 目录">
+  <a class="wiki-side-nav__back" href="{{ back_url | safe }}">← 返回 Wiki</a>
+  <div class="wiki-side-nav__head">
+    <a class="wiki-side-nav__title" href="{{ s.permalink | safe }}" title="回到 {{ s.title }} 主页">{{ s.title }}</a>
+    <span class="wiki-side-nav__count">{{ <wiki_count path={path} lang={lang} /> }} 篇</span>
+  </div>
+  <ol class="wiki-side-nav__list">
+    {{ <wiki_nav_pages path={path} lang={lang} current={current} /> }}
+  </ol>
+</nav>
+{% endif -%}
+{% endcomponent wiki_nav -%}

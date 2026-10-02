@@ -9,10 +9,10 @@ tags = ["encrypt", "demo"]
 [extra]
 encrypted = true
 password = "elysia"
-password_hint = "和 key 相同"
+password_hint = "主题名称"
 +++
 
-这是加密的正文，只有输入正确密码（`123456`）后才会显示。
+这是加密的正文，只有输入正确密码（`elysia`）后才会显示。
 
 ## 隐藏内容
 
@@ -21,20 +21,14 @@ password_hint = "和 key 相同"
 - 支持所有 Markdown 与组件
 - 代码块：
 
-```js,linenos,name=secret.js
+```js,name=secret.js
 const secret = "Elysia 🔐";
 console.log(secret);
 ```
 
 > [!IMPORTANT]
-> 加密仅为静态站点的轻量混淆，不适合高度敏感信息。
+> 加密使用 AES 加密，需要手动进行；推荐使用 CI，可以自动完成加密，相关内容可以查看 wiki 的使用指南。
 
 {% <note title="提示" color="yellow"> %}
 密码别名通过 front matter 的 `extra.password` 配置（如 `key1`），真密码只存放在加密脚本的 `encrypt.toml` 中；构建后脚本对正文做 AES-GCM 加密，前端解密。适合简单的访问控制。
 {% </note> %}
-
-
-```mermaid
-graph LR
-A --> B
-```

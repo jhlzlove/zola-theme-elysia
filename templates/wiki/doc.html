@@ -20,9 +20,7 @@
         </div>
         {% endif %}
       </header>
-      {# # Wiki: 移动端折叠目录 #}
-      {% set wm_section = section %}
-      {% set wm_current = "" %}
+      {# # Wiki: 移动端折叠目录（自包含寻根，与左侧栏同树） #}
       {% include "partials/wiki-mobile.html" %}
       <div class="article__content" id="articleContent">
         {{ section.content | safe }}

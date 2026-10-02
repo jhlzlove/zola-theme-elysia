@@ -175,10 +175,10 @@ enable = true
 
 ## 代码块
 
-**写法：** 支持 `linenos` / `name` / `hl_lines`：
+**写法：** 支持 `name` / `hl_lines`：
 
 ````md
-```ts,linenos,name=example.ts,hl_lines=2 3
+```ts,name=example.ts,hl_lines=2 3
 interface User {
   name: string;
   age: number;
@@ -659,10 +659,22 @@ func test() {
 {% </note> %}
 {% </column> %}
 
-{% <column color="red"> %}
+{% <column color="red" width="2"> %}
 右列，`width="2"`，占两份宽。
 
 {{ <link href="https://www.getzola.org/" title="Zola" desc="行组件也能嵌套" /> }}
+{% </column> %}
+{% </columns> %}
+
+竖列展示：
+
+{% <columns layout="v"> %}
+  {% <column color="red"> %}
+  1111
+{% </column> %}
+
+{% <column> %}
+  222
 {% </column> %}
 {% </columns> %}
 

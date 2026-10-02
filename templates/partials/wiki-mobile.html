@@ -1,28 +1,32 @@
 {# ############################################################################
    # Shared: Wiki 移动端折叠目录（<1024 显示，桌面端左侧栏已展示）
-   # 上下文：调用方需预设 wm_section（section 对象，含 title/pages/permalink）
-   #          wm_current（当前 permalink 字符串，可空）用于高亮
+   # 自包含寻根（与 wiki/sidebar.html 同逻辑）：回到顶层 wiki 项目，整棵分组树
+   # 调用方（wiki/page.html、wiki/doc.html）直接 include，无需预设变量
    ############################################################################ #}
-{% if wm_section and wm_section.pages | length > 0 %}
 {% set _m_lang = lang | default(value=config.default_language) %}
 {% set _m_wiki_root = get_url(path="wiki/", lang=_m_lang, trailing_slash=true) %}
-<details class="wiki-mobile" id="wikiMobile">
-  <summary class="toc-mobile__summary">
-    <span class="toc-mobile__label">📚 {{ wm_section.title }}</span>
-    <span class="toc-mobile__count">{{ wm_section.pages | length }} 篇</span>
-  </summary>
-  <nav class="wiki-mobile__nav" aria-label="Wiki 目录">
-    <a class="wiki-mobile__back" href="{{ _m_wiki_root | safe }}">← 返回 Wiki</a>
-    <ol class="wiki-side-nav__list">
-      {% for p in wm_section.pages %}
-      <li class="wiki-side-nav__item {% if wm_current and p.permalink == wm_current %}is-current{% endif %}">
-        <a href="{{ p.permalink | safe }}">
-          <span class="wiki-side-nav__index">{{ loop.index }}</span>
-          <span class="wiki-side-nav__item-title">{{ p.title }}</span>
-        </a>
-      </li>
-      {% endfor %}
-    </ol>
-  </nav>
-</details>
+{% set_global _m_nav_slug = "" %}
+{% set _m_nav_lang = config.default_language %}
+{% set _m_nav_current = "" %}
+{% if page is defined and page.ancestors is defined and page.ancestors | length > 0 %}
+  {% set _m_nav_current = page.permalink %}
+  {% if page.lang is defined and page.lang %}{% set _m_nav_lang = page.lang %}{% endif %}
+  {% for a in page.ancestors %}
+    {% set _ap = a | split(pat="/") %}
+    {% if _ap | length >= 3 and _ap[0] == "wiki" and _m_nav_slug == "" %}
+      {% set_global _m_nav_slug = _ap[1] %}
+    {% endif %}
+  {% endfor %}
+{% elif section is defined and section.path is defined %}
+  {% set _m_nav_current = section.permalink %}
+  {% if section.lang is defined and section.lang %}{% set _m_nav_lang = section.lang %}{% endif %}
+  {% set _sp = section.path | split(pat="/") %}
+  {% if _sp | length > 2 and _sp[1] == "wiki" and _sp[2] != "" %}
+    {% set_global _m_nav_slug = _sp[2] %}
+  {% elif _sp | length > 3 and _sp[2] == "wiki" and _sp[3] != "" %}
+    {% set_global _m_nav_slug = _sp[3] %}
+  {% endif %}
+{% endif %}
+{% if _m_nav_slug != "" %}
+{{ <wiki_nav path={"wiki/" ~ _m_nav_slug ~ "/_index.md"} lang={_m_nav_lang} current={_m_nav_current} variant="mobile" back_url={_m_wiki_root} /> }}
 {% endif %}

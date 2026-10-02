@@ -11,19 +11,21 @@
   {% if section.content %}<div class="article__content" style="margin-top:10px;padding-top:0">{{ section.content | safe }}</div>{% endif %}
 </div>
 
-{# # Wiki: 子项目 + 直属页面统一卡片 #}
+{# # Wiki: 子项目 + 直属页面统一卡片（计数含嵌套分组，与侧栏 wiki_count 同口径） #}
 {% set pages = section.pages %}
 {% if paginator %}{% set pages = paginator.pages %}{% endif %}
+{% set _grid_lang = lang | default(value=config.default_language) %}
+{% if section.lang is defined and section.lang %}{% set _grid_lang = section.lang %}{% endif %}
 
 <div class="wiki-grid" id="postList">
   {% if section.subsections %}
   {% for sub in section.subsections %}
-    {% set s = get_section(path=sub) %}
+    {% set s = get_section(path=sub, lang=_grid_lang) %}
     {% if s.title %}
     <article class="wiki-card">
       <div class="wiki-card__head">
         <h2 class="wiki-card__title"><a class="wiki-card__link" href="{{ s.permalink | safe }}">{{ s.title }}</a></h2>
-        <span class="wiki-card__count">{{ s.pages | length }} 篇</span>
+        <span class="wiki-card__count">{{ <wiki_count path={sub} lang={_grid_lang} /> }} 篇</span>
       </div>
       {% if s.description %}
       <p class="wiki-card__desc">{{ s.description }}</p>

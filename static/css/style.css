@@ -2224,7 +2224,8 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
   margin:18px 0;
 }
 .cols--h{flex-direction:row;align-items:stretch;flex-wrap:wrap}
-.cols--v{flex-direction:column}
+.cols--v{flex-direction:column;align-items:stretch}
+.cols--v .col-card{flex:0 0 auto !important;width:100%}
 .col-card{
   flex:1 1 0;
   min-width:0;
@@ -2972,6 +2973,60 @@ a.wiki-side-nav__title:hover{
   color:var(--accent);
   white-space:nowrap;
   flex-shrink:0;
+}
+/* # Wiki · 19. 子目录分组（有 title 的子目录内联为可折叠小节；无 title 则穿透）── */
+.wiki-side-nav__group{
+  list-style:none;
+  border-left:2px solid transparent;
+  border-radius:0;
+}
+.wiki-side-nav__group.is-current{
+  border-left-color:var(--accent);
+}
+.wiki-group{margin:0}
+.wiki-group__head{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 8px;
+  font-size:0.8125rem;
+  line-height:1.4;
+  cursor:pointer;
+  border-radius:6px;
+  list-style:none;
+  color:var(--fg);
+}
+.wiki-group__head::-webkit-details-marker{display:none}
+.wiki-group__head::marker{content:""}
+.wiki-group__head::before{
+  content:"▸";
+  flex:0 0 auto;
+  font-size:0.6875rem;
+  color:var(--muted);
+  transition:transform .15s ease;
+}
+.wiki-group[open] > .wiki-group__head::before{transform:rotate(90deg)}
+.wiki-group__head:hover .wiki-group__title{color:var(--accent)}
+.wiki-group__title{
+  flex:1;
+  min-width:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-weight:600;
+  color:var(--fg);
+  text-decoration:none;
+}
+.wiki-side-nav__group.is-current .wiki-group__title{color:var(--accent)}
+.wiki-group__count{
+  font-size:0.6875rem;
+  color:var(--muted);
+  white-space:nowrap;
+  flex-shrink:0;
+  font-variant-numeric:tabular-nums;
+}
+.wiki-side-nav__list--nested{
+  padding-left:14px;
 }
 
 /* # Wiki · Wiki 移动端折叠目录：桌面隐藏，<1024 显示 ── */

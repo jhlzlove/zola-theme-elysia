@@ -16,9 +16,6 @@ sticky = true
 [hexo-theme-stellar]: https://github.com/xaoxuu/hexo-theme-stellar
 [hugo-theme-reimu]: https://github.com/D-Sketon/hugo-theme-reimu
 
-> [!note]
-> 随着换机的折腾还有开发的经验，Windows 下推荐使用 [vfox](https://vfox.dev/zh-hans/)/[mise](https://mise.jdx.dev/) 和 [wsl](https://learn.microsoft.com/zh-cn/windows/wsl) 配置开发环境。这是非常好用的组合方式。如果喜欢远程开发，那么这种方式绝对值得一试！
-
 ## zola 0.23+ 版本
 
 0.23+ 是个破坏性更新，可以理解为大版本的更新，移除了 shortcode 的支持，所有类似的功能通过 component 组件进行支持。
@@ -31,9 +28,11 @@ zola 的组件主要分为两种：行组件和块组件。写法如下：
 
 - 行写法：
 
+  {% raw %}
   ```md
-  {% raw %}{{ <component-name attr=""/> }}{% endraw %}
+  {{ <component-name attr=""/> }}
   ```
+  {% endraw %}
 
 - 块写法：
 
@@ -88,7 +87,7 @@ Zola 使用 `_index.md` 表示一个 section。Wiki 子目录中的文章会自�
 
 ## 本地搜索
 
-默认使用 Pagefind 本地搜索，中文开箱即用，构建后运行 `pagefind --site public` 生成索引即可；也可以在 `[extra.search]` 中切换到 Algolia（需自行推送索引）或 `none` 关闭。
+本主题的搜索使用 Pagefind 实现本地搜索，需要注意的是 pagefind_extended 支持中文索引，在网站构建后运行 `pagefind_extended --site public` 生成索引即可；也可以在 `[extra.search]` 中切换到 Algolia（需自行推送索引）或 `none` 关闭。
 
 ## zola 嵌套目录的局限性
 
@@ -143,7 +142,6 @@ weight = 1
 
 > [!note]
 > 原则上，wiki 文章只需要示例中的三个 front matter。如果不确定以后是否迁移，建议和博客文章一样包含 taxonomies。原因应该不用说吧，zola 这么特立独行...
-
 
 ## 简历页
 
