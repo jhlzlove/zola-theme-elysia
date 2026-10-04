@@ -7,8 +7,10 @@ description = "Front Matter, Markdown, and Elysia components (syntax plus render
 
 Examples in this chapter can be copied into posts. Components use the Zola 0.23+ component syntax. Each section shows the syntax first, then the rendered result.
 
-> [!tip]
-> When using {% raw %}`{{ ... }}` or `{% ... %}`{% endraw %} in Markdown, you must wrap the expression with `raw` / `endraw`, otherwise Zola will try to execute it and fail to parse.
+
+> [!important]
+> {% raw %}
+> When using Zola, to use `{{ ... }}` or `{% ... %}` in Markdown source files, wrap them with `\{% raw %\}` and `\{% endraw %\}`, otherwise Zola will try to execute them and fail to parse.{% endraw %}
 
 ## Article Front Matter
 
@@ -28,7 +30,6 @@ Common fields for blog posts:
 +++
 title = "A post"
 date = 2026-03-10
-updated = 2026-03-12
 description = "Summary shown in lists"
 weight = 1
 

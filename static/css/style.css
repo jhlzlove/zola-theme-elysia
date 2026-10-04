@@ -1751,20 +1751,22 @@ html[data-theme="dark"] .callout--black{background:var(--bg-muted);border-color:
   border-top:1px dashed #e9ecef;
   border-bottom:1px dashed #e9ecef;
   box-shadow:none;
-  /* 单换行即换行：Markdown 单个 \n 在 HTML 里仍是 \n，用 pre-line 直接渲染为换行；空一行仍为分段，两者都兼容 */
-  white-space:pre-line;
 }
 .poetry__body::before{ display:none; }
-.poetry__body p{
+.poetry__stanza{
+  margin:0;
+  padding:0;
+}
+.poetry__stanza + .poetry__stanza{
+  margin-top:10px;
+}
+.poetry__body p,
+.poetry__line{
   position:relative;
   margin:0;
   padding:4px 0;
-  border-bottom:none;
   text-align:center;
-  white-space:pre-line;
 }
-.poetry__body p:last-child{ border-bottom:none; }
-.poetry__body br{content:""; display:block; margin:0;}
 .poetry__body strong, .poetry__body b{ font-weight:700; color:var(--fg); }
 /* 暗色 */
 html[data-theme="dark"] .poetry{

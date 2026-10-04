@@ -11,6 +11,7 @@ Zola 会把站点构建成纯静态文件。部署时只需要把 `public/` 发�
 
 在站点仓库中创建 `.github/workflows/deploy.yml`（与本仓库同名文件一致，可直接复制）：
 
+{% raw %}
 ```yaml
 name: ci
 
@@ -44,7 +45,7 @@ jobs:
           selector: "#encryptedBox"
           content-selector: "#articleContent"
         env:
-          SITE_ENCRYPT_PASSWORDS: {% raw %}${{ secrets.ENCRYPT_PASSWORDS }}{% endraw %}
+          SITE_ENCRYPT_PASSWORDS: ${{ secrets.ENCRYPT_PASSWORDS }}
 
       - name: Build Pagefind index
         run: |
@@ -66,12 +67,13 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: {% raw %}${{ steps.deployment.outputs.page_url }}{% endraw %}
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
 ```
+{% endraw %}
 
 然后：
 

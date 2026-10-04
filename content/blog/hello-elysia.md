@@ -30,7 +30,7 @@ zola 的组件主要分为两种：行组件和块组件。写法如下：
 
   {% raw %}
   ```md
-  {{ <component-name attr=""/> }}
+  {{ <component-name parameter=""/> }}
   ```
   {% endraw %}
 
@@ -38,9 +38,9 @@ zola 的组件主要分为两种：行组件和块组件。写法如下：
 
   {% raw %}
   ```md
-  {% <component-name attr=""> %}
+  {% <component-name parameter=""> %}
     some text...
-  {% <component-name/> %}
+  {% </component-name> %}
   ```
   {% endraw %}
 
@@ -91,20 +91,20 @@ Zola 使用 `_index.md` 表示一个 section。Wiki 子目录中的文章会自�
 
 ## zola 嵌套目录的局限性
 
-目录嵌套较深时，子目录想要在父级列表中显示必须有 `_index.md` 文件，其中至少有一行内容 `transparent = true`，否则列表不会显示。这和 Hexo、Hugo 这些框架不太一样。
+目录嵌套较深时，子目录想要在父级列表中显示必须有 `_index.md` 文件，其中至少有一行内容 `transparent = true`，否则列表不会显示（无法使用 zola 的 API 对象获取到）。这和 Hexo、Hugo 这些框架不太一样。
 
 虽然不会被父级显示，但是 zola 是会编译该文章的，可以使用该文章的 url 直接访问，这样的页面官方称为“孤儿页”，访问孤儿页必须添加入口按钮才方便。~~（谁会手动输入 url 啊喂 😑）~~
 
 ## 利用好分类
 
-由于 zola 孤儿页的影响，文章源文件一般建议一个目录平铺。但是建议给每篇文章进行分类，利用 zola 提供分类聚合，方便找到同一分类的文章。
+由于 zola 孤儿页的影响，文章源文件一般建议一个目录平铺。但是建议给每篇文章添加分类或者标签，利用 zola 主题提供分类、标签进行聚合，方便找到同一分类的文章。
 
 > [!tip]
 > 如果有多个子目录且文章具备关联性，可以使用本主题提供的 wiki 布局。
 
 ## 博客
 
-blog 目录中的文档。博客文章的 front matter 中建议包含以下几项，支持 toml 或者 yaml 格式。
+blog 目录中的文档。博客文章的 front matter 中建议包含以下几项，zola 支持 toml 或者 yaml 格式。
 
 ```md
 <!--toml-->
@@ -164,9 +164,7 @@ zola 的文章摘要支持不错，可以使用 front matter 的 `description` �
 
 ## 主题限制
 
-wiki 中的文章分类、标签不会出现在菜单中的分类、标签页面，wiki 相关文章自成一派。
-
-简历页面也是单独的，不在博客列表里面。
+wiki 中的文章分类、标签不会出现在菜单中的分类、标签页面，wiki 相关文章自成一派。简历页面也是单独的，不在博客列表里面。
 
 ## 主题灵感
 

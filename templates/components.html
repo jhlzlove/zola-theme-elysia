@@ -188,7 +188,7 @@
 {% endcomponent friends -%}
 
 {% component poetry(title = "", author = "") -%}
-<div class="poetry" data-component="poetry">{% if title %}<div class="poetry__title">{{ title }}</div>{% endif %}{% if author %}<div class="poetry__author">— {{ author }}</div>{% endif %}<div class="poetry__body">{{ body | markdown | safe }}</div></div>
+<div class="poetry" data-component="poetry">{% if title %}<div class="poetry__title">{{ title }}</div>{% endif %}{% if author %}<div class="poetry__author">— {{ author }}</div>{% endif %}<div class="poetry__body">{% set src = body | trim | replace(from="\r\n", to="\n") | replace(from="\r", to="\n") -%}{% set lines = src | split(pat="\n") -%}{% set_global stanza_open = false -%}{% for line in lines -%}{% set t = line | trim -%}{% if t == "" -%}{% if stanza_open -%}</div>{% set_global stanza_open = false -%}{% endif -%}{% else -%}{% if not stanza_open -%}<div class="poetry__stanza">{% set_global stanza_open = true -%}{% endif -%}<p class="poetry__line">{{ t | markdown(inline=true) | safe }}</p>{% endif -%}{% endfor -%}{% if stanza_open -%}</div>{% endif -%}</div></div>
 {% endcomponent poetry -%}
 
 {% component tabs() -%}

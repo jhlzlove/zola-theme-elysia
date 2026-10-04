@@ -89,7 +89,7 @@ police = ""
 moe = ""
 ```
 
-ICP, public security, and Moe ICP numbers. Empty values are not rendered. For Moe ICP, just fill in the number (e.g. `20268080`); the theme renders "萌 ICP 备案 X 号" with a lookup link automatically.
+ICP, public security, and Moe ICP numbers. Empty values are not rendered. For Moe ICP, just fill in the number (e.g. `2026xxxx`); the theme renders "萌 ICP 备案 X 号" with a lookup link automatically.
 
 ## Navigation and translations
 

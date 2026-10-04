@@ -11,6 +11,7 @@ Zola turns the site into static files. Deployment only needs to publish the gene
 
 Create `.github/workflows/deploy.yml` in the site repository (same as this repository's file, copy it directly):
 
+{% raw %}
 ```yaml
 name: ci
 
@@ -41,7 +42,7 @@ jobs:
           selector: "#encryptedBox"
           content-selector: "#articleContent"
         env:
-          SITE_ENCRYPT_PASSWORDS: {% raw %}${{ secrets.ENCRYPT_PASSWORDS }}{% endraw %}
+          SITE_ENCRYPT_PASSWORDS: ${{ secrets.ENCRYPT_PASSWORDS }}
 
       - name: Build Pagefind index
         run: |
@@ -63,12 +64,13 @@ jobs:
       id-token: write
     environment:
       name: github-pages
-      url: {% raw %}${{ steps.deployment.outputs.page_url }}{% endraw %}
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
 ```
+{% endraw %}
 
 Then:
 

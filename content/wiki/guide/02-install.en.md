@@ -7,7 +7,7 @@ description = "Install Zola, start a local preview, and understand where site fi
 
 ## Requirements
 
-- Zola `0.23.4` or newer. The theme uses the component syntax introduced in Zola 0.23+.
+- Zola `0.23+` or newer. The theme uses the component syntax introduced in Zola 0.23+.
 - Git, if you use the theme repository or a Git submodule.
 - An editor that can save UTF-8 text.
 

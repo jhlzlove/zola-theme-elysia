@@ -7,8 +7,10 @@ description = "掌握文章 Front Matter、Markdown 写法和 Elysia 内置组�
 
 本章示例可直接复制到文章中。组件使用 Zola 0.23+ 的 component 语法；每节先给写法，再给效果。
 
-> [!tip]
-> 在 md 文章中使用 {% raw %} `{{ ... }}` 或 `{% ... %}` {% endraw %} 时必须使用 `raw`、`endraw` 进行包裹，以避免被当前页执行，导致 zola 解析导致报错。
+
+> [!important]
+> {% raw %}
+> 使用 zola 时，如果想在 md 源文件中使用 `{{ ... }}` 或 `{% ... %}` 时，必须使用 `\{% raw %\}`、  `\{% endraw %\}` 进行包裹，以避免被当前页执行，导致 zola 解析导致报错。{% endraw %}
 
 ## 文章 Front Matter
 
@@ -28,7 +30,6 @@ description = "这是一段摘要"
 +++
 title = "一篇文章"
 date = 2026-03-10
-updated = 2026-03-12
 description = "列表页显示的摘要"
 weight = 1
 
@@ -495,6 +496,7 @@ developer:
 ### poetry 诗词
 
 **写法：**
+
 {% raw %}
 ```jinja
 {% <poetry title="春晓" author="孟浩然"> %}

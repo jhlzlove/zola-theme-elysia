@@ -7,7 +7,7 @@ description = "安装 Zola，启动本地预览，并了解站点文件的位置
 
 ## 环境要求
 
-- Zola `0.23.4` 或更高版本。主题使用 Zola 0.23+ 的 component 语法。
+- Zola `0.23+` 或更高版本。主题使用 Zola 0.23+ 的 component 语法。
 - Git。使用主题仓库或 Git 子模块时需要。
 - 一个可以编辑 UTF-8 文本的编辑器。
 
