@@ -32,9 +32,8 @@ avatar_alt = "Elysia"
 site_motto = "不修来世不修仙 且留大道在人间"
 
 # Footer (markdown supported)
-# <span id="jinrishici-sentence"></span> <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
 footer = """
-本博客所有文章除特别声明外，均采用 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) 许可协议，转载请注明出处。
+<span id="jinrishici-sentence"></span> <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
 
 © 2026 主题 [Elysia](https://github.com/jhlzlove/zola-theme-elysia) · 由 [Zola](https://www.getzola.org) 驱动
 """
