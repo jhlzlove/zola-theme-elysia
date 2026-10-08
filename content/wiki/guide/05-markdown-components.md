@@ -122,6 +122,12 @@ password_hint = "请输入密码"
 
 > [!WARNING]
 > 这是警告。
+
+> [!IMPORTANT]
+> 这是重要。
+
+> [!CAUTION]
+> 这是危险。
 ```
 
 **效果：**
@@ -134,6 +140,12 @@ password_hint = "请输入密码"
 
 > [!WARNING]
 > 这是警告。
+
+> [!IMPORTANT]
+> 这是重要。
+
+> [!CAUTION]
+> 这是危险。
 
 **写法（脚注）：**
 
