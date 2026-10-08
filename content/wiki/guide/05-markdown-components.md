@@ -147,6 +147,8 @@ password_hint = "请输入密码"
 > [!CAUTION]
 > 这是危险。
 
+Alert 为无底色线框样式（边框与 `note` 同款，标题固定为类型名）；需要带底色、自定义标题或颜色时用下面的 `note` 组件。
+
 **写法（脚注）：**
 
 ```md
@@ -234,32 +236,33 @@ interface User {
 
 {% raw %}
 ```jinja
-{% <note title="提示" color="blue"> %}
+{% <note title="提示" color="note"> %}
 这是一段提示内容。
 {% </note> %}
-{% <note title="成功" color="green"> %}...{% </note> %}
+{% <note title="成功" color="tip"> %}...{% </note> %}
+{% <note title="自定义" color="#F35E1C"> %}...{% </note> %}
 ```
 {% endraw %}
 
-`color` 可选 `blue` / `green` / `yellow` / `orange` / `red` / `black`。
+`color` 可选 `note`（默认）/ `tip` / `important` / `warning` / `caution`（与 GitHub Alerts 同色系），或任意十六进制颜色如 `#e8590c` / `#f00`，非法值回落 `note`。
 
 | 参数 | 必填/选填 | 说明 |
 | --- | --- | --- |
 | `title` | 选填 | 标题栏文字，不写则不显示标题栏 |
-| `color` | 选填 | `blue`（默认）/ `green` / `yellow` / `orange` / `red` / `black`，非法值回落 `blue` |
+| `color` | 选填 | `note`（默认）/ `tip` / `important` / `warning` / `caution` / 十六进制色，非法值回落 `note` |
 | 块内容 | 必填 | 提示正文，支持完整 Markdown |
 
 **效果：**
 
-{% <note title="提示" color="blue"> %}
-这是一段提示内容，`color="blue"` 为默认。
+{% <note title="提示" color="note"> %}
+这是一段提示内容，`color="note"` 为默认。
 {% </note> %}
 
-{% <note title="成功" color="green"> %}green{% </note> %}
-{% <note title="警告" color="yellow"> %}yellow{% </note> %}
-{% <note title="注意" color="orange"> %}orange{% </note> %}
-{% <note title="危险" color="red"> %}red{% </note> %}
-{% <note title="黑色" color="black"> %}black{% </note> %}
+{% <note title="技巧" color="tip"> %}tip{% </note> %}
+{% <note title="重要" color="important"> %}important{% </note> %}
+{% <note title="警告" color="warning"> %}warning{% </note> %}
+{% <note title="危险" color="caution"> %}caution{% </note> %}
+{% <note title="自定义" color="#e8590c"> %}任意十六进制颜色，如 `#e8590c`。{% </note> %}
 
 ### video 视频
 
@@ -604,7 +607,7 @@ console.log("hello")
 {% </tab> %}
 
 {% <tab title="note"> %}
-{% <note title="提示" color="blue"> %}
+{% <note title="提示" color="note"> %}
 面板里套 `note`。
 {% </note> %}
 {% </tab> %}
@@ -668,7 +671,7 @@ func test() {
 夜来风雨声，花落知多少。
 {% </poetry> %}
 
-{% <note title="提示" color="green"> %}
+{% <note title="提示" color="tip"> %}
 `note` 嵌套在 `column` 里。
 {% </note> %}
 {% </column> %}

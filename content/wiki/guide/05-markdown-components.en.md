@@ -136,6 +136,8 @@ Markdown links inside article content automatically receive a link icon; image l
 > [!WARNING]
 > A warning.
 
+Alerts use a border-only style with no background (same border as `note`, fixed type title); for tinted boxes with custom titles or colors, use the `note` component below.
+
 **Syntax (footnotes):**
 
 ```md
@@ -223,32 +225,33 @@ Parameters normally use double quotes; body supports full Markdown.
 
 {% raw %}
 ```jinja
-{% <note title="Note" color="blue"> %}
+{% <note title="Note" color="note"> %}
 This is a note.
 {% </note> %}
-{% <note title="Success" color="green"> %}...{% </note> %}
+{% <note title="Success" color="tip"> %}...{% </note> %}
+{% <note title="Custom" color="#e8590c"> %}...{% </note> %}
 ```
 {% endraw %}
 
-Available colors are `blue`, `green`, `yellow`, `orange`, `red`, and `black`.
+Available colors are `note` (default) / `tip` / `important` / `warning` / `caution` (same palette as GitHub Alerts), or any hex color such as `#e8590c` / `#f00`; invalid values fall back to `note`.
 
 | Parameter | Required | Description |
 | --- | --- | --- |
 | `title` | No | Heading text; no heading bar when omitted |
-| `color` | No | `blue` (default) / `green` / `yellow` / `orange` / `red` / `black`; invalid values fall back to `blue` |
+| `color` | No | `note` (default) / `tip` / `important` / `warning` / `caution` / hex color; invalid values fall back to `note` |
 | Body | Yes | Note text, full Markdown supported |
 
 **Rendered:**
 
-{% <note title="Note" color="blue"> %}
-This is a note with `color="blue"` (default).
+{% <note title="Note" color="note"> %}
+This is a note with `color="note"` (default).
 {% </note> %}
 
-{% <note title="Success" color="green"> %}green{% </note> %}
-{% <note title="Warning" color="yellow"> %}yellow{% </note> %}
-{% <note title="Attention" color="orange"> %}orange{% </note> %}
-{% <note title="Danger" color="red"> %}red{% </note> %}
-{% <note title="Black" color="black"> %}black{% </note> %}
+{% <note title="Tip" color="tip"> %}tip{% </note> %}
+{% <note title="Important" color="important"> %}important{% </note> %}
+{% <note title="Warning" color="warning"> %}warning{% </note> %}
+{% <note title="Caution" color="caution"> %}caution{% </note> %}
+{% <note title="Custom" color="#e8590c"> %}Any hex color, e.g. `#e8590c`.{% </note> %}
 
 ### video
 
@@ -599,7 +602,7 @@ Inner B.
 {% </tab> %}
 
 {% <tab title="note"> %}
-{% <note title="Tip" color="blue"> %}
+{% <note title="Tip" color="tip"> %}
 A `note` inside a `tab`.
 {% </note> %}
 {% </tab> %}

@@ -16,7 +16,7 @@
     {% endfor %}
   {% endif %}
 
-  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20261004">
+  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20261008">
   {# 代码高亮：双主题（zola.toml light_theme/dark_theme）生成 giallo-light/dark.css，按 data-theme 启用其一 #}
   <link id="giallo-light" rel="stylesheet" href="{{ get_url(path="giallo-light.css") | safe }}?v=20260924">
   <link id="giallo-dark" rel="stylesheet" href="{{ get_url(path="giallo-dark.css") | safe }}?v=20260924">
@@ -158,7 +158,7 @@
   <nav class="toc toc--float" id="tocFloatNav" aria-label="Table of contents">{% block toc_float %}{% endblock toc_float %}</nav>
 </div>
 
-<script>window.ELYSIA_ICONS_URL="{{ get_url(path="icons.svg") | safe }}?v=20260907";</script>
+<script>window.ELYSIA_ICONS_URL="{{ get_url(path="icons.svg") | safe }}?v=20261008";</script>
 <script src="{{ get_url(path="js/site-decrypt.js") | safe }}?v=20260907" defer></script>
   <script src="{{ get_url(path="js/main.js") | safe }}?v=20260928-4" defer></script>
 <script src="{{ get_url(path="js/friends.js") | safe }}?v=20260909" defer></script>

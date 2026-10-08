@@ -1,15 +1,16 @@
 {# Elysia Components — Tera components for Zola 0.23+ #}
-{% component note(title = "", color = "blue") -%}
-{% set c = color | lower -%}
-{% set cls = "blue" -%}
-{% if c == "red" %}{% set cls = "red" -%}
-{% elif c == "green" %}{% set cls = "green" -%}
-{% elif c == "yellow" %}{% set cls = "yellow" -%}
-{% elif c == "orange" %}{% set cls = "orange" -%}
-{% elif c == "black" %}{% set cls = "black" -%}
-{% elif c == "blue" %}{% set cls = "blue" -%}
+{% component note(title = "", color = "note") -%}
+{% set c = color | lower | trim -%}
+{% set cls = "note" -%}
+{% set ic = "note" -%}
+{% set custom = "" -%}
+{% if c == "tip" %}{% set cls = "tip" -%}{% set ic = "tip" -%}
+{% elif c == "important" %}{% set cls = "important" -%}{% set ic = "important" -%}
+{% elif c == "warning" %}{% set cls = "warning" -%}{% set ic = "warning" -%}
+{% elif c == "caution" %}{% set cls = "caution" -%}{% set ic = "caution" -%}
+{% elif c is starting_with(pat="#") %}{% set cls = "custom" -%}{% set custom = c -%}
 {% endif -%}
-<div class="callout callout--{{ cls }}" role="note" data-component="note">{% if title %}<div class="callout__head">{{ <icon name="callout" width="16" height="16"/> }}<span>{{ title }}</span></div>{% endif %}<div class="callout__body">{{ body | markdown | safe }}</div></div>
+<div class="callout callout--{{ cls }}" role="note" data-component="note"{% if custom %} style="--callout-accent:{{ custom }}"{% endif %}>{% if title %}<div class="callout__head">{{ <icon name={ic} width="16" height="16"/> }}<span>{{ title }}</span></div>{% endif %}<div class="callout__body">{{ body | markdown | safe }}</div></div>
 {% endcomponent note -%}
 
 {% component video(bilibili = "", youtube = "", src = "", width = "100%", caption = "", autoplay = "") -%}
@@ -237,4 +238,4 @@
   （传入后输出 role="img" + aria-label，否则为装饰性 aria-hidden）。
   新增图标只需在 static/icons.svg 追加 <symbol>，改动后同步下行 ?v=。 #}
 {% component icon(name = "", class = "", width = "", height = "", id = "", style = "", label = "") -%}
-<svg{% if id %} id="{{ id }}"{% endif %}{% if class %} class="{{ class }}"{% endif %}{% if width %} width="{{ width }}"{% endif %}{% if height %} height="{{ height }}"{% endif %}{% if style %} style="{{ style }}"{% endif %} {% if label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}><use href="{{ get_url(path="icons.svg") | safe }}?v=20260907#i-{{ name }}"></use></svg>{% endcomponent icon -%}
+<svg{% if id %} id="{{ id }}"{% endif %}{% if class %} class="{{ class }}"{% endif %}{% if width %} width="{{ width }}"{% endif %}{% if height %} height="{{ height }}"{% endif %}{% if style %} style="{{ style }}"{% endif %} {% if label %}role="img" aria-label="{{ label }}"{% else %}aria-hidden="true"{% endif %}><use href="{{ get_url(path="icons.svg") | safe }}?v=20261008#i-{{ name }}"></use></svg>{% endcomponent icon -%}
