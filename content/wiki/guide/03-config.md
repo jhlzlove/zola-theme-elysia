@@ -99,33 +99,31 @@ moe = ""
 
 ## 导航与多语言
 
-菜单仅维护一套，显示文本由 `translations` 提供：
+菜单名称支持 `name` / `name_key` 双模式（与 `[extra.features].i18n` 开关正交，均可用）：
 
 ```toml
+# 模式一：直接写名称，零 translations 维护成本
 [[extra.menus]]
-name_key = "menu_blog"
+name = "博客"
 url = "/"
 icon = "✍️"
 
+# 模式二：经 translations 翻译（多语言站点推荐）
 [[extra.menus]]
 name_key = "menu_wiki"
 url = "/wiki/"
 icon = "📚"
 
 [translations]
-menu_blog = "博客"
 menu_wiki = "Wiki"
 
 [languages.en.translations]
-menu_blog = "Blog"
 menu_wiki = "Wiki"
 ```
 
-- `name_key` 必须在 `[translations]` 与各 `[languages.<code>.translations]` 中同时存在。
+- 只写 `name`：直接显示；只写 `name_key`：经 `trans(key, lang=cur_lang)` 翻译，需在 `[translations]` 与各 `[languages.<code>.translations]` 中同时存在；两者都写时 `name` 优先。
 - `url` 使用不带语言前缀的路径（如 `/wiki/`），模板按 `cur_lang` 自动加前缀。
-- 新增/删除菜单时，同步增删翻译 key。
-
-模板通过 `trans(key=item.name_key, lang=cur_lang)` 渲染；侧边栏地球图标根据 `config.languages` 自动显示语言切换。
+- 语言切换器（侧栏地球图标）仅在 `[extra.features].i18n = true`（默认）**且**配置了 `config.languages` 时显示，按 `default_language + config.languages` 动态渲染；`i18n = false` 则整个隐藏。单语言用户可直接 `i18n = false` + 全用 `name`，并删除 `[languages.en]` 与 `*.en.md`。
 
 ## 社交链接
 
@@ -186,6 +184,7 @@ toc = true
 code_line_numbers = true
 paginate_by = 5
 show_reading_time = true
+i18n = true
 ```
 
 - `year_progress`：侧边栏年进度条。
@@ -193,6 +192,7 @@ show_reading_time = true
 - `code_line_numbers`：代码行号。
 - `paginate_by`：首页列表每页数量。
 - `show_reading_time`：标题下方阅读时间。
+- `i18n`：多语言切换器总开关，默认 `true`；`false` 则隐藏侧栏语言切换器（菜单 `name` / `name_key` 双模式均不受影响）。
 
 ## 搜索
 
@@ -364,6 +364,7 @@ article_expiry = "This article was last updated on {date} and has not been updat
 
 - URL 按 `cur_lang != default_language` 自动加前缀（如 `/en/wiki/`）。
 - 自定义 Section（`archive` / `heatmap` / `friends` / `links` / `search` / `resume`）需为每种语言创建对应的 `content/<section>/_index.<lang>.md` 或 `resume.<lang>.md`，否则对应语言下 404。
+- 不想要多语言：设 `[extra.features].i18n = false`，菜单全用 `name` 直写，删除 `[languages.en]` 与 `*.en.md` 即可；`[translations]`（默认语言文案）仍需保留供搜索框/目录/过期提示/许可声明使用。
 
 ## Front Matter 速查
 

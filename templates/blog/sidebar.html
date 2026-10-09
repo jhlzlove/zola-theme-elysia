@@ -13,12 +13,19 @@
   <div class="brand__title"><a href="{{ get_url(path="/", lang=cur_lang, trailing_slash=true) | safe }}">{{ config.title }}</a></div>
   {% if config.extra.site_motto %}<div class="brand__motto">{{ config.extra.site_motto }}</div>{% endif %}
 </div>
-{# # Blog: 主菜单 — 仅维护一套 [[extra.menus]]，名称经 translations 翻译 #}
+{# # Blog: 主菜单 — name / name_key 双模式（与 [extra.features].i18n 开关正交，均可用）：
+   # - 只写 name = "博客"：直接显示，零 translations 维护成本；
+   # - 只写 name_key = "menu_blog"：经 trans(key, lang=cur_lang) 翻译，需在各语言 translations 中定义；
+   # - 两者都写：name 优先（避免 trans 缺 key 构建报错）。 #}
 {% set_global menus = config.extra.menus %}
 {% if menus %}
 <nav class="nav-buttons" aria-label="Primary">
   {% for item in menus %}
-    {% set display_name = trans(key=item.name_key, lang=cur_lang) %}
+    {% if item.name is defined and item.name != "" %}
+      {% set display_name = item.name %}
+    {% else %}
+      {% set display_name = trans(key=item.name_key, lang=cur_lang) %}
+    {% endif %}
     {% set raw = item.url %}
     {# 外链原样输出；站内路径经 get_url 生成以支持 base_url 子路径部署 #}
     {% set is_external = raw is starting_with(pat="http://") or raw is starting_with(pat="https://") or raw is starting_with(pat="//") or raw is starting_with(pat="mailto:") or raw is starting_with(pat="tel:") or raw is starting_with(pat="#") %}
@@ -140,6 +147,11 @@
           <button class="palette__option" data-palette="violet" role="option" aria-selected="false"><span class="palette__dot" data-palette="violet"></span><span class="palette__label">梦幻紫</span><span class="palette__check" aria-hidden="true">✓</span></button>
         </div>
       </div>
+      {# # Blog: 语言切换器 — 受 [extra.features].i18n 控制（false 则整个不渲染）；
+         # 开启时按 default_language + config.languages 动态渲染（非硬编码中/英），单语言（无 config.languages）自动隐藏。 #}
+      {% set _i18n_on = true %}
+      {% if config.extra.features is defined and config.extra.features.i18n is defined %}{% set _i18n_on = config.extra.features.i18n %}{% endif %}
+      {% if _i18n_on and config.languages %}
       <div class="lang-wrap" id="langWrap">
         <button class="icon-btn" id="langToggle" aria-label="切换语言" aria-expanded="false" aria-controls="langDropdown" title="English / 中文">
           {{ <icon name="globe"/> }}
@@ -153,29 +165,64 @@
               {% set _cur = _pf %}
             {% endif %}
           {% endif %}
-          {% set _zh_href = get_url(path="/", trailing_slash=true) %}
-          {% set _en_href = get_url(path="en/", trailing_slash=true) %}
+          {# 默认语言入口 #}
+          {% set _code = config.default_language %}
+          {% set _href = get_url(path="/", trailing_slash=true) %}
           {% if page is defined %}
-            {% if page.lang == "zh" %}{% set_global _zh_href = page.permalink | safe %}{% elif page.lang == "en" %}{% set_global _en_href = page.permalink | safe %}{% endif %}
+            {% if page.lang is defined and page.lang == _code %}{% set_global _href = page.permalink | safe %}{% endif %}
             {% for t in page.translations %}
-              {% if t.lang == "zh" %}{% set_global _zh_href = t.permalink | safe %}{% endif %}
-              {% if t.lang == "en" %}{% set_global _en_href = t.permalink | safe %}{% endif %}
+              {% if t.lang == _code %}{% set_global _href = t.permalink | safe %}{% endif %}
             {% endfor %}
           {% elif section is defined %}
-            {% if section.lang == "zh" %}{% set_global _zh_href = section.permalink | safe %}{% elif section.lang == "en" %}{% set_global _en_href = section.permalink | safe %}{% endif %}
+            {% if section.lang is defined and section.lang == _code %}{% set_global _href = section.permalink | safe %}{% endif %}
             {% for t in section.translations %}
-              {% if t.lang == "zh" %}{% set_global _zh_href = t.permalink | safe %}{% endif %}
-              {% if t.lang == "en" %}{% set_global _en_href = t.permalink | safe %}{% endif %}
+              {% if t.lang == _code %}{% set_global _href = t.permalink | safe %}{% endif %}
             {% endfor %}
           {% endif %}
-          <a class="palette__option {% if _cur == "zh" %}is-active{% endif %}" href="{{ _zh_href | safe }}" role="option" aria-selected="{% if _cur == "zh" %}true{% else %}false{% endif %}">
-            <span style="font-size:0.875rem">🇨🇳</span><span class="palette__label">中文</span><span class="palette__check" aria-hidden="true">✓</span>
-          </a>
-          <a class="palette__option {% if _cur == "en" %}is-active{% endif %}" href="{{ _en_href | safe }}" role="option" aria-selected="{% if _cur == "en" %}true{% else %}false{% endif %}">
-            <span style="font-size:0.875rem">🇺🇸</span><span class="palette__label">English</span><span class="palette__check" aria-hidden="true">✓</span>
-          </a>
+          {% if _code == "zh" %}
+            <a class="palette__option {% if _cur == _code %}is-active{% endif %}" href="{{ _href | safe }}" role="option" aria-selected="{% if _cur == _code %}true{% else %}false{% endif %}">
+              <span style="font-size:0.875rem">🇨🇳</span><span class="palette__label">中文</span><span class="palette__check" aria-hidden="true">✓</span>
+            </a>
+          {% elif _code == "en" %}
+            <a class="palette__option {% if _cur == _code %}is-active{% endif %}" href="{{ _href | safe }}" role="option" aria-selected="{% if _cur == _code %}true{% else %}false{% endif %}">
+              <span style="font-size:0.875rem">🇺🇸</span><span class="palette__label">English</span><span class="palette__check" aria-hidden="true">✓</span>
+            </a>
+          {% else %}
+            <a class="palette__option {% if _cur == _code %}is-active{% endif %}" href="{{ _href | safe }}" role="option" aria-selected="{% if _cur == _code %}true{% else %}false{% endif %}">
+              <span style="font-size:0.875rem">🌐</span><span class="palette__label">{{ _code }}</span><span class="palette__check" aria-hidden="true">✓</span>
+            </a>
+          {% endif %}
+          {# 其他语言：遍历 config.languages #}
+          {% for _lcode, _lopts in config.languages %}
+            {% set _lhref = get_url(path=_lcode ~ "/", trailing_slash=true) %}
+            {% if page is defined %}
+              {% if page.lang is defined and page.lang == _lcode %}{% set_global _lhref = page.permalink | safe %}{% endif %}
+              {% for t in page.translations %}
+                {% if t.lang == _lcode %}{% set_global _lhref = t.permalink | safe %}{% endif %}
+              {% endfor %}
+            {% elif section is defined %}
+              {% if section.lang is defined and section.lang == _lcode %}{% set_global _lhref = section.permalink | safe %}{% endif %}
+              {% for t in section.translations %}
+                {% if t.lang == _lcode %}{% set_global _lhref = t.permalink | safe %}{% endif %}
+              {% endfor %}
+            {% endif %}
+            {% if _lcode == "zh" %}
+              <a class="palette__option {% if _cur == _lcode %}is-active{% endif %}" href="{{ _lhref | safe }}" role="option" aria-selected="{% if _cur == _lcode %}true{% else %}false{% endif %}">
+                <span style="font-size:0.875rem">🇨🇳</span><span class="palette__label">中文</span><span class="palette__check" aria-hidden="true">✓</span>
+              </a>
+            {% elif _lcode == "en" %}
+              <a class="palette__option {% if _cur == _lcode %}is-active{% endif %}" href="{{ _lhref | safe }}" role="option" aria-selected="{% if _cur == _lcode %}true{% else %}false{% endif %}">
+                <span style="font-size:0.875rem">🇺🇸</span><span class="palette__label">English</span><span class="palette__check" aria-hidden="true">✓</span>
+              </a>
+            {% else %}
+              <a class="palette__option {% if _cur == _lcode %}is-active{% endif %}" href="{{ _lhref | safe }}" role="option" aria-selected="{% if _cur == _lcode %}true{% else %}false{% endif %}">
+                <span style="font-size:0.875rem">🌐</span><span class="palette__label">{{ _lcode }}</span><span class="palette__check" aria-hidden="true">✓</span>
+              </a>
+            {% endif %}
+          {% endfor %}
         </div>
       </div>
+      {% endif %}
     </div>
     <div class="theme-controls">
       <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">

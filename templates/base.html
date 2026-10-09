@@ -35,6 +35,10 @@
       {% endif %}
     }
   </style>
+  {# i18n — [extra.features].i18n 总开关（默认 true），仅控制多语言 UI 的显示/隐藏（如侧栏语言切换器）。
+     缺字段按 true 处理以向后兼容；文案解析仍经 trans(..., lang=default_language) 退化，不受开关影响。 #}
+  {% set_global i18n_enabled = true %}
+  {% if config.extra.features is defined and config.extra.features.i18n is defined %}{% set_global i18n_enabled = config.extra.features.i18n %}{% endif %}
   {# Search — 总开关 [extra.search].enable，provider: "pagefind"（默认）| "algolia" | "none"，search.html 共用。
      本 Tera 版本缺 key 直接访问会报错，故全部经 is defined 收敛为全局变量。
      placeholder 为翻译 key，经 trans 按当前语言解析。 #}

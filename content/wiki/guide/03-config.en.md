@@ -93,31 +93,31 @@ ICP, public security, and Moe ICP numbers. Empty values are not rendered. For Mo
 
 ## Navigation and translations
 
-Maintain one menu list; visible labels come from `translations`:
+Menu labels support `name` / `name_key` dual mode (orthogonal to the `[extra.features].i18n` switch; both work either way):
 
 ```toml
+# Mode 1: plain label, zero translations maintenance
 [[extra.menus]]
-name_key = "menu_blog"
+name = "Blog"
 url = "/"
 icon = "✍️"
 
+# Mode 2: translated via translations (recommended for multilingual sites)
 [[extra.menus]]
 name_key = "menu_wiki"
 url = "/wiki/"
 icon = "📚"
 
 [translations]
-menu_blog = "Blog"
 menu_wiki = "Wiki"
 
 [languages.zh.translations]
-menu_blog = "博客"
 menu_wiki = "Wiki"
 ```
 
-- `name_key` must exist in `[translations]` and every `[languages.<code>.translations]`.
+- `name` only: rendered as-is; `name_key` only: rendered via `trans(key=item.name_key, lang=cur_lang)` and must exist in `[translations]` and every `[languages.<code>.translations]`; when both are set, `name` wins.
 - `url` stays language-agnostic (e.g., `/wiki/`); the template prefixes it by `cur_lang`.
-- Rendering uses `trans(key=item.name_key, lang=cur_lang)`; the globe icon appears based on `config.languages`.
+- The language switcher (globe icon) renders only when `[extra.features].i18n = true` (default) **and** `config.languages` is configured, built dynamically from `default_language + config.languages`; `i18n = false` hides it entirely. Single-language users can set `i18n = false`, use `name` everywhere, and drop `[languages.zh]` plus `*.zh.md`.
 
 ## Social links
 
@@ -178,11 +178,13 @@ toc = true
 code_line_numbers = true
 paginate_by = 5
 show_reading_time = true
+i18n = true
 ```
 
 - `year_progress`: sidebar year progress bar.
 - `toc`: right-side table of contents starting from `##`.
 - `code_line_numbers`: code line numbers.
+- `i18n`: language switcher master switch, default `true`; `false` hides the sidebar switcher (menu `name` / `name_key` dual mode is unaffected).
 
 ## Search
 
@@ -352,6 +354,7 @@ article_expiry = "本文最后更新于 {date}，已超过 {days} 天未更新�
 
 - URLs are prefixed by `cur_lang != default_language` (e.g., `/zh/wiki/`).
 - Custom sections (`archive` / `heatmap` / `friends` / `links` / `search` / `resume`) need an `_index.<lang>.md` or `resume.<lang>.md` per language, otherwise 404.
+- To opt out of i18n: set `[extra.features].i18n = false`, use plain `name` for all menus, and drop extra `[languages.*]` sections plus `*.<lang>.md` files; keep `[translations]` (default-language strings) for search/TOC/expiry/license.
 
 ## Front Matter quick reference
 

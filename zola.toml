@@ -47,10 +47,10 @@ moe = "20268080"
 
 # ── Top Navigation Buttons (wrap automatically, 4 per row on desktop) ──
 # icon is optional, can be emoji / svg name / url
-# 使用 Zola translations 实现多语言：仅需维护一套菜单，显示名称通过 translations 翻译
-# - 默认语言文案在 [translations] 中定义
-# - 其他语言在 [languages.<code>.translations] 中定义
-# - 模板通过 trans(key=item.name_key, lang=cur_lang) 获取当前语言名称
+# 菜单名称双模式（与 [extra.features].i18n 开关正交，均可用）：
+# - name = "博客"：直接显示，零 translations 维护成本；
+# - name_key = "menu_blog"：经 trans(key, lang=cur_lang) 翻译，需在 [translations] 与各 [languages.<code>.translations] 中定义；
+# - 两者都写时 name 优先。
 # - URL 保持与语言无关的形式（如 "/"、"/wiki/"），模板按 cur_lang 自动加前缀
 [[extra.menus]]
 name_key = "menu_blog"
@@ -224,6 +224,8 @@ code_line_numbers = true
 paginate_by = 5
 # Show reading time
 show_reading_time = true
+# Show language switcher (default true; false hides it; menu name / name_key both work either way)
+i18n = false
 
 
 # ── Article Expiry Warning — 文章过期提示 ──
