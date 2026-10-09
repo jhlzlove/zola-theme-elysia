@@ -364,6 +364,11 @@ html[data-palette="violet"][data-theme="dark"]{
   .sidebar__panel{
     display:none;
   }
+  /* 展开时整层抬到 backdrop 之上：backdrop 与 .sidebar 同为 z-index:30 但在 DOM 中靠后，
+     不抬层会被 backdrop 盖住（模糊 + 拦截点击） */
+  .sidebar:not(.is-collapsed){
+    z-index:60;
+  }
   .sidebar:not(.is-collapsed) .sidebar__panel{
     display:flex;
     position:fixed;
