@@ -9,7 +9,7 @@ tags = ["zola", "elysia", "design"]
 sticky = true
 +++
 
-Welcome to **Elysia**! This is a pinned post (posts with earlier dates appear first when multiple are pinned).
+Welcome to **Elysia**! This is a pinned post (when multiple posts are pinned, earlier dates come first, since pinned posts sort by date ascending).
 
 <!-- more -->
 
@@ -18,29 +18,31 @@ Welcome to **Elysia**! This is a pinned post (posts with earlier dates appear fi
 
 ## Zola 0.23+
 
-0.23 is a breaking change: you can treat it as a major update. Shortcodes were removed and all similar features are now provided through components.
+0.23+ is a breaking update — you can treat it as a major release. Shortcode support was removed, and everything similar is now provided through components.
 
-Reference: https://github.com/getzola/zola/blob/master/CHANGELOG.md#0230-2026-08-05
+Official reference: https://github.com/getzola/zola/blob/master/CHANGELOG.md#0230-2026-08-05
 
 ## Component syntax
 
-Zola components come in two forms, inline and block:
+Zola components come in two forms: inline and block.
 
 - Inline:
 
+  {% raw %}
   ```md
-  {% raw %}{{ <component-name attr=""/> }}{% endraw %}
+  {{ <component-name parameter=""/> }}
   ```
+  {% endraw %}
 
 - Block:
 
-  ```md
   {% raw %}
-  {% <component-name attr=""> %}
-    some text...
-  {% <component-name/> %}
-  {% endraw %}
+  ```md
+  {% <component-name parameter=""> %}
+  some text...
+  {% </component-name> %}
   ```
+  {% endraw %}
 
 ## Content layout
 
@@ -65,13 +67,19 @@ content/
 └── links/_index.md           # Link collections
 ```
 
-Zola uses `_index.md` to declare a section. Articles inside a Wiki directory naturally belong to that directory; its title comes from `_index.md`.
+Zola uses `_index.md` to declare a section. Articles inside a Wiki subdirectory naturally belong to it; the section title comes from its `_index.md`.
+
+## Nested directories in Zola
+
+When `content` has nested subdirectories, a subdirectory only shows up in its parent list if it contains an `_index.md` with at least one line, `transparent = true` — meaning pages inside use the same templates, sorting, and pagination rules as the parent. Otherwise the list won't show them (they can't be reached through Zola's API objects). This works differently from Hexo or Hugo.
+
+Even when hidden from the parent, Zola still compiles these pages and they are reachable by direct URL. The docs call them "orphan pages", and visiting one is only convenient with an entry button. ~~(Who types URLs by hand? 😑)~~ See the `Resume` nav menu (that page works like an "orphan page"): without an entry point it never appears in any list, but you can still open it by typing its URL in the address bar.
 
 ## Blog vs Wiki
 
-Blog posts usually live under `content/blog/` and are collected by the home page and archive. Wiki sections are better for tutorials and maintained documentation; placing pages in a subdirectory is enough to get directory navigation.
+Blog posts usually live under `content/blog/` and are collected by the home page and archive. Wiki fits tutorials, manuals, and continuously maintained docs — placing pages in a subdirectory of `content/wiki/` is enough to get directory navigation.
 
-The page type is mainly determined by its location and template:
+The page type is mainly determined by file location and template:
 
 - Regular posts use `page.html`.
 - Wiki posts also use `page.html`, with Wiki navigation inferred from their directory.
@@ -79,34 +87,32 @@ The page type is mainly determined by its location and template:
 
 ## No cover images
 
-Card layouts with cover images can look nice, but they require careful design. I previously tried the lists with images from [hexo-theme-stellar] and [hugo-theme-reimu] — nice designs worth checking if you like that style.
+Card layouts look good with cover images, but those need careful design. I previously used [hexo-theme-stellar] and [hugo-theme-reimu], whose image lists look quite nice — worth a look if you like that style~
 
-This theme intentionally avoids cover images to save bandwidth (though it is not much) 😄. Images inside posts are supported via the `image` component; fancybox is not included yet — that can wait until it is actually needed.
+This theme intentionally skips image covers to save bandwidth (though it wouldn't cost much) 😄. Images inside posts are supported via the image component; fancybox hasn't been introduced yet — that can wait until it's actually needed.
 
-## Local search
+## Search
 
-Pagefind local search is the default and works with Chinese out of the box — just run `pagefind --site public` after building to generate the index. You can switch to Algolia (requires pushing the index yourself) or `none` in `[extra.search]`.
+Local search is implemented with [Pagefind](https://pagefind.app/). After building the site, run `pagefind_extended --site public` to build the index — search only works once indexed.
 
-## Nested directories in Zola
+> [!important]
+> You need the `pagefind_extended` build — extended supports Chinese indexing.
 
-For a subdirectory to appear in its parent list, it must contain an `_index.md` with at least `transparent = true`. Without it the section behaves differently from Hexo or Hugo.
+You can also switch to Algolia in `[extra.search]` (push the index yourself or use the Algolia crawler) or `none` to disable it.
 
-Even without being listed, Zola still compiles those pages and they are reachable by direct URL. They are called "orphan pages" in the docs, so a navigation entry is needed for convenient access. ~~(Who types URLs manually? 😑)~~
+## Use categories well
 
-## Use categories
-
-Because of orphan pages, a flat directory for posts is generally recommended. Use categories to group posts; Zola's taxonomy pages make it easy to find posts in the same category.
+Because of orphan pages, blog sources are best kept flat in a single directory. But every post should still get a category or tags, so the theme can aggregate them via taxonomies and readers can find posts in the same category.
 
 > [!tip]
-> If you have multiple subdirectories with related content, the Wiki layout provided by the theme is a better fit.
+> If you have multiple subdirectories with related content, use the Wiki layout provided by this theme.
 
 ## Blog
 
-Content in `content/blog/`. Blog posts should include the following fields; both TOML and YAML are supported.
+Content in `content/blog/`. Blog front matter should include the following fields; Zola supports both TOML and YAML.
 
 ```md
 <!--toml-->
-
 +++
 title = "Hello, Elysia — A Modern Zola Theme"
 date = 2026-01-15
@@ -117,9 +123,7 @@ description = "If you like writing summaries in front matter, Zola supports it"
 +++
 
 <!--yaml-->
-
 ---
-
 title: Hello, Elysia — A Modern Zola Theme
 date: 2026-01-15
 taxonomies:
@@ -131,22 +135,41 @@ description: "If you like writing summaries in front matter, Zola supports it"
 
 ## Wiki
 
-Wiki does not need separate deployment configuration. Put `_index.md` and articles under `content/wiki/` and the build will generate pages and chapter navigation. Wiki pages should include:
+`content/wiki/` is the Wiki root, whose `_index.md` needs the following:
 
-```md
+```toml,name=content/wiki/_index.md,hl_lines=3-6
+title = "Wiki"
+description = "Knowledge base · docs-style layout"
+sort_by = "date"
+template = "wiki/grid.html"
+page_template = "wiki/page.html"
+transparent = false
+```
+
+> [!note]
+> The highlighted lines 3–6 are the point. Create this file once and leave it alone afterwards.
+
+Each directory under the Wiki root is a project — create directories and write their content following this site's structure.
+
+Wiki front matter should include:
+
+```toml
 title = "01 · Meet Elysia"
 date = 2026-03-01
 weight = 1
+[taxonomies]
+  categories = ["xx"]
+  tags = ["xxx"]
 ```
 
-`weight` is required for ordering chapters.
-
 > [!note]
-> In principle, a Wiki page only needs the three fields above. If you are not sure about future migration, it is recommended to include `taxonomies` as well. No need to explain why — Zola is just that opinionated...
+> The `weight` field orders pages and is one of the required fields.
+>
+> In principle Wiki pages don't need taxonomies. But in case you migrate to another site or theme later that doesn't support this style or has no Wiki feature, it's better to include taxonomies just like regular blog posts — future migration will be easier to adjust.
 
 ## Resume page
 
-The resume is a standalone page and does not inherit the blog sidebar or table of contents. Create `content/resume.md` with:
+The resume is a standalone page that doesn't inherit the blog sidebar or the article table of contents. When creating `content/resume.md`, use:
 
 ```toml
 +++
@@ -161,17 +184,15 @@ role = "Software Engineer"
 
 ## Summary
 
-Zola handles summaries well. You can use `description` in front matter or `<!-- more -->` in the body; any amount of whitespace is accepted, which is much better than Hugo — migration from Hexo to Zola is seamless. This was a pain point when migrating from Hexo to Hugo.
+Zola handles summaries well. You can define one with the `description` front matter field, or use `<!-- more -->` — any amount of whitespace around it is accepted, which is much better than Hugo. Migrating from Hexo to Zola is seamless; moving from Hexo to Hugo previously required changing all of these.
 
 ## Limitations
 
-Wiki categories and tags do not appear on the menu's category/tag pages; Wiki forms its own collection.
-
-The resume page is also standalone and not included in the blog list.
+Wiki posts form their own collection — their categories and tags don't appear on the menu's category/tag pages. The resume page is also standalone and not in the blog list.
 
 ## Inspirations
 
-This theme "copies homework" from the layout and features of the following open-source projects and blogs:
+This theme "copies homework" from the layouts and features of the following open-source projects and blogs:
 
 - [Hexo Stellar](https://xaoxuu.com/)
 - [Hugo reimu](https://github.com/D-Sketon/hugo-theme-reimu)
@@ -181,6 +202,6 @@ This theme "copies homework" from the layout and features of the following open-
 
 See the full guide:
 
-{{ <link href="/wiki/guide" title="Elysia Guide" icon="/avatar.svg" desc="Complete guide from install to writing and deployment"/> }}
+{{ <link href="/wiki/guide" title="Elysia Guide" icon="/avatar.svg" desc="Elysia user guide"/> }}
 
 You can also explore this project's source structure to learn from it.

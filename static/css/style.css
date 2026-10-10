@@ -1556,7 +1556,6 @@ html[data-theme="dark"] .code-wrap__gutter .gutter-line.hl{
 .article__content ol.footnotes-list p{margin:6px 0}
 .article__content ol.footnotes-list a[href*="#fr-"]{text-decoration:none;white-space:nowrap}
 .article__content ol.footnotes-list a[href*="#fr-"]:hover{text-decoration:underline;text-underline-offset:3px}
-.article__content ol.footnotes-list > li:target{background:var(--bg-muted);border-radius:var(--radius-xs);box-shadow:0 0 0 3px var(--accent-ring)}
 .article__content [id^="fn-"], .article__content [id^="fr-"]{scroll-margin-top:76px}
 
 /* Inline highlights fallback */
