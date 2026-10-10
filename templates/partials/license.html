@@ -18,6 +18,6 @@
 {% set _lic_author = page.extra.author | default(value=config.author) | default(value=config.title) %}
 {% set _lic_url = page.permalink | default(value="") %}
 {% set_global _lic_rendered = _lic_raw | replace(from="{author}", to=_lic_author) | replace(from="{title}", to=page.title) | replace(from="{url}", to=_lic_url) %}
-<div class="article-license">{{ _lic_rendered | markdown | safe }}</div>
+<div class="article-license"><div class="article-license__body">{{ _lic_rendered | markdown | safe }}</div><span class="article-license__cc" aria-hidden="true">{{ <icon name="cc"/> }}{{ <icon name="by"/> }}{{ <icon name="nc"/> }}{{ <icon name="sa"/> }}</span></div>
 {% endif %}
 {% endif %}

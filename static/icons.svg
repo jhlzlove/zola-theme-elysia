@@ -138,4 +138,17 @@
   <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M20 6L9 17l-5-5"/>
   </symbol>
+  <!-- 许可：CC BY-NC-SA 徽标组（文章许可卡片右侧，见 templates/partials/license.html） -->
+  <symbol id="i-cc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+    <circle cx="12" cy="12" r="9"/><text x="12" y="14.7" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,system-ui,sans-serif">CC</text>
+  </symbol>
+  <symbol id="i-by" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+    <circle cx="12" cy="12" r="9"/><text x="12" y="14.7" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,system-ui,sans-serif">BY</text>
+  </symbol>
+  <symbol id="i-nc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+    <circle cx="12" cy="12" r="9"/><text x="12" y="14.7" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,system-ui,sans-serif">NC</text>
+  </symbol>
+  <symbol id="i-sa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+    <circle cx="12" cy="12" r="9"/><text x="12" y="14.7" text-anchor="middle" font-size="7" font-weight="700" fill="currentColor" stroke="none" font-family="Inter,system-ui,sans-serif">SA</text>
+  </symbol>
 </svg>
