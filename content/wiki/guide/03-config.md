@@ -181,6 +181,7 @@ expiry_enable = true
 expiry_days = 90
 license_enable = true
 katex_enable = true
+lightbox_enable = true
 ```
 
 - `year_progress`：侧边栏年进度条。
@@ -191,6 +192,7 @@ katex_enable = true
 - `expiry_enable` / `expiry_days`：文章过期提示总开关与阈值天数（文案见下节）。
 - `license_enable`：文章许可声明总开关。
 - `katex_enable`：`$...$` / `$$...$$` 数学公式总开关。
+- `lightbox_enable`：正文图片点击放大总开关，默认 `true`；`false` 则点击走原链接。
 
 ## 搜索
 

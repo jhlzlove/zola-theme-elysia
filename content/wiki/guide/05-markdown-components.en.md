@@ -381,6 +381,87 @@ This is sample body text demonstrating text wrap. With `position="left"`, the im
 
 This is sample body text demonstrating text wrap. With `position="right"`, the image floats right and paragraphs flow around its left side, mirroring `left`. Use `width="300px"` or `width="40%"` to size the whole figure including its caption.
 
+### gallery
+
+Responsive photo wall. All three layouts share one `size` semantic (target image width, px): wider containers fit more columns, narrow ones degrade to a single column without overflow.
+
+**Syntax:** block component, one minimal Markdown image per body line:
+
+{% raw %}
+```jinja
+{% <gallery style="grid" size="220"> %}
+![lake](https://example.com/lake.jpg)
+![peak](/photos/peak.png)
+{% </gallery> %}
+```
+{% endraw %}
+
+- Each line must strictly be `![alt](src)`: `alt` may not contain `[` or `]`; titles (`"title"`) and reference-style images are not supported; surrounding whitespace is ignored.
+- An `http(s)` `src` is emitted as-is (remote image); anything else is looked up as a project-relative path under `static/`, `content/`, etc., and a `/`-prefixed path gets the `base_url` prefix via `get_url` (e.g. `/photos/peak.png` maps to `static/photos/peak.png`).
+- Image lines render in written order; non-image lines are ignored; empty body renders a placeholder.
+
+| Parameter | Required | Description |
+| --- | --- | --- |
+| body | Yes | One `![alt](src)` per line; `alt` is the alt text |
+| `style` | No | `grid` (default, uniform 4:3 crop) / `masonry` (keeps original ratio) / `justified` (equal-height rows, needs JS) |
+| `size` | No | Target image width in px, default `240` (clamped 80–800); grid/masonry derive column count from it, justified derives target row height (≈ size×0.75) |
+| `gap` | No | Spacing in px, default `5` (clamped 0–48), passed via CSS variable |
+| `radius` | No | Corner radius in px, default `10` (clamped 0–32), passed via CSS variable |
+
+Local raster images (`jpg/jpeg/png/webp/avif/gif/bmp`, any case) get build-time 800px thumbnails (`fit`, never upscaled) with real aspect ratios embedded, so no layout shift; remote images and other formats are emitted as-is, ratios are measured at runtime and justified/masonry reflow once after load; a missing local path fails the build.
+
+Click-to-zoom: with `[extra.features] lightbox_enable = true` (default on), every article image (gallery included) opens in a lightbox with prev/next inside its group; `false` keeps plain links.
+
+Known limits: masonry uses CSS Columns (column-major visual order, not strict row order); the justified last row keeps fixed height and left-aligns instead of stretching; extreme ratios are clamped to 0.25–4; failed images are hidden and the row repacked; without JS, justified degrades to an equal-height flex fallback.
+
+**Which layout to use:**
+
+- `grid`: many images and a tidy uniform look, e.g. event photos, product shots; everything is cropped to 4:3, so avoid it when images must stay whole.
+- `masonry`: mixed heights and orientations, e.g. photography, travel snaps; column count derives from `size`, and it looks best with plenty of images in varied shapes — too few looks sparse.
+- `justified`: the classic album look, prettiest with mostly landscape images, e.g. scenery, gatherings; equal height, no cropping, edge-to-edge rows, closest to a traditional photo wall.
+
+**Photo tips:** masonry looks best with photos in the same orientation (mostly portrait or mostly landscape) and ratios converged to one or two stops (e.g. portraits at 3:4, landscapes at 4:3); avoid mixing extreme panoramas, extra-tall strips, and squares. A unified color grade (same filter/scene) helps but is optional.
+
+**Rendered (grid):**
+
+{% <gallery style="grid" size="220"> %}
+![eg-grid-1](https://picsum.photos/seed/eg-grid-1/600/400)
+![eg-grid-2](https://picsum.photos/seed/eg-grid-2/500/700)
+![eg-grid-3](https://picsum.photos/seed/eg-grid-3/700/500)
+![eg-grid-4](https://picsum.photos/seed/eg-grid-4/400/400)
+![eg-grid-5](https://picsum.photos/seed/eg-grid-5/800/600)
+![eg-grid-6](https://picsum.photos/seed/eg-grid-6/450/650)
+{% </gallery> %}
+
+**Rendered (masonry):**
+
+{% <gallery style="masonry" size="220"> %}
+![eg-mas-1](https://picsum.photos/seed/eg-mas-1/600/800)
+![eg-mas-2](https://picsum.photos/seed/eg-mas-2/800/600)
+![eg-mas-3](https://picsum.photos/seed/eg-mas-3/450/600)
+![eg-mas-4](https://picsum.photos/seed/eg-mas-4/480/640)
+![eg-mas-5](https://picsum.photos/seed/eg-mas-5/640/480)
+![eg-mas-6](https://picsum.photos/seed/eg-mas-6/540/720)
+![eg-mas-7](https://picsum.photos/seed/eg-mas-7/720/540)
+![eg-mas-8](https://picsum.photos/seed/eg-mas-8/510/680)
+![eg-mas-9](https://picsum.photos/seed/eg-mas-9/570/760)
+![eg-mas-10](https://picsum.photos/seed/eg-mas-10/760/570)
+![eg-mas-11](https://picsum.photos/seed/eg-mas-11/420/560)
+![eg-mas-12](https://picsum.photos/seed/eg-mas-12/660/495)
+{% </gallery> %}
+
+**Rendered (justified):**
+
+{% <gallery style="justified" size="240"> %}
+![eg-jus-1](https://picsum.photos/seed/eg-jus-1/600/400)
+![eg-jus-2](https://picsum.photos/seed/eg-jus-2/500/700)
+![eg-jus-3](https://picsum.photos/seed/eg-jus-3/700/500)
+![eg-jus-4](https://picsum.photos/seed/eg-jus-4/400/400)
+![eg-jus-5](https://picsum.photos/seed/eg-jus-5/800/600)
+![eg-jus-6](https://picsum.photos/seed/eg-jus-6/450/650)
+![eg-jus-7](https://picsum.photos/seed/eg-jus-7/650/450)
+{% </gallery> %}
+
 ### link card
 
 **Syntax:**

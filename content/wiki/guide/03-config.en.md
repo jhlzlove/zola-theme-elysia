@@ -175,6 +175,7 @@ expiry_enable = true
 expiry_days = 90
 license_enable = true
 katex_enable = true
+lightbox_enable = true
 ```
 
 - `year_progress`: sidebar year progress bar.
@@ -184,6 +185,7 @@ katex_enable = true
 - `expiry_enable` / `expiry_days`: article expiry banner switch and threshold (copy below).
 - `license_enable`: article license notice switch.
 - `katex_enable`: `$...$` / `$$...$$` math switch.
+- `lightbox_enable`: click-to-zoom switch for article images, default `true`; `false` keeps plain links.
 
 ## Search
 

@@ -3175,3 +3175,38 @@ a.wiki-side-nav__title:hover{
 @media print{
   .wiki-side-nav, .wiki-mobile{display:none !important}
 }
+
+/* ─────────────────────────────────────────
+   Gallery Component — grid / masonry / justified（自适应照片墙）
+   size/gap/radius 经 --g-* 传入；列数与行布局按容器实际宽度推导，无断点参数。
+───────────────────────────────────────── */
+.gallery{--g-size:240px;--g-gap:12px;--g-radius:10px;min-width:0;max-width:100%;container-type:inline-size}
+.gallery__track{min-width:0;max-width:100%}
+/* # Shared · 与 article__content img 全局样式解耦：gallery 内图片零外边距、无边框 */
+.article__content .gallery{margin:18px 0}
+.article__content .gallery img{margin:0;border:none;box-shadow:none;max-width:100%}
+.gallery__item{position:relative;overflow:hidden;border-radius:var(--g-radius);background:var(--bg-muted);border:1px solid var(--border);margin:0;min-width:0;max-width:100%}
+.gallery__link{display:block;height:100%;color:inherit;text-decoration:none}
+.gallery__link:hover{opacity:1;text-decoration:none}
+.gallery__item img{display:block;width:100%;margin:0;background:var(--bg-muted)}
+.gallery__item.is-broken{display:none}
+.gallery__empty{padding:16px;border:1px dashed var(--border);border-radius:var(--g-radius);color:var(--muted);font-size:0.8125rem}
+/* Grid：统一 4:3 裁切，列数 = auto-fill(size)，容器不足时自动退化单列、不溢出 */
+.gallery[data-style="grid"] .gallery__track{display:grid;gap:var(--g-gap);grid-template-columns:repeat(auto-fill, minmax(min(max(var(--g-size), 140px), 100%), 1fr))}
+.gallery[data-style="grid"] .gallery__item{aspect-ratio:4 / 3}
+.gallery[data-style="grid"] .gallery__item img{height:100%;object-fit:cover}
+/* Masonry：CSS Columns 保留原比例；注意列内纵向填充，视觉顺序为列优先 */
+.gallery[data-style="masonry"] .gallery__track{columns:var(--g-size);column-gap:var(--g-gap)}
+.gallery[data-style="masonry"] .gallery__item{break-inside:avoid;-webkit-column-break-inside:avoid;margin:0 0 var(--g-gap);min-height:120px}
+.gallery[data-style="masonry"] .gallery__item img{height:auto}
+/* Justified：无 JS 时为等高 flex 兜底；有 JS 时由 gallery.js 按行重排、不裁切 */
+.gallery[data-style="justified"] .gallery__track{display:flex;flex-wrap:wrap;gap:var(--g-gap)}
+.gallery[data-style="justified"] .gallery__item{flex:1 1 var(--g-size);height:220px;min-width:0}
+.gallery[data-style="justified"] .gallery__item img{height:100%;object-fit:cover}
+
+/* ─────────────────────────────────────────
+   Lightbox — PhotoSwipe（CDN）与主题的衔接
+   vendor 样式只在 [extra.features].lightbox_enable=true（默认）时加载
+───────────────────────────────────────── */
+.article__content a.pswp-g, .article__content a.pswp-a,
+.article__content a.pswp-g img, .article__content a.pswp-a img{cursor:zoom-in}

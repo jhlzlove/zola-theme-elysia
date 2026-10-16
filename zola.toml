@@ -240,6 +240,8 @@ katex_enable = true
 # katex_css_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
 # katex_js_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
 # katex_auto_render_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+# ── Lightbox ── 正文图片点击放大（PhotoSwipe CDN），默认开启；false 则点击走原链接
+lightbox_enable = true
 
 # ── Translations — 默认语言 (zh) ──
 # 增删菜单时：只需在 [[extra.menus]] 中改一套，同步在此与 [languages.en.translations] 中增删对应 key

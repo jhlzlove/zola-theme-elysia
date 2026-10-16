@@ -388,6 +388,88 @@ Spotify（`type` 支持 `single` / `album` / `playlist`，`single` 对应 `track
 
 这是一段用于演示文字环绕的示例正文。当图片设置 `position="right"` 时，图片浮动在右侧，正文段落会自动环绕在图片左侧，用法与 `left` 对称。如需指定尺寸，可写 `width="300px"` 或 `width="40%"`，此时宽度作用于整个图片块（含说明文字）。
 
+### gallery 照片墙
+
+自适应照片墙，三种布局共用 `size`（目标图片宽，px）语义：容器越宽列越多，容器不足自动退化单列，不溢出。
+
+**写法：** 块组件，正文每行一张最简 Markdown 图片：
+
+{% raw %}
+```jinja
+{% <gallery style="grid" size="220"> %}
+![湖](https://example.com/lake.jpg)
+![峰](/photos/peak.png)
+{% </gallery> %}
+```
+{% endraw %}
+
+- 每行必须严格是 `![alt](src)`：`alt` 不得含 `[` 或 `]`，不支持标题（`"title"`）与引用式；首尾空格会被忽略。
+- `src` 为 `http(s)` 时原样输出网络图；其余按项目相对路径在 `static/`、`content/` 等处查找，`/` 开头经 `get_url` 自动拼接 `base_url` 前缀（如上例 `/photos/peak.png` 对应 `static/photos/peak.png`）。
+- 图片行按书写顺序展示；非图片行会被忽略；正文为空时显示"暂无图片"。
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| 块内容 | 必填 | 每行一张 `![alt](src)`，`alt` 即无障碍文本 |
+| `style` | 选填 | `grid`（默认，统一 4:3 裁切）/ `masonry`（保留原比例）/ `justified`（等高铺满，需 JS） |
+| `size` | 选填 | 目标图片宽 px，默认 `240`（钳制 80~800）；grid/masonry 据此算列数，justified 据此推导目标行高（≈ size×0.75） |
+| `gap` | 选填 | 间距 px，默认 `5`（钳制 0~48），经 CSS 变量传入 |
+| `radius` | 选填 | 圆角 px，默认 `10`（钳制 0~32），经 CSS 变量传入 |
+
+本地光栅图（`jpg/jpeg/png/webp/avif/gif/bmp`，大小写不限）构建期生成 800px 内缩略图（`fit`，不放大），并写入真实宽高比，加载前后不跳动；网络图及其他格式原样输出，比例运行时测量，justified/masonry 会在加载后重排一次；路径不存在的本地图会在构建时报错。
+
+点击放大：`[extra.features] lightbox_enable = true`（默认开启）时正文所有图片（含 gallery）点击进灯箱，同组内可左右切换；`false` 则点击走原链接。
+
+已知限制：masonry 用 CSS Columns 实现，图片按列纵向填充，视觉顺序为列优先（非严格行序）；justified 最后一行固定行高左对齐、不拉伸；极端宽高比钳制在 0.25~4；加载失败的图片自动隐藏并重排；禁用 JS 时 justified 退化为等高 flex 兜底。
+
+**选型建议：**
+
+- `grid`：图片数量多、想要整齐划一时用，如活动合影、产品图；统一裁切成 4:3，不适合必须完整呈现的图。
+- `masonry`：图片高矮不一、横竖混排时用，如摄影、旅行随手拍；列数由 `size` 推导，图片越多、越高矮错落越好看，数量太少会显空。
+- `justified`：经典相册效果，横图为主时最漂亮，如风光、聚会；等高、不裁切、无缝铺满，最像传统照片墙。
+
+**选片建议：** masonry 想排得好看，尽量选同一朝向的照片（多竖图或多横图），宽高比收敛到相近的两档（如竖图统一 3:4、横图统一 4:3），避免极宽全景、极高长条与正方形混排；色系统一（同滤镜/同场景）是加分项，不是必需。
+
+**效果（grid）：**
+
+{% <gallery style="grid" size="220"> %}
+![eg-grid-1](https://picsum.photos/seed/eg-grid-1/600/400)
+![eg-grid-2](https://picsum.photos/seed/eg-grid-2/500/700)
+![eg-grid-3](https://picsum.photos/seed/eg-grid-3/700/500)
+![eg-grid-4](https://picsum.photos/seed/eg-grid-4/400/400)
+![eg-grid-5](https://picsum.photos/seed/eg-grid-5/800/600)
+![eg-grid-6](https://picsum.photos/seed/eg-grid-6/450/650)
+![eg-grid-6](/avatar.jpg)
+{% </gallery> %}
+
+**效果（masonry）：**
+
+{% <gallery style="masonry" size="220"> %}
+![eg-mas-1](https://picsum.photos/seed/eg-mas-1/600/800)
+![eg-mas-2](https://picsum.photos/seed/eg-mas-2/800/600)
+![eg-mas-3](https://picsum.photos/seed/eg-mas-3/450/600)
+![eg-mas-4](https://picsum.photos/seed/eg-mas-4/480/640)
+![eg-mas-5](https://picsum.photos/seed/eg-mas-5/640/480)
+![eg-mas-6](https://picsum.photos/seed/eg-mas-6/540/720)
+![eg-mas-7](https://picsum.photos/seed/eg-mas-7/720/540)
+![eg-mas-8](https://picsum.photos/seed/eg-mas-8/510/680)
+![eg-mas-9](https://picsum.photos/seed/eg-mas-9/570/760)
+![eg-mas-10](https://picsum.photos/seed/eg-mas-10/760/570)
+![eg-mas-11](https://picsum.photos/seed/eg-mas-11/420/560)
+![eg-mas-12](https://picsum.photos/seed/eg-mas-12/660/495)
+{% </gallery> %}
+
+**效果（justified）：**
+
+{% <gallery style="justified" size="240"> %}
+![eg-jus-1](https://picsum.photos/seed/eg-jus-1/600/400)
+![eg-jus-2](https://picsum.photos/seed/eg-jus-2/500/700)
+![eg-jus-3](https://picsum.photos/seed/eg-jus-3/700/500)
+![eg-jus-4](https://picsum.photos/seed/eg-jus-4/400/400)
+![eg-jus-5](https://picsum.photos/seed/eg-jus-5/800/600)
+![eg-jus-6](https://picsum.photos/seed/eg-jus-6/450/650)
+![eg-jus-7](https://picsum.photos/seed/eg-jus-7/650/450)
+{% </gallery> %}
+
 ### link 单个链接卡片
 
 **写法：**

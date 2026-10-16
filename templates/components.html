@@ -230,6 +230,57 @@
 <div class="col-card{% if cls %} col-card--{{ cls }}{% endif %}" data-component="column" style="flex:{{ flex }} {{ flex }} 0">{{ body | markdown | safe }}</div>
 {% endcomponent column -%}
 
+{# ── Gallery：自适应照片墙（grid / masonry / justified）────────────────
+   块组件，正文每行一张最简 Markdown 图片（alt 不得含 [ 或 ]，不支持标题与引用式）：
+   {% <gallery style="masonry" size="220"> %}
+   ![湖](https://example.com/lake.jpg)
+   ![峰](/photos/peak.png)
+   {% </gallery> %}
+   路径规则：http(s) 直链原样输出；其余按项目相对路径在 static/、content/ 等处查找，
+   本地光栅图构建期生成缩略图并嵌入真实宽高比；详见 Wiki 05 章 #}
+{% component gallery(style = "grid", size = "240", gap = "5", radius = "10") -%}
+{% set st = style | default(value="grid") | lower | trim -%}
+{% if st != "grid" and st != "masonry" and st != "justified" %}{% set st = "grid" %}{% endif -%}
+{% set sz = size | default(value="240") | int -%}
+{% if sz < 80 %}{% set sz = 80 %}{% elif sz > 800 %}{% set sz = 800 %}{% endif -%}
+{% set gp = gap | default(value="5") | int -%}
+{% if gp < 0 %}{% set gp = 0 %}{% elif gp > 48 %}{% set gp = 48 %}{% endif -%}
+{% set rd = radius | default(value="10") | int -%}
+{% if rd < 0 %}{% set rd = 0 %}{% elif rd > 32 %}{% set rd = 32 %}{% endif -%}
+<div class="gallery" data-component="gallery" data-style="{{ st }}" style="--g-size:{{ sz }}px;--g-gap:{{ gp }}px;--g-radius:{{ rd }}px"><div class="gallery__track">
+{%- set_global g_count = 0 -%}
+{% set norm = body | default(value="") | replace(from="\r\n", to="\n") | replace(from="\r", to="\n") -%}
+{% for line in norm | split(pat="\n") -%}
+{% set t = line | trim -%}
+{% if t is starting_with(pat="![") and "](" in t and t is ending_with(pat=")") -%}
+{% set alt = t | split(pat="](") | first | replace(from="![", to="") | trim -%}
+{% set src = t | split(pat="](") | last | trim_end(pat=")") | split(pat=" ") | first | trim | replace(from="<", to="") | replace(from=">", to="") -%}
+{% if src != "" -%}
+{% if src is starting_with(pat="http://") or src is starting_with(pat="https://") -%}
+<figure class="gallery__item"><a class="gallery__link" href="{{ src | safe }}" target="_blank" rel="noopener"><img src="{{ src | safe }}" alt="{{ alt }}" loading="lazy" decoding="async"></a></figure>
+{%- set_global g_count = g_count + 1 -%}
+{% else -%}
+{% set low = src | lower -%}
+{% if low is matching(pat="[.](jpg|jpeg|png|webp|avif|gif|bmp)$") -%}
+{% set im = resize_image(path=src, width=800, height=800, op="fit") -%}
+{% set full = get_url(path=src) -%}
+<figure class="gallery__item"{% if st != "grid" %} style="aspect-ratio:{{ im.width }} / {{ im.height }}"{% endif %} data-ratio="{{ im.width / im.height }}"><a class="gallery__link" href="{{ full | safe }}" target="_blank" rel="noopener" data-pswp-width="{{ im.orig_width }}" data-pswp-height="{{ im.orig_height }}"><img src="{{ im.url | safe }}" width="{{ im.width }}" height="{{ im.height }}" alt="{{ alt }}" loading="lazy" decoding="async"></a></figure>
+{%- set_global g_count = g_count + 1 -%}
+{% else -%}
+{% set full = get_url(path=src) -%}
+<figure class="gallery__item"><a class="gallery__link" href="{{ full | safe }}" target="_blank" rel="noopener"><img src="{{ full | safe }}" alt="{{ alt }}" loading="lazy" decoding="async"></a></figure>
+{%- set_global g_count = g_count + 1 -%}
+{% endif -%}
+{% endif -%}
+{% endif -%}
+{% endif -%}
+{% endfor -%}
+{%- if g_count == 0 -%}
+<div class="gallery__empty">暂无图片</div>
+{%- endif -%}
+</div></div>
+{% endcomponent gallery -%}
+
 {# ── Icon：全站 UI 图标统一经由 static/icons.svg sprite 渲染 ──────────
   用法：{{ <icon name="search" class="search__icon" /> }}
   参数全为可选字符串：name（sprite 中 i-<name>，不含前缀）、class、
