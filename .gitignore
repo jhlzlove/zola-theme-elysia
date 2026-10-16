@@ -8,3 +8,4 @@ content/wiki/*
 encrypt.toml
 *.exe
 target/
+zola.dev.toml

@@ -152,7 +152,7 @@ This sentence has a footnote[^source].
 
 [^source]: The footnote text.
 
-**Syntax (KaTeX, requires `extra.katex.enable = true`):**
+**Syntax (KaTeX, requires `[extra.features].katex_enable = true`):**
 
 ```md
 Inline formula: $E=mc^2$
@@ -173,8 +173,8 @@ $$
 Configuration:
 
 ```toml
-[extra.katex]
-enable = true
+[extra.features]
+katex_enable = true
 ```
 
 ## Code blocks
@@ -397,6 +397,8 @@ This is sample body text demonstrating text wrap. With `position="right"`, the i
 | `title` | No | Card title, defaults to `href` |
 | `icon` | No | Icon: remote/local image URL, or an emoji/character (image URLs follow the same rules as `href`) |
 | `desc` | No | Description text |
+
+With `[extra.api.sitemap]` enabled, card metadata is fetched with the card `href` on page visit; on success the returned title/description/icon overwrite the card (API first), on failure the handwritten values here are kept.
 
 **Rendered:**
 

@@ -8,14 +8,14 @@
   <link rel="canonical" href="{{ page.permalink | safe }}">
 
   <style>
-    /* 字体全部来自 zola.toml [extra.style.fonts]，禁止硬编码，与 base.html 保持同源 */
+    /* 字体全部来自 zola.toml [extra.style]，禁止硬编码，与 base.html 保持同源 */
     :root{
-      {% if config.extra.style and config.extra.style.fonts %}
-        {% if config.extra.style.fonts.body_family %}--font-body:{{ config.extra.style.fonts.body_family | join(sep=", ") | safe }};{% endif %}
-        {% if config.extra.style.fonts.code_block_family %}--font-code:{{ config.extra.style.fonts.code_block_family | join(sep=", ") | safe }};{% endif %}
-        {% if config.extra.style.fonts.base_size %}--font-size-base:{{ config.extra.style.fonts.base_size }};{% endif %}
-        {% if config.extra.style.fonts.body_size %}--font-size-body:{{ config.extra.style.fonts.body_size }};{% endif %}
-        {% if config.extra.style.fonts.code_block_size %}--font-size-code:{{ config.extra.style.fonts.code_block_size }};{% endif %}
+      {% if config.extra.style %}
+        {% if config.extra.style.font_body_family %}--font-body:{{ config.extra.style.font_body_family | join(sep=", ") | safe }};{% endif %}
+        {% if config.extra.style.font_code_family %}--font-code:{{ config.extra.style.font_code_family | join(sep=", ") | safe }};{% endif %}
+        {% if config.extra.style.font_base_size %}--font-size-base:{{ config.extra.style.font_base_size }};{% endif %}
+        {% if config.extra.style.font_body_size %}--font-size-body:{{ config.extra.style.font_body_size }};{% endif %}
+        {% if config.extra.style.font_code_size %}--font-size-code:{{ config.extra.style.font_code_size }};{% endif %}
       {% endif %}
       --resume-bg:#ffffff;
       --resume-fg:#1f2937;          /* was #1e293b — darker, like BelResume --text */

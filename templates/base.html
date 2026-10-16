@@ -21,17 +21,17 @@
   <link id="giallo-light" rel="stylesheet" href="{{ get_url(path="giallo-light.css") | safe }}?v=20260924">
   <link id="giallo-dark" rel="stylesheet" href="{{ get_url(path="giallo-dark.css") | safe }}?v=20260924">
   <script>try{var _t=localStorage.getItem('elysia-theme');if(_t!=='dark'&&_t!=='light')_t='light';document.getElementById(_t==='dark'?'giallo-light':'giallo-dark').disabled=true;}catch(_e){try{document.getElementById('giallo-dark').disabled=true;}catch(_e2){}}</script>
-  {% if config.extra.katex and config.extra.katex.enable %}
-  <link rel="stylesheet" href="{{ config.extra.katex.css_url | default(value="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css") | safe }}" crossorigin="anonymous">
+  {% if config.extra.features and config.extra.features.katex_enable %}
+  <link rel="stylesheet" href="{{ config.extra.features.katex_css_url | default(value="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css") | safe }}" crossorigin="anonymous">
   {% endif %}
   <style>
     :root{
-      {% if config.extra.style and config.extra.style.fonts %}
-        {% if config.extra.style.fonts.body_family %}--font-body:{{ config.extra.style.fonts.body_family | join(sep=", ") | safe }};{% endif %}
-        {% if config.extra.style.fonts.code_block_family %}--font-code:{{ config.extra.style.fonts.code_block_family | join(sep=", ") | safe }};{% endif %}
-        {% if config.extra.style.fonts.base_size %}--font-size-base:{{ config.extra.style.fonts.base_size }};{% endif %}
-        {% if config.extra.style.fonts.body_size %}--font-size-body:{{ config.extra.style.fonts.body_size }};{% endif %}
-        {% if config.extra.style.fonts.code_block_size %}--font-size-code:{{ config.extra.style.fonts.code_block_size }};{% endif %}
+      {% if config.extra.style %}
+        {% if config.extra.style.font_body_family %}--font-body:{{ config.extra.style.font_body_family | join(sep=", ") | safe }};{% endif %}
+        {% if config.extra.style.font_code_family %}--font-code:{{ config.extra.style.font_code_family | join(sep=", ") | safe }};{% endif %}
+        {% if config.extra.style.font_base_size %}--font-size-base:{{ config.extra.style.font_base_size }};{% endif %}
+        {% if config.extra.style.font_body_size %}--font-size-body:{{ config.extra.style.font_body_size }};{% endif %}
+        {% if config.extra.style.font_code_size %}--font-size-code:{{ config.extra.style.font_code_size }};{% endif %}
       {% endif %}
     }
   </style>
@@ -52,20 +52,20 @@
   {% set_global search_ph_key = "search_placeholder" %}
   {% if config.extra.search is defined and config.extra.search.placeholder is defined and config.extra.search.placeholder != "" %}{% set_global search_ph_key = config.extra.search.placeholder %}{% endif %}
   {% set_global search_ph = trans(key=search_ph_key, lang=lang | default(value=config.default_language)) %}
-  {# Pagefind bundle 目录（`pagefind_extended --site public` 输出位置，默认 pagefind/；经 get_url 拼接 base_url 子路径） #}
+  {# Pagefind bundle 目录（`pagefind_extended --site public` 输出位置，[extra.search].pagefind_path；经 get_url 拼接 base_url 子路径） #}
   {% set_global pf_dir = "pagefind/" %}
-  {% if config.extra.pagefind is defined and config.extra.pagefind.path is defined and config.extra.pagefind.path != "" %}{% set_global pf_dir = config.extra.pagefind.path %}{% endif %}
+  {% if config.extra.search is defined and config.extra.search.pagefind_path is defined and config.extra.search.pagefind_path != "" %}{% set_global pf_dir = config.extra.search.pagefind_path %}{% endif %}
   {% if not pf_dir is ending_with(pat="/") %}{% set_global pf_dir = pf_dir ~ "/" %}{% endif %}
   {% set_global pf_js = get_url(path=pf_dir ~ "pagefind.js") %}
   {% set_global pf_dir_url = get_url(path=pf_dir, trailing_slash=true) %}
   {% set_global pf_ui_js = get_url(path=pf_dir ~ "pagefind-ui.js") %}
   {% set_global pf_ui_css = get_url(path=pf_dir ~ "pagefind-ui.css") %}
-  {% set_global search_use_algolia = search_enabled and search_provider == "algolia" and config.extra.algolia is defined and config.extra.algolia.app_id is defined and config.extra.algolia.app_id != "" and config.extra.algolia.api_key is defined and config.extra.algolia.api_key != "" and config.extra.algolia.index_name is defined and config.extra.algolia.index_name != "" %}
+  {% set_global search_use_algolia = search_enabled and search_provider == "algolia" and config.extra.search is defined and config.extra.search.algolia is defined and config.extra.search.algolia.app_id is defined and config.extra.search.algolia.app_id != "" and config.extra.search.algolia.api_key is defined and config.extra.search.algolia.api_key != "" and config.extra.search.algolia.index_name is defined and config.extra.search.algolia.index_name != "" %}
   {% set_global search_use_pagefind = search_enabled and search_provider == "pagefind" %}
   {% set_global search_powered = false %}
   {% if search_use_algolia %}
     {% set_global search_powered = true %}
-    {% if config.extra.algolia.show_powered_by is defined %}{% set_global search_powered = config.extra.algolia.show_powered_by %}{% endif %}
+    {% if config.extra.search.algolia.show_powered_by is defined %}{% set_global search_powered = config.extra.search.algolia.show_powered_by %}{% endif %}
   {% endif %}
   {% if search_use_pagefind %}
   <script type="module" src="{{ get_url(path="js/pagefind-search.js") | safe }}"></script>
@@ -117,31 +117,39 @@
   <main class="main" id="main">
     <div class="main__inner">
       {% block content %}{% endblock content %}
+      {% if config.extra.footer is defined %}
+      {% set footer = config.extra.footer %}
+      {% set has_text = footer.text is defined and footer.text != "" %}
+      {% set has_icp = footer.icp is defined and footer.icp != "" %}
+      {% set has_police = footer.police is defined and footer.police != "" %}
+      {% set has_moe = footer.moe is defined and footer.moe != "" %}
+      {% if has_text %}
       <footer class="site-footer">
-        <div class="site-footer__copyright">{% if config.extra.footer %}{{ config.extra.footer | markdown | safe }}{% else %}© {{ now() | date(format="%Y") }} {{ config.title }} · <a href="{{ config.base_url | safe }}">{{ config.base_url }}</a>{% endif %}</div>
+        <div class="site-footer__copyright">{{ footer.text | markdown | safe }}</div>
       </footer>
-      {% if config.extra.filing %}
-      {% set mengguo_number = config.extra.filing.moe %}
+      {% endif %}
+      {% if has_icp or has_police or has_moe %}
       <div class="site-footer__filings" aria-label="网站备案信息">
-        {% if config.extra.filing.icp %}
+        {% if has_icp %}
         <a class="site-footer__filing" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">
           {{ <icon name="shield-check"/> }}
-          <span>{{ config.extra.filing.icp }}</span>
+          <span>{{ footer.icp }}</span>
         </a>
         {% endif %}
-        {% if config.extra.filing.police %}
+        {% if has_police %}
         <a class="site-footer__filing" href="https://beian.mps.gov.cn/" target="_blank" rel="noopener">
           {{ <icon name="shield-text"/> }}
-          <span>{{ config.extra.filing.police }}</span>
+          <span>{{ footer.police }}</span>
         </a>
         {% endif %}
-        {% if mengguo_number %}
-        <a class="site-footer__filing" href="https://icp.gov.moe/?keyword={{ mengguo_number | urlencode | safe }}" target="_blank" rel="noopener">
+        {% if has_moe %}
+        <a class="site-footer__filing" href="https://icp.gov.moe/?keyword={{ footer.moe | urlencode | safe }}" target="_blank" rel="noopener">
           {{ <icon name="moe"/> }}
-          <span>萌 ICP 备案 {{ mengguo_number }} 号</span>
+          <span>萌 ICP 备案 {{ footer.moe }} 号</span>
         </a>
         {% endif %}
       </div>
+      {% endif %}
       {% endif %}
     </div>
   </main>
@@ -170,9 +178,13 @@
 <script src="https://cdn.jsdelivr.net/npm/algoliasearch@4/dist/algoliasearch-lite.umd.js" defer></script>
 <script src="{{ get_url(path="js/search.js") | safe }}" defer></script>
 {% endif %}
-{% if config.extra.katex and config.extra.katex.enable %}
-<script defer src="{{ config.extra.katex.js_url | default(value="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js") | safe }}" crossorigin="anonymous"></script>
-<script defer src="{{ config.extra.katex.auto_render_url | default(value="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js") | safe }}" crossorigin="anonymous" onload="try{renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}catch(e){}"></script>
+{% if config.extra.features and config.extra.features.katex_enable %}
+<script defer src="{{ config.extra.features.katex_js_url | default(value="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js") | safe }}" crossorigin="anonymous"></script>
+<script defer src="{{ config.extra.features.katex_auto_render_url | default(value="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js") | safe }}" crossorigin="anonymous" onload="try{renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false});}catch(e){}"></script>
+{% endif %}
+{% if config.extra.api is defined and config.extra.api.sitemap is defined and config.extra.api.sitemap.enable and config.extra.api.sitemap.api is defined and config.extra.api.sitemap.api != "" %}
+<script>window.SITEMAP_API="{{ config.extra.api.sitemap.api | safe }}";</script>
+<script src="{{ get_url(path="js/sitemap.js") | safe }}?v=20261012" defer></script>
 {% endif %}
 {% block scripts %}{% endblock scripts %}
 </body>

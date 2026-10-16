@@ -75,21 +75,16 @@ style = "class"
 avatar = "/avatar.jpg"
 avatar_alt = "Site avatar"
 site_motto = "Notes, sharing, and reading"
-footer = "© 2026 My Blog"
-```
 
-- `footer` supports Markdown and raw HTML.
-
-## Filing
-
-```toml
-[extra.filing]
+[extra.footer]
+text = "© 2026 My Blog"
 icp = ""
 police = ""
 moe = ""
 ```
 
-ICP, public security, and Moe ICP numbers. Empty values are not rendered. For Moe ICP, just fill in the number (e.g. `2026xxxx`); the theme renders "萌 ICP 备案 X 号" with a lookup link automatically.
+- `footer.text` supports Markdown and raw HTML; empty text hides the footer line.
+- `footer.icp` / `footer.police` / `footer.moe` are ICP, public security, and Moe ICP numbers. Empty values are not rendered. For Moe ICP, just fill in the number (e.g. `2026xxxx`); the theme renders "萌 ICP 备案 X 号" with a lookup link automatically.
 
 ## Navigation and translations
 
@@ -145,20 +140,17 @@ head = [
 ]
 
 [extra.style]
-default_theme = "auto"      # auto | light | dark
 default_palette = "default" # default | lime | orange | violet
-
-[extra.style.fonts]
-base_size = "16px"
-body_size = "16px"
-code_block_size = "14px"
-body_family = ["Inter", "system-ui", "sans-serif"]
-code_block_family = ["JetBrains Mono", "ui-monospace", "monospace"]
+font_base_size = "16px"
+font_body_size = "16px"
+font_code_size = "14px"
+font_body_family = ["Inter", "system-ui", "sans-serif"]
+font_code_family = ["JetBrains Mono", "ui-monospace", "monospace"]
 ```
 
 - `inject.head` loads web fonts or custom CSS.
-- `default_theme` / `default_palette` are first-paint defaults; toggles persist to `localStorage`.
-- Font arrays become CSS stacks; `base_size` is the site-wide base size (all UI text except body/code/resume scales with it), `body_size` drives article body text on all screens, `code_block_size` drives code blocks. The resume page uses a fixed print layout and follows none of these. Giscus/Artalk comments render in external iframes and ignore `base_size` (Waline follows it).
+- `default_palette` is the first-paint default; toggles persist to `localStorage`.
+- Font arrays become CSS stacks; `font_base_size` is the site-wide base size (all UI text except body/code/resume scales with it), `font_body_size` drives article body text on all screens, `font_code_size` drives code blocks. The resume page uses a fixed print layout and follows none of these. Giscus/Artalk comments render in external iframes and ignore `font_base_size` (Waline follows it).
 
 Palettes:
 
@@ -176,15 +168,22 @@ Palettes:
 year_progress = true
 toc = true
 code_line_numbers = true
-paginate_by = 5
 show_reading_time = true
 i18n = true
+# expiry / license / math sections below live in the same table
+expiry_enable = true
+expiry_days = 90
+license_enable = true
+katex_enable = true
 ```
 
 - `year_progress`: sidebar year progress bar.
 - `toc`: right-side table of contents starting from `##`.
 - `code_line_numbers`: code line numbers.
 - `i18n`: language switcher master switch, default `true`; `false` hides the sidebar switcher (menu `name` / `name_key` dual mode is unaffected).
+- `expiry_enable` / `expiry_days`: article expiry banner switch and threshold (copy below).
+- `license_enable`: article license notice switch.
+- `katex_enable`: `$...$` / `$$...$$` math switch.
 
 ## Search
 
@@ -194,32 +193,36 @@ enable = true              # master switch; false disables the search box and pa
 provider = "pagefind"      # pagefind (default, local index) | algolia | none
 hits_per_page = 8          # sidebar dropdown result count
 placeholder = "search_placeholder"   # translation key for the input placeholder
+pagefind_path = "pagefind/"         # Pagefind bundle output dir (relative to site root)
 
-[extra.pagefind]
-path = "pagefind/"         # Pagefind bundle output dir (relative to site root)
-```
-
-- `pagefind`: no API key needed; run `pagefind_extended --site public` after each build to generate the index (download the matching `pagefind_extended` package from [Pagefind Releases](https://github.com/Pagefind/pagefind/releases); CI downloads it automatically). `[extra.pagefind].path` controls the bundle output dir. The search page embeds Pagefind's own UI; the sidebar uses a theme-styled dropdown.
-> [!warning]
-> Sites with Chinese content must use `pagefind_extended` instead of the regular `pagefind` binary: the regular build has no Chinese segmentation and Chinese queries will largely return nothing.
-- `algolia`: uses `[extra.algolia]` below (`app_id + api_key + index_name` required), plus pushing content to the index.
-- `placeholder` is a key in `[translations]` (e.g. the default `search_placeholder`), rendered in the current language; a custom key must be defined in every language's translations (same rule as menu `name_key`), otherwise the build fails.
-- `search/_index.md` is the standalone search page; `/` focuses the sidebar input, `?q=` deep-links the search page.
-- Indexing is allowlist-based: only blog posts and wiki leaf articles are indexed; list pages (home/sections/categories/tags/archive/friends/resume/search/404) and encrypted bodies are excluded automatically. New templates must add a `data-pagefind-body` marker to searchable regions, or the page will be silently skipped.
-- Heading-level jumps are supported: the main result links straight to the best-matching section `#` anchor (with that section's excerpt).
-
-## Algolia search
-
-```toml
-[extra.algolia]
+[extra.search.algolia]
 app_id = "YOUR_APP_ID"
 api_key = "YOUR_SEARCH_ONLY_KEY"
 index_name = "YOUR_INDEX"
 show_powered_by = true
 ```
 
-- Use a search-only key. Push content to the index separately (manual or crawler on `sitemap.xml`).
-- `search/_index.md` is the standalone search page; `/` focuses the search input.
+- `pagefind`: no API key needed; run `pagefind_extended --site public` after each build to generate the index (download the matching `pagefind_extended` package from [Pagefind Releases](https://github.com/Pagefind/pagefind/releases); CI downloads it automatically). `pagefind_path` controls the bundle output dir. The search page embeds Pagefind's own UI; the sidebar uses a theme-styled dropdown.
+> [!warning]
+> Sites with Chinese content must use `pagefind_extended` instead of the regular `pagefind` binary: the regular build has no Chinese segmentation and Chinese queries will largely return nothing.
+- `algolia`: uses `[extra.search.algolia]` (`app_id + api_key + index_name` required, search-only key), plus pushing content to the index (manual or crawler on `sitemap.xml`).
+- `placeholder` is a key in `[translations]` (e.g. the default `search_placeholder`), rendered in the current language; a custom key must be defined in every language's translations (same rule as menu `name_key`), otherwise the build fails.
+- `search/_index.md` is the standalone search page; `/` focuses the sidebar input, `?q=` deep-links the search page.
+- Indexing is allowlist-based: only blog posts and wiki leaf articles are indexed; list pages (home/sections/categories/tags/archive/friends/resume/search/404) and encrypted bodies are excluded automatically. New templates must add a `data-pagefind-body` marker to searchable regions, or the page will be silently skipped.
+- Heading-level jumps are supported: the main result links straight to the best-matching section `#` anchor (with that section's excerpt).
+
+## API services
+
+External integrations live in per-service subtables; add `[extra.api.xxx]` for new services:
+
+```toml
+[extra.api.sitemap]
+enable = false
+api = "https://melodious-lily-64ecd1.netlify.app/.netlify/functions/index?url={href}"
+```
+
+- `sitemap`: metadata enhancement for `link` cards. On page visit the card `href` is requested (`{href}` is replaced with `encodeURIComponent(href)`, 10s timeout); on success the returned `title` / `desc` / `icon` overwrite the card (API first), on failure/timeout the user-written content is kept (pure CSR, no build-time fetch, no SEO).
+- `enable = false` or a missing table emits no requests and skips `static/js/sitemap.js`.
 
 ## Comments
 
@@ -233,12 +236,12 @@ comment_title = "Leave a comment"
 ```
 
 - `enable = false` disables site-wide; `extra.comments = false` in a page disables that page.
-- If `provider` is empty, the theme infers it from whether `giscus` / `artalk` / `waline` is configured.
+- `provider` is the only switch; no auto-inference from configured servers.
 
 ### Giscus
 
 ```toml
-[extra.giscus]
+[extra.comments.giscus]
 repo = "user/repo"
 repo_id = ""
 category = "General"
@@ -250,7 +253,6 @@ emit_metadata = "0"
 input_position = "top"
 theme = "preferred_color_scheme"
 lang = "zh-CN"
-loading = "lazy"
 ```
 
 All official Giscus fields.
@@ -258,12 +260,11 @@ All official Giscus fields.
 ### Artalk
 
 ```toml
-[extra.artalk]
+[extra.comments.artalk]
 server = "https://artalk.example.com"
 site = ""
 placeholder = ""
 no_comment = ""
-emit_own = false
 page_key = ""
 gravatar_mirror = ""
 avatar_mirror = ""
@@ -272,7 +273,7 @@ avatar_mirror = ""
 ### Waline
 
 ```toml
-[extra.waline]
+[extra.comments.waline]
 serverURL = "https://waline.example.com"
 lang = "zh-CN"
 dark = "auto"
@@ -283,31 +284,33 @@ login = "false"
 placeholder = ""
 ```
 
+Comment behavior lives in `static/js/comment.js`, loaded on demand only on article pages with comments (theme changes reach it via the `elysia:theme-change` event).
+
 ## Article expiry
 
 ```toml
-[extra.article_expiry]
-enable = true
-days = 90
+[extra.features]
+expiry_enable = true
+expiry_days = 90
 
 [translations]
-article_expiry = "This article was last updated on {date} and has not been updated for over {days} days. The content may be outdated, please verify the information."
+article_expiry = "This article was last updated on {date} ({diff} days ago, over the {days}-day threshold). The content may be outdated, please verify the information."
 
 [languages.zh.translations]
-article_expiry = "本文最后更新于 {date}，已超过 {days} 天未更新，内容可能已过时，请注意甄别。"
+article_expiry = "本文最后更新于 {date}，距今已有 {diff} 天（超过 {days} 天未更新），内容可能已过时，请注意甄别。"
 ```
 
-- `days` is the threshold. Copy supports `{days}` `{date}` `{diff}` placeholders.
+- `expiry_days` is the threshold. Copy supports `{date}` (last-updated date), `{diff}` (actual days elapsed), `{days}` (threshold) placeholders.
 - Per-page overrides: `extra.expiry = false` disables; `extra.expiry_days` overrides threshold; `extra.expiry_text` overrides text.
 
 ## KaTeX
 
 ```toml
-[extra.katex]
-enable = true
-# css_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-# js_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
-# auto_render_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+[extra.features]
+katex_enable = true
+# katex_css_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+# katex_js_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+# katex_auto_render_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
 ```
 
 Enables `$E=mc^2$` and `$$...$$`. Optional URLs allow self-hosted CDN.
@@ -329,7 +332,7 @@ menu_friends = "Friends"
 menu_links = "Tools"
 toc_title = "On this page"
 toc_on_this_page = "On this page"
-article_expiry = "This article was last updated on {date} and has not been updated for over {days} days. The content may be outdated, please verify the information."
+article_expiry = "This article was last updated on {date} ({diff} days ago, over the {days}-day threshold). The content may be outdated, please verify the information."
 
 [languages.zh]
 title = "Elysia"
@@ -349,7 +352,7 @@ menu_friends = "友链"
 menu_links = "工具集"
 toc_title = "目录"
 toc_on_this_page = "本页目录"
-article_expiry = "本文最后更新于 {date}，已超过 {days} 天未更新，内容可能已过时，请注意甄别。"
+article_expiry = "本文最后更新于 {date}，距今已有 {diff} 天（超过 {days} 天未更新），内容可能已过时，请注意甄别。"
 ```
 
 - URLs are prefixed by `cur_lang != default_language` (e.g., `/zh/wiki/`).
@@ -375,7 +378,7 @@ password = "blog"      # password alias matching a key in encrypt.toml [password
 password_hint = "hint"
 expiry = false
 expiry_days = 60
-expiry_text = "Custom {date} {days} {diff}"
+expiry_text = "Custom {date} {diff} {days}"
 comments = false
 +++
 ```

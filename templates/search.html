@@ -27,9 +27,9 @@
 </div>
 {% elif search_use_algolia %}
 <div class="search-page" data-algolia-page
-  data-app-id="{{ config.extra.algolia.app_id | safe }}"
-  data-api-key="{{ config.extra.algolia.api_key | safe }}"
-  data-index-name="{{ config.extra.algolia.index_name | safe }}"
+  data-app-id="{{ config.extra.search.algolia.app_id | safe }}"
+  data-api-key="{{ config.extra.search.algolia.api_key | safe }}"
+  data-index-name="{{ config.extra.search.algolia.index_name | safe }}"
   data-hits-per-page="{{ search_hits_page }}">
   <div class="search-page__wrap">
     {{ <icon name="search" class="search-page__icon"/> }}
@@ -54,7 +54,7 @@ enable = true
 provider = "pagefind"   # pagefind | algolia | none
 hits_per_page = 8
 placeholder = "search_placeholder"   # 翻译 key，见 [translations]</code></pre>
-  <p class="muted" style="font-size:0.8125rem">使用 <code>pagefind</code> 时，每次构建后运行 <code>pagefind_extended --site public</code> 生成索引（中文必须用 extended）；使用 <code>algolia</code> 时，需另行配置 <code>[extra.algolia]</code> 并将 <code>content</code> 推送至对应 index。</p>
+  <p class="muted" style="font-size:0.8125rem">使用 <code>pagefind</code> 时，每次构建后运行 <code>pagefind_extended --site public</code> 生成索引（中文必须用 extended）；使用 <code>algolia</code> 时，需另行配置 <code>[extra.search.algolia]</code> 并将 <code>content</code> 推送至对应 index。</p>
 </div>
 {% endif %}
 

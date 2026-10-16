@@ -1154,6 +1154,8 @@ html[data-theme="dark"] .tag:nth-child(5n+5){background:#082f49;color:#7dd3fc;bo
 }
 .article__content th:last-child, .article__content td:last-child{border-right:none}
 .article__content tr:last-child td{border-bottom:none}
+/* 表格内 code：只在真正溢出时断词，不参与列宽挤压（短标识不断开、长标识仍可换行兜底） */
+.article__content th code, .article__content td code{overflow-wrap:break-word;}
 .article__content code{
   font-family:var(--font-code);
   font-size:.9em;

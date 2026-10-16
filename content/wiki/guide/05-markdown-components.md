@@ -163,7 +163,7 @@ Alert 为无底色线框样式（边框与 `note` 同款，标题固定为类型
 
 [^source]: 脚注内容。
 
-**写法（KaTeX，需 `extra.katex.enable = true`）：**
+**写法（KaTeX，需 `[extra.features].katex_enable = true`）：**
 
 ```md
 行内公式：$E=mc^2$
@@ -184,8 +184,8 @@ $$
 配置：
 
 ```toml
-[extra.katex]
-enable = true
+[extra.features]
+katex_enable = true
 ```
 
 ## 代码块
@@ -404,6 +404,8 @@ Spotify（`type` 支持 `single` / `album` / `playlist`，`single` 对应 `track
 | `title` | 选填 | 卡片标题，缺省显示 `href` |
 | `icon` | 选填 | 图标：远程/本地图片地址，或 emoji/文字（图片地址按 `href` 同规则处理） |
 | `desc` | 选填 | 描述文字 |
+
+启用 `[extra.api.sitemap]` 后，访客打开页面时会自动用卡片 `href` 请求元数据接口，成功则用返回的标题/描述/图标覆盖卡片（接口优先），失败则保留此处手写信息。
 
 **效果：**
 

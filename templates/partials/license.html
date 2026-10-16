@@ -1,18 +1,18 @@
 {# ############################################################################
    # License: 文章许可声明（正文末尾）
-   # 配置：[extra.license] enable 总开关，license_text 自定义文案（Markdown，
+   # 配置：[extra.features] license_enable 总开关，license_text 自定义文案（Markdown，
    # 支持占位符 {author} {title} {url}）；单篇 extra.license = false 关闭，
    # extra.license_text 覆盖本篇；加密文章隐藏
    ############################################################################ #}
 {% set _lic_enable = true %}
-{% if config.extra.license is defined and config.extra.license.enable is defined %}{% set_global _lic_enable = config.extra.license.enable %}{% endif %}
+{% if config.extra.features is defined and config.extra.features.license_enable is defined %}{% set_global _lic_enable = config.extra.features.license_enable %}{% endif %}
 {% if page.extra.license is defined and page.extra.license == false %}{% set_global _lic_enable = false %}{% endif %}
 {% set _lic_locked = page.extra.encrypted | default(value=false) %}
 {% if _lic_enable and not _lic_locked %}
 {% set _lic_lang = lang | default(value=config.default_language) %}
 {% if page.lang is defined and page.lang %}{% set_global _lic_lang = page.lang %}{% endif %}
 {% set _lic_raw = page.extra.license_text | default(value="") %}
-{% if _lic_raw == "" %}{% set_global _lic_raw = config.extra.license.license_text | default(value="") %}{% endif %}
+{% if _lic_raw == "" %}{% set_global _lic_raw = config.extra.features.license_text | default(value="") %}{% endif %}
 {% if _lic_raw == "" %}{% set_global _lic_raw = trans(key="license_text", lang=_lic_lang) %}{% endif %}
 {% if _lic_raw != "" %}
 {% set _lic_author = page.extra.author | default(value=config.author) | default(value=config.title) %}

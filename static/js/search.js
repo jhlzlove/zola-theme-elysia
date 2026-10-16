@@ -1,4 +1,4 @@
-/* Elysia Algolia Search — vanilla, configurable via zola.toml [extra.algolia] */
+/* Elysia Algolia Search — vanilla, configurable via zola.toml [extra.search.algolia] */
 (function(){
   const ROOT_ID = 'searchRoot';
   const INPUT_ID = 'searchInput';

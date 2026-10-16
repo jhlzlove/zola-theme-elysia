@@ -70,9 +70,9 @@
   data-bundle="{{ pf_js | safe }}"
   data-site-root="{{ get_url(path="/", trailing_slash=true) | safe }}"
   data-search-page="{{ get_url(path="search/", lang=cur_lang, trailing_slash=true) | safe }}"
-  {% if search_use_algolia %}data-app-id="{{ config.extra.algolia.app_id | safe }}"
-  data-api-key="{{ config.extra.algolia.api_key | safe }}"
-  data-index-name="{{ config.extra.algolia.index_name | safe }}"
+  {% if search_use_algolia %}data-app-id="{{ config.extra.search.algolia.app_id | safe }}"
+  data-api-key="{{ config.extra.search.algolia.api_key | safe }}"
+  data-index-name="{{ config.extra.search.algolia.index_name | safe }}"
   data-powered="{{ search_powered }}"{% endif %}>
   <label for="searchInput" class="sr-only">搜索</label>
   <div class="search__input-wrap">

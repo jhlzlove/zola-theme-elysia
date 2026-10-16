@@ -11,6 +11,8 @@ sticky = true
 
 欢迎使用 **Elysia**！这是一篇置顶文章（日期较早的置顶会排在前面，因为多置顶按日期正序）。
 
+{{ <link href="https://github.com" title="github"/> }}
+
 <!-- more -->
 
 [hexo-theme-stellar]: https://github.com/xaoxuu/hexo-theme-stellar

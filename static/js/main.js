@@ -45,70 +45,12 @@
       if(d) d.disabled = !isDark;
     }catch(e){}
   }
-  function syncCommentTheme(){
-    const isDark = getIsDark();
-    // Giscus — postMessage to iframe (supports late load via retry)
+  // ── 评论区主题同步（已拆至 comment.js，按需加载）──
+  // 本文件只负责广播主题变更，comment.js 订阅 `elysia:theme-change` 后自行同步。
+  function notifyThemeChange(){
     try{
-      var iframe = document.querySelector('iframe.giscus-frame');
-      if(iframe && iframe.contentWindow){
-        iframe.contentWindow.postMessage({ giscus: { setConfig: { theme: isDark ? 'dark' : 'light' } } }, 'https://giscus.app');
-      }
-    }catch(e){}
-    // Artalk — official setDarkMode
-    try{
-      if(window.Artalk && typeof window.Artalk.setDarkMode === 'function'){
-        window.Artalk.setDarkMode(isDark);
-      } else if(window.artalk && typeof window.artalk.setDarkMode === 'function'){
-        window.artalk.setDarkMode(isDark);
-      }
-      var artalkEl = document.getElementById('artalk');
-      if(artalkEl){
-        artalkEl.setAttribute('data-dark', String(isDark));
-      }
-    }catch(e){}
-    try{
-      var walineEl = document.getElementById('waline');
-      if(walineEl){
-        walineEl.setAttribute('data-waline-dark', String(isDark));
-      }
-    }catch(e){}
-  }
-  // 确保 giscus 异步加载后也能同步暗色：观察 iframe 插入 + 轮询 + load 事件
-  function initGiscusWatcher(){
-    try{
-      var retrySync = function(){ setTimeout(syncCommentTheme, 80); setTimeout(syncCommentTheme, 400); setTimeout(syncCommentTheme, 1200); };
-      var observer = new MutationObserver(function(muts){
-        muts.forEach(function(m){
-          m.addedNodes.forEach(function(n){
-            if(!n || n.nodeType!==1) return;
-            if(n.tagName==='IFRAME' && n.classList.contains('giscus-frame')){
-              n.addEventListener('load', syncCommentTheme);
-              retrySync();
-            }
-            if(n.querySelectorAll){
-              var f = n.querySelector('iframe.giscus-frame');
-              if(f){
-                f.addEventListener('load', syncCommentTheme);
-                retrySync();
-              }
-            }
-          });
-        });
-      });
-      observer.observe(document.body, {childList:true, subtree:true});
-      // 轮询：client.js 可能晚于 DOMContentLoaded 数秒才创建 iframe
-      var tries=0;
-      var iv=setInterval(function(){
-        var f=document.querySelector('iframe.giscus-frame');
-        if(f){ syncCommentTheme(); clearInterval(iv); }
-        if(++tries>30) clearInterval(iv);
-      }, 400);
-      // 已存在的 iframe 直接绑定
-      var existing=document.querySelector('iframe.giscus-frame');
-      if(existing){
-        existing.addEventListener('load', syncCommentTheme);
-        retrySync();
-      }
+      var isDark = getIsDark();
+      document.dispatchEvent(new CustomEvent('elysia:theme-change', { detail: { isDark: isDark } }));
     }catch(e){}
   }
   let _themeClickBound = false;
@@ -124,9 +66,9 @@
     html.setAttribute('data-theme', theme);
     syncThemeIcon();
     syncGialloTheme();
-    // 初始即尝试同步，覆盖首屏 giscus 已渲染为 light 的情况
-    setTimeout(syncCommentTheme, 300);
-    setTimeout(syncCommentTheme, 1000);
+    // 初始广播一次（comment.js 若已加载则同步；未加载时其自初始化会兜底）
+    setTimeout(notifyThemeChange, 300);
+    setTimeout(notifyThemeChange, 1000);
     if(_themeClickBound) return;
     const btn=document.getElementById('themeToggle');
     if(btn){
@@ -139,9 +81,9 @@
         localStorage.setItem(LS_THEME, next);
         syncThemeIcon();
         syncGialloTheme();
-        syncCommentTheme();
-        setTimeout(syncCommentTheme, 250);
-        setTimeout(syncCommentTheme, 900);
+        notifyThemeChange();
+        setTimeout(notifyThemeChange, 250);
+        setTimeout(notifyThemeChange, 900);
       });
     }
   }
@@ -1085,15 +1027,10 @@
     initAudioPlayers();
     initNeteaseToggle();
     initBookmarkTips();
-    initGiscusWatcher();
-    // 首次渲染后再次同步，确保 giscus iframe 已生成
-    setTimeout(syncCommentTheme, 500);
   });
   // Also run some immediately for no-FOUC
   initTheme();
   initPalette();
-  // 尽早监听 giscus iframe，避免错过首次插入
-  try{ initGiscusWatcher(); }catch(e){}
-  // 额外兜底：监听 giscus 异步加载完成后同步
-  window.addEventListener('load', function(){ setTimeout(syncCommentTheme, 400); try{ initExpiry(); }catch(e){} });
+  // 额外兜底：构建后时间流逝导致的过期文案刷新
+  window.addEventListener('load', function(){ try{ initExpiry(); }catch(e){} });
 })();

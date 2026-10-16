@@ -44,10 +44,10 @@
         </div>
       </header>
 
-      {# # Blog: 过期提示（[extra.article_expiry] + translations.article_expiry） #}
+      {# # Blog: 过期提示（[extra.features].expiry_enable/expiry_days + translations.article_expiry，占位符 {date} {diff} {days}） #}
       {% set _expiry_enable = false %}
-      {% if config.extra.article_expiry is defined and config.extra.article_expiry.enable is defined %}
-        {% set_global _expiry_enable = config.extra.article_expiry.enable %}
+      {% if config.extra.features is defined and config.extra.features.expiry_enable is defined %}
+        {% set_global _expiry_enable = config.extra.features.expiry_enable %}
       {% endif %}
       {% if page.extra.expiry is defined %}
         {% if page.extra.expiry == false %}
@@ -58,8 +58,8 @@
       {% endif %}
       {% if _expiry_enable and page.date %}
         {% set _expiry_days = 90 %}
-        {% if config.extra.article_expiry is defined and config.extra.article_expiry.days is defined %}
-          {% set_global _expiry_days = config.extra.article_expiry.days %}
+        {% if config.extra.features is defined and config.extra.features.expiry_days is defined %}
+          {% set_global _expiry_days = config.extra.features.expiry_days %}
         {% endif %}
         {% if page.extra.expiry_days is defined %}
           {% set_global _expiry_days = page.extra.expiry_days %}

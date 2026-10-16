@@ -25,25 +25,16 @@ light_theme = "ayu-light"
 dark_theme = "ayu-dark"
 style = "class"
 
+[slugify]
+paths = "on"
+taxonomies = "off"
+anchors = "on"
+
 [extra]
 # ── Site Identity ──
 avatar = "/avatar.jpg"
 avatar_alt = "Elysia"
 site_motto = "不修来世不修仙 且留大道在人间"
-
-# Footer (markdown supported)
-footer = """
-<span id="jinrishici-sentence"></span> <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
-
-© 2026 主题 [Elysia](https://github.com/jhlzlove/zola-theme-elysia) · 由 [Zola](https://www.getzola.org) 驱动
-"""
-
-# ── Site filings / 备案信息（留空则不显示对应项目）──
-# 支持 icp、公安、萌国备案号
-[extra.filing]
-icp = ""
-police = ""
-moe = "20268080"
 
 # ── Top Navigation Buttons (wrap automatically, 4 per row on desktop) ──
 # icon is optional, can be emoji / svg name / url
@@ -113,6 +104,17 @@ name = "Email"
 url = "mailto:hello@example.com"
 icon = "mail"
 
+# Footer (markdown supported, empty text hides the footer line)
+# icp / police / moe 留空则不显示对应备案项
+[extra.footer]
+icp = ""
+police = ""
+moe = "20268080"
+text = """
+<span id="jinrishici-sentence"></span> <script src="https://sdk.jinrishici.com/v2/browser/jinrishici.js" charset="utf-8"></script>
+
+© 2026 主题 [Elysia](https://github.com/jhlzlove/zola-theme-elysia) · 由 [Zola](https://www.getzola.org) 驱动
+"""
 
 # ── Inject head — arbitrary <link> etc. ──
 # Example: { rel = "stylesheet", href = "https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-web/style.css" }
@@ -123,34 +125,28 @@ head = [
   { rel = "stylesheet", href = "https://fontsapi.zeoseven.com/442/main/result.css" },
 ]
 
-# ── Style / Palette defaults ──
-# theme: "auto" | "light" | "dark"
-[extra.style]
-default_theme = "auto"
+# ── Style / Palette / Fonts ──
 # palette: "default" | "lime" | "orange" | "violet"
+# font_base_size: 全站基准字号（html rem 锚点；除正文/代码/简历外的 UI 文字都以此缩放）
+# font_body_size: 文章正文；font_code_size: 代码块；font_*_family 为完整字体栈
+[extra.style]
 default_palette = "default"
-
-# ── Fonts ──
-# base_size: 全站基准字号（html rem 锚点；除正文/代码/简历外的 UI 文字都以此缩放）
-# body_size: 文章正文；code_block_size: 代码块
-# body_family / code_block_family: full font stack as array (include defaults so source stays simple)
-[extra.style.fonts]
-base_size = "16px"
-body_size = "1rem"
-code_block_size = "0.875rem"
-body_family = [ "Maple Mono NF CN", "Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"]
-code_block_family = ["JetBrains Mono", "Maple Mono NF CN", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
+font_base_size = "16px"
+font_body_size = "1rem"
+font_code_size = "0.875rem"
+font_body_family = [ "Maple Mono NF CN", "Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"]
+font_code_family = ["JetBrains Mono", "Maple Mono NF CN", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
 
 # ── Comments ──
-# enable 在 [extra.comments] 统一控制；各系统不再单独设 enable
-# provider: "giscus" | "artalk" | "waline" | "none"
+# enable 总开关；provider: "giscus" | "artalk" | "waline" | "none"
+# provider 为空时按 giscus → artalk → waline 是否填有服务地址自动推断
 [extra.comments]
 enable = false
 provider = "giscus"   # e.g. "artalk"
 comment_title = "欢迎评论 — 留下你的想法"
 
 # ── Giscus ──
-[extra.giscus]
+[extra.comments.giscus]
 repo = "user/repo"
 repo_id = "repo_id"
 category = ""
@@ -162,21 +158,19 @@ emit_metadata = "0"
 input_position = "top"
 theme = "preferred_color_scheme"
 lang = "zh-CN"
-loading = "lazy"
 
 # ── Artalk ── https://artalk.js.org
-[extra.artalk]
+[extra.comments.artalk]
 server = ""          # e.g. "https://artalk.example.com"
 site = ""            # site name, optional
 placeholder = ""     # placeholder text
 no_comment = ""      # text when no comments
-emit_own = false
 page_key = ""        # leave empty to use pathname
 gravatar_mirror = ""
 avatar_mirror = ""
 
 # ── Waline ── https://waline.js.org
-[extra.waline]
+[extra.comments.waline]
 serverURL = ""       # e.g. "https://waline.example.com"
 lang = "zh-CN"
 dark = "auto"        # "auto" | css selector
@@ -189,28 +183,32 @@ placeholder = ""
 # ── Search ──
 # provider: "pagefind"（默认，本地索引）| "algolia" | "none"
 # pagefind：构建后运行 ./pagefind_extended --site public 生成 public/pagefind/ 索引，无需任何 key（中文站必须用 extended，普通版 pagefind 不含中文分词）
-# algolia：沿用下方 [extra.algolia] 配置（需 app_id + api_key + index_name）
+# pagefind_path：bundle 输出目录（`pagefind_extended --site public` 的位置），站内相对路径
+# algolia：见下方 [extra.search.algolia]（需 app_id + api_key + index_name）
 # placeholder：搜索框提示文案的翻译 key（见 [translations] search_placeholder），自定义 key 必须在各语言 translations 中定义，否则构建会报错（与菜单 name_key 规则一致）
 [extra.search]
 enable = true
 provider = "pagefind"
 hits_per_page = 8
 placeholder = "search_placeholder"
+pagefind_path = "pagefind/"
 
-# ── Pagefind Search（本地索引）──
-# bundle 输出目录（`pagefind_extended --site public` 的位置），站内相对路径；默认 "pagefind/"
-[extra.pagefind]
-path = "pagefind/"
-
-# ── Algolia Search ──
-[extra.algolia]
-# Get from https://dashboard.algolia.com
+# ── Algolia Search ── Get from https://dashboard.algolia.com
+[extra.search.algolia]
 app_id = ""          # e.g. "LATENCY"
 api_key = ""         # search-only API key
 index_name = ""      # e.g. "elysia"
 show_powered_by = true
-# Optional: customize hits display (title, url, summary, content)
-# attribute_for_highlight = ["title", "content"]
+
+# ── API Services — 外部接口（各服务独立子表，按需扩展）──
+# sitemap：link 卡片元数据增强。访客打开页面时用卡片 href 请求 api，
+# 成功则用返回的 title / desc / icon 覆盖卡片，失败则保留用户手写信息。
+# api 中的 {href} 为占位符
+# 设置 api 可以自动提取网页标题、图标，服务部署方法：https://github.com/xaoxuu/site-info-api/
+# 接口测试通过后，把按钮的 href 部分替换成 {href} 之后填写到下方，例如：https://api.xaox.cc/site_info/v1?url={href}
+[extra.api.sitemap]
+enable = false
+api = "https://melodious-lily-64ecd1.netlify.app/.netlify/functions/index?url={href}"
 
 # ── Features ──
 [extra.features]
@@ -220,37 +218,28 @@ year_progress = true
 toc = true
 # Show line numbers in code blocks (true by default)
 code_line_numbers = true
-# Articles per page
-paginate_by = 5
 # Show reading time
 show_reading_time = true
 # Show language switcher (default true; false hides it; menu name / name_key both work either way)
 i18n = true
-
-
-# ── Article Expiry Warning — 文章过期提示 ──
-# 在文章头部显示过期提醒：根据 date/updated 与当前时间计算，超过 days 天即显示
-# 文案通过 Zola translations 管理：key 为 `article_expiry`，支持占位符 {days} {date} {diff}
+# ── Article Expiry — 文章过期提示 ──
+# 在文章头部显示过期提醒：根据 date/updated 与当前时间计算，超过 expiry_days 天即显示
+# 文案通过 Zola translations 管理：key 为 `article_expiry`，支持占位符 {date}（最后更新日期） {diff}（距今实际天数） {days}（阈值天数）
 # 默认语言在 [translations] 中配置，其他语言在 [languages.<code>.translations] 中配置
-[extra.article_expiry]
-enable = true
-days = 90
-
+expiry_enable = true
+expiry_days = 90
 # ── License — 文章许可声明（正文末）──
 # 文案优先级：单篇 extra.license_text > 此处 license_text > translations 的 license_text；
 # license_text 为 Markdown，支持占位符 {author} {title} {url}；
 # 单篇以 extra.license = false 关闭；英文默认文案在 [languages.en.translations] 中
-[extra.license]
-enable = true
+license_enable = true
 # license_text = "本文作者：{author} · 许可协议 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) · 转载请注明出处 [原文链接]({url})"
-
-# ── KaTeX ── 设 enable = true 即启用 $...$ / $$...$$ 数学公式
-[extra.katex]
-enable = true
+# ── KaTeX ── 设 katex_enable = true 即启用 $...$ / $$...$$ 数学公式
+katex_enable = true
 # 可选：自定义 CDN，默认 jsDelivr 0.16.9
-# css_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-# js_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
-# auto_render_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+# katex_css_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+# katex_js_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"
+# katex_auto_render_url = "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
 
 # ── Translations — 默认语言 (zh) ──
 # 增删菜单时：只需在 [[extra.menus]] 中改一套，同步在此与 [languages.en.translations] 中增删对应 key
@@ -264,7 +253,7 @@ menu_heatmap = "热力图"
 menu_resume = "简历"
 menu_friends = "友链"
 menu_links = "工具集"
-article_expiry = "本文最后更新于 {date}，已超过 {days} 天未更新，内容可能已过时，请注意甄别。"
+article_expiry = "本文最后更新于 {date}，距今已有 {diff} 天（超过 {days} 天未更新），内容可能已过时，请注意甄别。"
 toc_title = "目录"
 toc_on_this_page = "本页目录"
 search_placeholder = "搜索文章..."
@@ -295,13 +284,8 @@ menu_heatmap = "Heatmap"
 menu_resume = "Resume"
 menu_friends = "Friends"
 menu_links = "Tools"
-article_expiry = "This article was last updated on {date} and has not been updated for over {days} days. The content may be outdated, please verify the information."
+article_expiry = "This article was last updated on {date} ({diff} days ago, over the {days}-day threshold). The content may be outdated, please verify the information."
 toc_title = "On this page"
 toc_on_this_page = "On this page"
 search_placeholder = "Search posts..."
 license_text = "Author: {author} · Licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) · Please credit the [original article]({url}) when sharing"
-
-[slugify]
-paths = "on"
-taxonomies = "off"
-anchors = "on"
