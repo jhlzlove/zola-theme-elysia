@@ -419,7 +419,7 @@ Spotify（`type` 支持 `single` / `album` / `playlist`，`single` 对应 `track
 
 点击放大：`[extra.features] lightbox_enable = true`（默认开启）时正文所有图片（含 gallery）点击进灯箱，同组内可左右切换；`false` 则点击走原链接。
 
-已知限制：masonry 用 CSS Columns 实现，图片按列纵向填充，视觉顺序为列优先（非严格行序）；justified 最后一行固定行高左对齐、不拉伸；极端宽高比钳制在 0.25~4；加载失败的图片自动隐藏并重排；禁用 JS 时 justified 退化为等高 flex 兜底。
+已知限制：masonry 用 CSS Columns 实现，图片按列纵向填充，视觉顺序为列优先（非严格行序）；容器宽度 ≤560px 时 grid / masonry 自动按双列排布（容器查询不可用的旧浏览器按视口 ≤640px 回退）；justified 最后一行固定行高左对齐、不拉伸；极端宽高比钳制在 0.25~4；加载失败的图片自动隐藏并重排；禁用 JS 时 justified 退化为等高 flex 兜底。
 
 **选型建议：**
 

@@ -412,7 +412,7 @@ Local raster images (`jpg/jpeg/png/webp/avif/gif/bmp`, any case) get build-time 
 
 Click-to-zoom: with `[extra.features] lightbox_enable = true` (default on), every article image (gallery included) opens in a lightbox with prev/next inside its group; `false` keeps plain links.
 
-Known limits: masonry uses CSS Columns (column-major visual order, not strict row order); the justified last row keeps fixed height and left-aligns instead of stretching; extreme ratios are clamped to 0.25–4; failed images are hidden and the row repacked; without JS, justified degrades to an equal-height flex fallback.
+Known limits: masonry uses CSS Columns (column-major visual order, not strict row order); in narrow containers (≤560px) grid / masonry automatically use two columns (old browsers without container queries fall back to viewport ≤640px); the justified last row keeps fixed height and left-aligns instead of stretching; extreme ratios are clamped to 0.25–4; failed images are hidden and the row repacked; without JS, justified degrades to an equal-height flex fallback.
 
 **Which layout to use:**
 

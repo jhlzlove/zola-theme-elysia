@@ -3203,6 +3203,18 @@ a.wiki-side-nav__title:hover{
 .gallery[data-style="justified"] .gallery__track{display:flex;flex-wrap:wrap;gap:var(--g-gap)}
 .gallery[data-style="justified"] .gallery__item{flex:1 1 var(--g-size);height:220px;min-width:0}
 .gallery[data-style="justified"] .gallery__item img{height:100%;object-fit:cover}
+/* 窄容器双列：小屏上默认 size 只够排单列、视觉等同普通插图；容器窄时强制双列 */
+@container (max-width: 560px){
+  .gallery[data-style="grid"] .gallery__track{grid-template-columns:repeat(2, minmax(0, 1fr))}
+  .gallery[data-style="masonry"] .gallery__track{columns:2}
+}
+/* 容器查询不可用时的回退（旧浏览器）：按视口宽度近似 */
+@supports not (container-type: inline-size){
+  @media (max-width: 640px){
+    .gallery[data-style="grid"] .gallery__track{grid-template-columns:repeat(2, minmax(0, 1fr))}
+    .gallery[data-style="masonry"] .gallery__track{columns:2}
+  }
+}
 
 /* ─────────────────────────────────────────
    Lightbox — PhotoSwipe（CDN）与主题的衔接
