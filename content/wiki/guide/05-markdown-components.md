@@ -779,6 +779,62 @@ func test() {
 {% </column> %}
 {% </columns> %}
 
+### timeline 时间线
+
+**写法：**
+
+{% raw %}
+````jinja
+{% <timeline> %}
+{% <timenode text="2026-10-16，简单的记录"> %}
+some text，支持完整 Markdown，可嵌套其它块组件。
+{% </timenode> %}
+
+{% <timenode text="2026-10-17，简单的记录 2"> %}
+some text
+{% </timenode> %}
+{% </timeline> %}
+````
+{% endraw %}
+
+- 外层 `timeline`：无参数，块内容为一组 `timenode`（只放节点，之间留空行）。
+- 内层 `timenode`：`text` 为节点标题，**原样显示**（日期与说明怎么写都行，如 `2026-10-16，简单的记录`）；不写则只渲染正文。
+- 节点正文支持完整 Markdown，可嵌套其它块/行组件；`timeline` 整体也可放进 `tab` / `column` 等组件，嵌套时各自的线、点互不影响。
+- 块组件不要缩进 4 个空格以上、节点之间保持空行，否则可能被 Markdown 当作代码块或并入段落。
+
+`timeline` 参数：
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| 块内容 | 必填 | 一组 `timenode`，之间留空行 |
+
+`timenode` 参数：
+
+| 参数 | 必填/选填 | 说明 |
+| --- | --- | --- |
+| `text` | 选填 | 节点标题，原样显示；缺省只显示正文 |
+| 块内容 | 必填 | 节点正文，支持完整 Markdown，可嵌套其它块/行组件 |
+
+**效果：**
+
+{% <timeline> %}
+{% <timenode text="2026-10-16，简单的记录"> %}
+some text，支持完整 Markdown。
+
+{% <note title="提示" color="tip"> %}
+节点里套 `note`。
+{% </note> %}
+{% </timenode> %}
+
+{% <timenode text="2026-10-17，简单的记录 2"> %}
+some text
+{% </timenode> %}
+
+{% <timenode> %}
+不传 `text` 时只渲染正文。
+{% </timenode> %}
+{% </timeline> %}
+
 ## Wiki 章节
 
 Wiki 根目录（`/wiki/` 项目导航）与子目录（阅读单元）使用不同的模板，不要混用：

@@ -746,6 +746,62 @@ Right column, `width="2"`, takes two shares.
 {% </column> %}
 {% </columns> %}
 
+### timeline
+
+**Syntax:**
+
+{% raw %}
+````jinja
+{% <timeline> %}
+{% <timenode text="2026-10-16, a quick note"> %}
+some text, full Markdown supported, other block components can nest inside.
+{% </timenode> %}
+
+{% <timenode text="2026-10-17, another note"> %}
+some text
+{% </timenode> %}
+{% </timeline> %}
+````
+{% endraw %}
+
+- Outer `timeline`: no parameters; its body is a set of `timenode` blocks (nodes only, with blank lines between them).
+- Inner `timenode`: `text` is the node heading, rendered verbatim (any date/note format, e.g. `2026-10-16, a quick note`); omit it to render the body only.
+- Node bodies support full Markdown and can nest other block/inline components; the whole `timeline` can also live inside `tab` / `column` etc. — connector lines and dots are scoped via direct-child selectors so nesting stays independent.
+- Keep block components indented by less than 4 spaces and leave blank lines between nodes, otherwise Markdown may treat them as code blocks or merge them into paragraphs.
+
+`timeline` parameters:
+
+| Parameter | Required | Description |
+| --- | --- | --- |
+| Body | Yes | A set of `timenode` blocks with blank lines between them |
+
+`timenode` parameters:
+
+| Parameter | Required | Description |
+| --- | --- | --- |
+| `text` | No | Node heading, rendered verbatim; when omitted only the body is shown |
+| Body | Yes | Node text, full Markdown supported, other block/inline components may nest inside |
+
+**Rendered:**
+
+{% <timeline> %}
+{% <timenode text="2026-10-16, a quick note"> %}
+some text, full Markdown supported.
+
+{% <note title="Tip" color="tip"> %}
+A `note` nested inside the node.
+{% </note> %}
+{% </timenode> %}
+
+{% <timenode text="2026-10-17, another note"> %}
+some text
+{% </timenode> %}
+
+{% <timenode> %}
+Body-only node (no `text`).
+{% </timenode> %}
+{% </timeline> %}
+
 ## Wiki sections
 
 The Wiki root (`/wiki/` project hub) and subdirectories (reading units) use different templates — do not mix them:

@@ -230,6 +230,24 @@
 <div class="col-card{% if cls %} col-card--{{ cls }}{% endif %}" data-component="column" style="flex:{{ flex }} {{ flex }} 0">{{ body | markdown | safe }}</div>
 {% endcomponent column -%}
 
+{# ── Timeline：时间线（timeline > timenode，可嵌套其它块组件）─────────────
+   块组件，用法：
+   {% <timeline> %}
+   {% <timenode text="2026-10-16，简单的记录"> %}
+   节点正文，支持完整 Markdown
+   {% </timenode> %}
+   {% </timeline> %}
+   text 选填、原样显示（日期/说明任意格式）；timenode 只放在 timeline 内，
+   节点之间留空行，且不要缩进 4 个空格以上（会被 Markdown 当代码块） #}
+{% component timeline() -%}
+<div class="timeline" data-component="timeline">{{ body | markdown | safe }}</div>
+{% endcomponent timeline -%}
+
+{% component timenode(text = "") -%}
+{% set t = text | default(value="") | trim -%}
+<div class="timeline__node" data-component="timenode">{% if t %}<div class="timeline__head">{{ t }}</div>{% endif %}<div class="timeline__body">{{ body | markdown | safe }}</div></div>
+{% endcomponent timenode -%}
+
 {# ── Gallery：自适应照片墙（grid / masonry / justified）────────────────
    块组件，正文每行一张最简 Markdown 图片（alt 不得含 [ 或 ]，不支持标题与引用式）：
    {% <gallery style="masonry" size="220"> %}
