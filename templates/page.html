@@ -44,54 +44,8 @@
         </div>
       </header>
 
-      {# # Blog: 过期提示（[extra.features].expiry_enable/expiry_days + translations.article_expiry，占位符 {date} {diff} {days}） #}
-      {% set _expiry_enable = false %}
-      {% if config.extra.features is defined and config.extra.features.expiry_enable is defined %}
-        {% set_global _expiry_enable = config.extra.features.expiry_enable %}
-      {% endif %}
-      {% if page.extra.expiry is defined %}
-        {% if page.extra.expiry == false %}
-          {% set_global _expiry_enable = false %}
-        {% elif page.extra.expiry == true %}
-          {% set_global _expiry_enable = true %}
-        {% endif %}
-      {% endif %}
-      {% if _expiry_enable and page.date %}
-        {% set _expiry_days = 90 %}
-        {% if config.extra.features is defined and config.extra.features.expiry_days is defined %}
-          {% set_global _expiry_days = config.extra.features.expiry_days %}
-        {% endif %}
-        {% if page.extra.expiry_days is defined %}
-          {% set_global _expiry_days = page.extra.expiry_days %}
-        {% endif %}
-        {% set _expiry_date = page.date %}
-        {% if page.updated is defined and page.updated %}
-          {% set_global _expiry_date = page.updated %}
-        {% endif %}
-        {% set _expiry_date_str = _expiry_date | date(format="%Y-%m-%d") %}
-        {% set _expiry_ts = _expiry_date | date(format="%s") | int %}
-        {% set _cur_lang = lang | default(value=config.default_language) %}
-        {% if page.lang is defined and page.lang %}{% set_global _cur_lang = page.lang %}{% endif %}
-        {% set _expiry_raw = "" %}
-        {% if page.extra.expiry_text is defined and page.extra.expiry_text %}
-          {% set_global _expiry_raw = page.extra.expiry_text %}
-        {% else %}
-          {% set_global _expiry_raw = trans(key="article_expiry", lang=_cur_lang) %}
-        {% endif %}
-        {% set _now_ts = now() | date(format="%s") | int %}
-        {% set _diff_build_f = (_now_ts - _expiry_ts) / 86400 %}
-        {% set _diff_build_s = (_diff_build_f ~ "") | split(pat=".") | first %}
-        {% set _diff_build = _diff_build_s | int %}
-        {% if _diff_build < 0 %}{% set_global _diff_build = 0 %}{% set_global _diff_build_s = "0" %}{% endif %}
-        {% set _expiry_days_s = _expiry_days ~ "" %}
-        {% set _expiry_rendered = _expiry_raw | replace(from="{days}", to=_expiry_days_s) | replace(from="{date}", to=_expiry_date_str) | replace(from="{diff}", to=_diff_build_s) %}
-        <div id="articleExpiry" class="article-expiry" {% if _diff_build < _expiry_days %}hidden{% endif %} data-expiry-days="{{ _expiry_days }}" data-expiry-ts="{{ _expiry_ts }}" data-expiry-date="{{ _expiry_date_str }}" data-expiry-text="{{ _expiry_raw | escape_xml | safe }}" data-lang="{{ _cur_lang }}" role="status" aria-live="polite">
-          <div class="article-expiry__icon" aria-hidden="true">
-            {{ <icon name="alert" width="18" height="18"/> }}
-          </div>
-          <div class="article-expiry__body">{{ _expiry_rendered }}</div>
-        </div>
-      {% endif %}
+      {# # Blog: 过期提示（单篇 extra.expiry_enable > 全局；优先级与实现见 partials/article-expiry.html） #}
+      {% include "partials/article-expiry.html" %}
 
       {# # Blog: 加密锁 / 正文 #}
       {% if is_encrypted %}

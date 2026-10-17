@@ -189,7 +189,7 @@ lightbox_enable = true
 - `code_line_numbers`：代码行号。
 - `show_reading_time`：标题下方阅读时间。
 - `i18n`：多语言切换器总开关，默认 `true`；`false` 则隐藏侧栏语言切换器（菜单 `name` / `name_key` 双模式均不受影响）。
-- `expiry_enable` / `expiry_days`：文章过期提示总开关与阈值天数（文案见下节）。
+- `expiry_enable` / `expiry_days`：文章过期提示总开关与阈值天数（单篇可用 `extra.expiry_enable` 覆盖，文案见下节）。
 - `license_enable`：文章许可声明总开关。
 - `katex_enable`：`$...$` / `$$...$$` 数学公式总开关。
 - `lightbox_enable`：正文图片点击放大总开关，默认 `true`；`false` 则点击走原链接。
@@ -311,7 +311,7 @@ article_expiry = "This article was last updated on {date} ({diff} days ago, over
 
 - `expiry_days`：阈值天数，超过即显示。
 - 文案通过 `translations` 的 `article_expiry` 管理，支持占位符 `{date}`（最后更新日期） `{diff}`（距今实际天数） `{days}`（阈值天数）。
-- 单篇覆盖：`extra.expiry = false` 关闭；`extra.expiry_days` 覆写天数；`extra.expiry_text` 覆写文案。
+- 单篇覆盖（单篇配置优先于全局）：`extra.expiry_enable = false` 关闭 / `true` 强制开启；`extra.expiry_days` 覆写天数；`extra.expiry_text` 覆写文案；旧键 `extra.expiry` 仍兼容。
 
 ## KaTeX
 
@@ -386,7 +386,7 @@ sticky = true          # 置顶：sticky / top / pinned 任一为真即置顶
 encrypted = true
 password = "blog"      # 密码别名，对应 encrypt.toml [passwords] 的 key，真密码只写在那里
 password_hint = "提示"
-expiry = false         # 关闭本篇过期提示
+expiry_enable = false   # 本篇过期提示开关（优先于全局；旧键 expiry 兼容）
 expiry_days = 60
 expiry_text = "自定义 {date} {diff} {days}"
 comments = false       # 关闭本篇评论

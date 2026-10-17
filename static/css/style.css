@@ -967,7 +967,8 @@ html[data-theme="dark"] .tag:nth-child(5n+5){background:#082f49;color:#7dd3fc;bo
   .post-nav__card--next{text-align:left}
 }
 
-/* Article license — 正文末许可声明卡片（随内容进 RSS；与 callout / footnote-definition 同一卡片语言） */
+/* Article license — 正文末许可声明卡片（随内容进 RSS；与 callout / footnote-definition 同一卡片语言）
+   桌面：正文 + 右侧 CC 图标列；≤640px：正文通栏、图标改为底部徽章行（长 URL 不再被图标挤压换行） */
 .article-license{
   display:flex;gap:10px;align-items:flex-start;
   margin-top:26px;padding:12px 14px;
@@ -982,6 +983,7 @@ html[data-theme="dark"] .tag:nth-child(5n+5){background:#082f49;color:#7dd3fc;bo
 }
 .article-license__body{flex:1;min-width:0}
 .article-license__body p{margin:0}
+.article-license__body p+p{margin-top:6px}
 .article-license a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong)}
 .article-license a:hover{text-decoration-color:var(--accent)}
 .article-license__cc{
@@ -991,8 +993,17 @@ html[data-theme="dark"] .tag:nth-child(5n+5){background:#082f49;color:#7dd3fc;bo
 }
 .article-license__cc svg{width:30px;height:30px;display:block}
 @media (max-width:640px){
-  .article-license{flex-wrap:wrap}
-  .article-license__cc{margin-left:0}
+  .article-license{
+    flex-direction:column;gap:0;
+    margin-top:20px;padding:11px 13px;
+  }
+  .article-license__cc{
+    align-self:stretch;
+    margin-top:10px;padding-top:9px;
+    border-top:1px solid var(--border);
+    gap:6px;
+  }
+  .article-license__cc svg{width:22px;height:22px}
 }
 
 /* Pagination / Infinite loader */

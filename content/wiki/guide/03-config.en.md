@@ -182,7 +182,7 @@ lightbox_enable = true
 - `toc`: right-side table of contents starting from `##`.
 - `code_line_numbers`: code line numbers.
 - `i18n`: language switcher master switch, default `true`; `false` hides the sidebar switcher (menu `name` / `name_key` dual mode is unaffected).
-- `expiry_enable` / `expiry_days`: article expiry banner switch and threshold (copy below).
+- `expiry_enable` / `expiry_days`: article expiry banner switch and threshold (per-page `extra.expiry_enable` overrides; copy below).
 - `license_enable`: article license notice switch.
 - `katex_enable`: `$...$` / `$$...$$` math switch.
 - `lightbox_enable`: click-to-zoom switch for article images, default `true`; `false` keeps plain links.
@@ -303,7 +303,7 @@ article_expiry = "本文最后更新于 {date}，距今已有 {diff} 天（超�
 ```
 
 - `expiry_days` is the threshold. Copy supports `{date}` (last-updated date), `{diff}` (actual days elapsed), `{days}` (threshold) placeholders.
-- Per-page overrides: `extra.expiry = false` disables; `extra.expiry_days` overrides threshold; `extra.expiry_text` overrides text.
+- Per-page overrides (page config beats global): `extra.expiry_enable = false` disables / `true` forces it on; `extra.expiry_days` overrides the threshold; `extra.expiry_text` overrides the copy. The legacy `extra.expiry` key still works.
 
 ## KaTeX
 
@@ -378,7 +378,7 @@ sticky = true          # pinned: any of sticky / top / pinned set to true
 encrypted = true
 password = "blog"      # password alias matching a key in encrypt.toml [passwords]; never the real password
 password_hint = "hint"
-expiry = false
+expiry_enable = false   # per-page switch, beats the global one (legacy key: expiry)
 expiry_days = 60
 expiry_text = "Custom {date} {diff} {days}"
 comments = false

@@ -224,6 +224,7 @@ show_reading_time = true
 i18n = true
 # ── Article Expiry — 文章过期提示 ──
 # 在文章头部显示过期提醒：根据 date/updated 与当前时间计算，超过 expiry_days 天即显示
+# 单篇可用 [extra] expiry_enable = true/false 单独开关（单篇配置优先于全局），expiry_days / expiry_text 覆写阈值与文案
 # 文案通过 Zola translations 管理：key 为 `article_expiry`，支持占位符 {date}（最后更新日期） {diff}（距今实际天数） {days}（阈值天数）
 # 默认语言在 [translations] 中配置，其他语言在 [languages.<code>.translations] 中配置
 expiry_enable = true
