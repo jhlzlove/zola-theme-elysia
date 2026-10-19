@@ -47,7 +47,7 @@
 {% set_global pinned_all = [] %}
 {% set_global normal_all = [] %}
 {% for p in pages_all %}
-  {% if p.extra.sticky or p.extra.top or p.extra.pinned or p.extra.sticky == true %}
+  {% if p.extra.sticky %}
     {% set_global pinned_all = [...pinned_all, p] %}
   {% else %}
     {% set_global normal_all = [...normal_all, p] %}
@@ -105,7 +105,7 @@
 {# ── Normal list (paged) — pinned excluded entirely, only shown in pinnedList above ── #}
 <div class="post-list" id="postList">
 {% for page in pages_paged %}
-  {% set is_pinned = page.extra.sticky or page.extra.top or page.extra.pinned %}
+  {% set is_pinned = page.extra.sticky %}
   {% if is_pinned %}{% continue %}{% endif %}
   <article class="post-card">
     {% if page.extra.encrypted %}

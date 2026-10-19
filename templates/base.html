@@ -16,7 +16,7 @@
     {% endfor %}
   {% endif %}
 
-  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20261008">
+  <link rel="stylesheet" href="{{ get_url(path="css/style.css") | safe }}?v=20261020">
   {# 代码高亮：双主题（zola.toml light_theme/dark_theme）生成 giallo-light/dark.css，按 data-theme 启用其一 #}
   <link id="giallo-light" rel="stylesheet" href="{{ get_url(path="giallo-light.css") | safe }}?v=20260924">
   <link id="giallo-dark" rel="stylesheet" href="{{ get_url(path="giallo-dark.css") | safe }}?v=20260924">
@@ -84,7 +84,6 @@
      # Shell: base 只留骨架；侧栏按模板命名空间分发（默认 blog，wiki 覆盖）
      # - blog/*：{% include "blog/sidebar.html" %}（品牌+菜单+搜索+底部）
      # - wiki/page.html、wiki/doc.html：覆盖 block sidebar → wiki/sidebar.html（纯目录）
-     # 历史 is_wiki_context 路径判定已删除（死代码），见 wiki/sidebar.html 自包含判定
      ######################################################################### #}
   {# ── Sidebar ── #}
   <aside class="sidebar is-collapsed" id="sidebar" aria-label="Sidebar">
@@ -179,7 +178,7 @@
 <script>window.ELYSIA_ICONS_URL="{{ get_url(path="icons.svg") | safe }}?v=20261008";</script>
 <script src="{{ get_url(path="js/site-decrypt.js") | safe }}?v=20260907" defer></script>
   <script src="{{ get_url(path="js/main.js") | safe }}?v=20260928-4" defer></script>
-<script src="{{ get_url(path="js/friends.js") | safe }}?v=20260909" defer></script>
+<script src="{{ get_url(path="js/friends.js") | safe }}?v=20261019" defer></script>
 <script src="{{ get_url(path="js/gallery.js") | safe }}?v=20261016" defer></script>
 {% if lightbox_on %}
 <script type="module" src="{{ get_url(path="js/lightbox.js") | safe }}?v=20261018"></script>

@@ -1,11 +1,14 @@
 {# ############################################################################
    # Shared: 评论区脚本（vendor 按需加载 + static/js/comment.js；giscus 已在正文同步渲染）
-   # 上下文：需 page 已定义；初始化逻辑全部在 comment.js，本模板只负责 vendor 与按需引入
+   # 上下文：需 page 已定义；单页开关同 comments.html（comment_enable 优先于全站）
+   # 初始化逻辑全部在 comment.js，本模板只负责 vendor 与按需引入
    ############################################################################ #}
 {% set _provider = "none" %}
+{# 单页开关优先级：extra.comment_enable > 全站 [extra.comments].enable #}
 {% set _comments_enabled = true %}
 {% if config.extra.comments and config.extra.comments.enable is defined and config.extra.comments.enable == false %}{% set_global _comments_enabled = false %}{% endif %}
-{% if page.extra.comments is defined and page.extra.comments == false %}{% set_global _comments_enabled = false %}{% endif %}
+{% if page.extra.comment_enable is defined and page.extra.comment_enable == false %}{% set_global _comments_enabled = false %}{% endif %}
+{% if page.extra.comment_enable is defined and page.extra.comment_enable == true %}{% set_global _comments_enabled = true %}{% endif %}
 {% if _comments_enabled and config.extra.comments and config.extra.comments.provider is defined and config.extra.comments.provider != "" %}
   {% set_global _provider = config.extra.comments.provider | lower %}
 {% endif %}

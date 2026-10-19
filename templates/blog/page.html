@@ -21,7 +21,7 @@
     <article class="article">
       <header class="article__header" data-pagefind-body>
         <div class="article__kicker">
-          {% if page.extra.sticky or page.extra.top or page.extra.pinned %}
+          {% if page.extra.sticky %}
             <span class="post-card__pin">{{ <icon name="pin" width="14" height="14"/> }} 置顶</span>
           {% endif %}
           {% if page.extra.encrypted %}
@@ -90,7 +90,7 @@
 {% endblock toc_float %}
 
 {% block toc %}
-{# # Blog: 桌面端右侧大纲（窄屏隐藏，走悬浮按钮；行内 details 已移除） #}
+{# # Blog: 桌面端右侧大纲（窄屏隐藏，走悬浮按钮） #}
 <aside class="toc-aside" id="tocAside" aria-label="Table of contents">
     {% set toc_locked = page.extra.encrypted | default(value=false) %}
     {% if not toc_locked and config.extra.features.toc | default(value=true) and page.toc | length > 0 %}

@@ -1,12 +1,14 @@
 {# ############################################################################
    # License: 文章许可声明（正文末尾）
    # 配置：[extra.features] license_enable 总开关，license_text 自定义文案（Markdown，
-   # 支持占位符 {author} {title} {url}）；单篇 extra.license = false 关闭，
+   # 支持占位符 {author} {title} {url}）；单篇 extra.license_enable = false 关闭（优先于全站），
    # extra.license_text 覆盖本篇；加密文章隐藏
    ############################################################################ #}
 {% set _lic_enable = true %}
 {% if config.extra.features is defined and config.extra.features.license_enable is defined %}{% set_global _lic_enable = config.extra.features.license_enable %}{% endif %}
-{% if page.extra.license is defined and page.extra.license == false %}{% set_global _lic_enable = false %}{% endif %}
+{# 单页开关优先级：extra.license_enable > 全站 [extra.features].license_enable #}
+{% if page.extra.license_enable is defined and page.extra.license_enable == false %}{% set_global _lic_enable = false %}{% endif %}
+{% if page.extra.license_enable is defined and page.extra.license_enable == true %}{% set_global _lic_enable = true %}{% endif %}
 {% set _lic_locked = page.extra.encrypted | default(value=false) %}
 {% if _lic_enable and not _lic_locked %}
 {% set _lic_lang = lang | default(value=config.default_language) %}

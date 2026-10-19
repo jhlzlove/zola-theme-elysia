@@ -36,9 +36,9 @@
 <div class="post-list" id="postList">
 {% for page in pages %}
   <article class="post-card">
-    {% if page.extra.sticky or page.extra.top or page.extra.pinned or page.extra.encrypted %}
+    {% if page.extra.sticky or page.extra.encrypted %}
     <div class="post-card__top">
-      {% if page.extra.sticky or page.extra.top or page.extra.pinned %}<span class="post-card__pin">置顶</span>{% endif %}
+      {% if page.extra.sticky %}<span class="post-card__pin">置顶</span>{% endif %}
       {% if page.extra.encrypted %}<span class="post-card__lock">🔒 加密</span>{% endif %}
     </div>
     {% endif %}

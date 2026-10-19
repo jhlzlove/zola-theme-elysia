@@ -237,7 +237,7 @@ provider = "giscus"  # giscus | artalk | waline | none
 comment_title = "Leave a comment"
 ```
 
-- `enable = false` disables site-wide; `extra.comments = false` in a page disables that page.
+- `enable = false` disables site-wide; per-page overrides (page config beats global): `extra.comment_enable = false` disables / `true` forces it on.
 - `provider` is the only switch; no auto-inference from configured servers.
 
 ### Giscus
@@ -303,7 +303,7 @@ article_expiry = "本文最后更新于 {date}，距今已有 {diff} 天（超�
 ```
 
 - `expiry_days` is the threshold. Copy supports `{date}` (last-updated date), `{diff}` (actual days elapsed), `{days}` (threshold) placeholders.
-- Per-page overrides (page config beats global): `extra.expiry_enable = false` disables / `true` forces it on; `extra.expiry_days` overrides the threshold; `extra.expiry_text` overrides the copy. The legacy `extra.expiry` key still works.
+- Per-page overrides (page config beats global): `extra.expiry_enable = false` disables / `true` forces it on; `extra.expiry_days` overrides the threshold; `extra.expiry_text` overrides the copy.
 
 ## KaTeX
 
@@ -374,14 +374,15 @@ description = "Summary"
 categories = ["Tech"]
 tags = ["zola"]
 [extra]
-sticky = true          # pinned: any of sticky / top / pinned set to true
+sticky = true          # pinned
 encrypted = true
 password = "blog"      # password alias matching a key in encrypt.toml [passwords]; never the real password
 password_hint = "hint"
-expiry_enable = false   # per-page switch, beats the global one (legacy key: expiry)
+expiry_enable = false   # per-page switch, beats the global one
 expiry_days = 60
 expiry_text = "Custom {date} {diff} {days}"
-comments = false
+comment_enable = false   # per-page switch, beats the global one
+license_enable = false   # per-page switch, beats the global one
 +++
 ```
 

@@ -139,7 +139,8 @@ font_code_family = ["JetBrains Mono", "Maple Mono NF CN", "ui-monospace", "SFMon
 
 # ── Comments ──
 # enable 总开关；provider: "giscus" | "artalk" | "waline" | "none"
-# provider 为空时按 giscus → artalk → waline 是否填有服务地址自动推断
+# 单篇可在 [extra] 中用 comment_enable = false / true 单独关闭或开启（优先于全站）
+# provider 为唯一开关（不按服务地址自动推断）；空值或 "none" 时不渲染评论区
 [extra.comments]
 enable = false
 provider = "giscus"   # e.g. "artalk"
@@ -232,7 +233,7 @@ expiry_days = 90
 # ── License — 文章许可声明（正文末）──
 # 文案优先级：单篇 extra.license_text > 此处 license_text > translations 的 license_text；
 # license_text 为 Markdown，支持占位符 {author} {title} {url}；
-# 单篇以 extra.license = false 关闭；英文默认文案在 [languages.en.translations] 中
+# 单篇以 extra.license_enable = false 关闭（优先于全站）；英文默认文案在 [languages.en.translations] 中
 license_enable = true
 # license_text = "本文作者：{author} · 许可协议 [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) · 转载请注明出处 [原文链接]({url})"
 # ── KaTeX ── 设 katex_enable = true 即启用 $...$ / $$...$$ 数学公式

@@ -1709,7 +1709,7 @@ html[data-theme="dark"] blockquote.markdown-alert-caution{border-color:rgba(218,
 .toc__list--h3 a{padding-left:20px;font-size:0.7813rem}
 .toc__list--h4 a{padding-left:32px;font-size:0.75rem;color:var(--muted-2)}
 
-/* # Shared · 折叠条 summary 行样式（wiki 移动端目录 details 复用；文章行内目录已移除） */
+/* # Shared · 折叠条 summary 行样式（wiki 移动端目录 details 复用） */
 .toc-mobile__summary{
   display:flex;
   align-items:center;
@@ -2185,6 +2185,8 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
   border:1px solid var(--border);
   border-radius:var(--radius);
   background:var(--bg-soft);
+  /* grid 子项默认可被内容撑大导致横向溢出，显式允许收缩 */
+  min-width:0;
 }
 .friend-card__side{
   flex:0 0 200px;
@@ -2229,7 +2231,8 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
 .article__content .friend-card__head::after{display:none}
 .article__content .friend-card__post-list a{text-decoration:none}
 .article__content .friend-card__post-list a::after{display:none}
-.friend-card__desc{width:100%;text-align:center;font-size:0.7813rem;color:var(--muted);margin-top:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.8em}
+/* 说明完整展示：不截断，长说明随卡片自然变高；长单词/链接不溢出 */
+.friend-card__desc{width:100%;text-align:center;font-size:0.7813rem;color:var(--muted);margin-top:6px;line-height:1.6;overflow-wrap:anywhere}
 .friend-card__posts{
   flex:1;min-width:0;
   display:flex;flex-direction:column;justify-content:center;
@@ -2237,11 +2240,24 @@ html[data-theme="dark"] .cat-dir__badge--pin{background:#3b0764;color:#f0abfc;bo
   border-left:1px dashed var(--border);
   padding-top:0;padding-left:20px;
 }
-.friend-card__post-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
-.friend-card__post-list li{display:flex;flex-direction:column;gap:3px;min-width:0}
-.friend-card__post-list a{font-size:0.9375rem;font-weight:500;line-height:1.55;color:var(--fg-soft);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+/* 最近三篇：标题单行（过长省略），日期小字在标题下方（与原来一致）；清除正文 li 外边距，整体更紧凑 */
+.friend-card__post-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.friend-card__post-list li{position:relative;display:flex;flex-direction:column;gap:2px;min-width:0;margin:0}
+.friend-card__post-list a{min-width:0;font-size:0.875rem;font-weight:500;line-height:1.5;color:var(--fg-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .friend-card__post-list a:hover{color:var(--accent)}
-.friend-card__post-list time{font-size:0.75rem;color:var(--muted-2)}
+.friend-card__post-list time{font-size:0.6875rem;color:var(--muted-2)}
+/* 标题被截断时悬浮条目显示完整标题（is-overflow 由 JS 在确实溢出时添加） */
+.friend-card__post-list li.is-overflow:hover::after{
+  content:attr(data-full);
+  position:absolute;bottom:calc(100% + 8px);left:0;
+  width:max-content;max-width:100%;
+  padding:8px 10px;border-radius:8px;
+  background:var(--fg);color:var(--bg-soft);
+  border:1px solid var(--border-strong);
+  box-shadow:var(--shadow);
+  font-size:0.7813rem;line-height:1.6;white-space:normal;
+  z-index:5;pointer-events:none;
+}
 .friend-card__rss-empty{font-size:0.7813rem;color:var(--muted-2);margin:auto 0}
 /* 窄屏回落为上下结构 */
 @media (max-width:640px){
@@ -2966,12 +2982,15 @@ a.wiki-side-nav__title:hover{
 }
 .wiki-side-nav__count{
   font-size:0.6875rem;
-  color:var(--muted);
-  background:transparent;
-  border:none;
-  padding:0;
+  font-weight:500;
+  color:var(--muted-2);
+  background:var(--bg-muted);
+  border:1px solid var(--border);
+  padding:1px 7px;
+  border-radius:999px;
   white-space:nowrap;
   flex-shrink:0;
+  font-variant-numeric:tabular-nums;
 }
 .wiki-side-nav__list{
   list-style:none;
@@ -2981,9 +3000,12 @@ a.wiki-side-nav__title:hover{
   flex-direction:column;
   gap:2px;
 }
+/* 序号：仅顶层列表建立计数器作用域（嵌套分组列表不重置）→ 平铺链与分组条目全列表连续编号 */
+.wiki-side-nav__list:not(.wiki-side-nav__list--nested){counter-reset:wikiseq}
 .wiki-side-nav__item{
   border-left:2px solid transparent;
   border-radius:0;
+  counter-increment:wikiseq;
 }
 .wiki-side-nav__item.is-current{
   border-left-color:var(--accent);
@@ -3020,6 +3042,8 @@ a.wiki-side-nav__title:hover{
   color:var(--muted);
   font-variant-numeric:tabular-nums;
 }
+/* 序号文本由计数器渲染（见 .wiki-side-nav__list 的 counter-reset） */
+.wiki-side-nav__index::before{content:counter(wikiseq)}
 .wiki-side-nav__item.is-current .wiki-side-nav__index{
   background:transparent;
   color:var(--accent);
@@ -3050,6 +3074,7 @@ a.wiki-side-nav__title:hover{
   list-style:none;
   border-left:2px solid transparent;
   border-radius:0;
+  margin:4px 0;
 }
 .wiki-side-nav__group.is-current{
   border-left-color:var(--accent);
@@ -3066,17 +3091,22 @@ a.wiki-side-nav__title:hover{
   border-radius:6px;
   list-style:none;
   color:var(--fg);
+  transition:background .15s ease;
 }
 .wiki-group__head::-webkit-details-marker{display:none}
 .wiki-group__head::marker{content:""}
 .wiki-group__head::before{
   content:"▸";
   flex:0 0 auto;
-  font-size:0.6875rem;
-  color:var(--muted);
-  transition:transform .15s ease;
+  width:12px;
+  text-align:center;
+  font-size:0.625rem;
+  color:var(--muted-2);
+  transition:transform .18s ease, color .15s ease;
 }
 .wiki-group[open] > .wiki-group__head::before{transform:rotate(90deg)}
+.wiki-group__head:hover{background:var(--bg-muted)}
+.wiki-group__head:hover::before,
 .wiki-group__head:hover .wiki-group__title{color:var(--accent)}
 .wiki-group__title{
   flex:1;
@@ -3085,19 +3115,33 @@ a.wiki-side-nav__title:hover{
   overflow:hidden;
   text-overflow:ellipsis;
   font-weight:600;
+  letter-spacing:.01em;
   color:var(--fg);
   text-decoration:none;
 }
 .wiki-side-nav__group.is-current .wiki-group__title{color:var(--accent)}
 .wiki-group__count{
   font-size:0.6875rem;
-  color:var(--muted);
+  font-weight:500;
+  color:var(--muted-2);
+  background:var(--bg-muted);
+  border:1px solid var(--border);
+  padding:1px 7px;
+  border-radius:999px;
   white-space:nowrap;
   flex-shrink:0;
   font-variant-numeric:tabular-nums;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+.wiki-side-nav__group.is-current .wiki-group__count{
+  background:var(--accent-soft);
+  color:var(--accent);
+  border-color:transparent;
 }
 .wiki-side-nav__list--nested{
-  padding-left:14px;
+  padding:2px 0 2px 12px;
+  margin-left:10px;
+  border-left:1px solid var(--border);
 }
 
 /* # Wiki · Wiki 移动端折叠目录：桌面隐藏，<1024 显示 ── */

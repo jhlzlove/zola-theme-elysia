@@ -10,6 +10,7 @@ tags = ["encrypt", "demo"]
 encrypted = true
 password = "elysia"
 password_hint = "主题名称"
+comment_enable=false
 +++
 
 这是加密的正文，只有输入正确密码（`elysia`）后才会显示。

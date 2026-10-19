@@ -44,7 +44,7 @@ sticky = true
 
 - `date`：排序与显示日期；`updated`：更新时间（用于过期提示）。
 - `description`：列表摘要与页面描述；普通文章也可用正文 `<!-- more -->` 分隔生成 `page.summary`。
-- `weight`：Wiki 章节排序；`sticky` / `top` / `pinned` 置顶。
+- `weight`：Wiki 章节排序；`sticky = true` 置顶。
 - 分类与标签必须写在 `[taxonomies]` 下。
 
 加密文章（`password` 为别名，对应 `encrypt.toml` `[passwords]` 的 key，真密码只写在那里并通过构建后加密生效，详见第 04 章）：
@@ -551,6 +551,7 @@ developer:
 - `description`：可空，一句话简介，显示在名称下方；缺失/非字符串按空处理。
 - `feed`：可空，订阅地址；构建期不抓取，访客进页面后由 `friends.js` 自动抓取最近 3 篇文章展示在卡片右侧。
   缺失、为空或非字符串显示"暂未配置 feed 订阅"且排序靠后；地址无效、抓取失败或对方不允许跨域时显示"订阅暂不可用"，不影响构建。
+- 抓取到的文章标题过长时以省略号截断，鼠标悬浮条目显示完整标题。
 - 卡片不再显示网站链接地址；顶层键为分组名，可用 `group` 参数只渲染某一组。
 
 组件参数：
@@ -877,6 +878,8 @@ page_template = "wiki/page.html"
 - 阅读单元的 `_index.md` 用 `wiki/doc.html`，其下文章自动使用 `wiki/page.html` 并显示左侧目录；Wiki 根目录用 `wiki/grid.html` 显示项目卡片网格。
 - 章节文章使用 `weight` 排序（`sort_by = "weight"`）；博客文章只看 `date`。
 - 版式由文件位置与上述 `template` / `page_template` 决定，不要写 `extra.style`。
+- 侧栏子目录约定：子目录**不加 `title` → 平铺**，其文章（含更深层无 `title` 子目录的文章）直接展开在上一级列表，并统一排在分组之前；**加 `title` → 折叠分组**，统一下沉在平铺内容之后，计数自动统计整个子树（建议同时设 `template = "wiki/doc.html"`，让分组标题链接的目录首页正常渲染）。
+- **Wiki 章节不要设 `transparent = true`**：它会把子目录文章复制进祖先的 `.pages`，而目录本身仍留在 `.subsections`，侧栏会出现重复条目；平铺还是分组只取决于有没有 `title`。
 
 > [!NOTE]
 > Wiki 项目首页即 `_index.md` 是一个 Section，没有 `page.summary`，`<!-- more -->` 对它无效。

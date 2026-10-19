@@ -1,6 +1,6 @@
 {# ############################################################################
    # Article Expiry: 文章过期提示（位于文章头部下方，继承页面上下文）
-   # 开关优先级：单篇 extra.expiry_enable > 单篇 extra.expiry（旧键，兼容）> 全局 [extra.features].expiry_enable
+   # 开关优先级：单篇 extra.expiry_enable > 全局 [extra.features].expiry_enable
    # 天数优先级：单篇 extra.expiry_days > 全局 [extra.features].expiry_days > 90
    # 文案优先级：单篇 extra.expiry_text > translations.article_expiry
    # 占位符：{date}（最后更新日期） {diff}（距今实际天数） {days}（阈值天数）
@@ -9,13 +9,6 @@
 {% set _expiry_enable = false %}
 {% if config.extra.features is defined and config.extra.features.expiry_enable is defined %}
   {% set_global _expiry_enable = config.extra.features.expiry_enable %}
-{% endif %}
-{% if page.extra.expiry is defined %}
-  {% if page.extra.expiry == false %}
-    {% set_global _expiry_enable = false %}
-  {% elif page.extra.expiry == true %}
-    {% set_global _expiry_enable = true %}
-  {% endif %}
 {% endif %}
 {% if page.extra.expiry_enable is defined %}
   {% set_global _expiry_enable = page.extra.expiry_enable %}

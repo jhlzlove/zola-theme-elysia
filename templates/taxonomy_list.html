@@ -81,7 +81,7 @@
           <span class="cat-dir__file-icon">
             {% if page.extra.encrypted %}
               {{ <icon name="lock"/> }}
-            {% elif page.extra.sticky or page.extra.top or page.extra.pinned %}
+            {% elif page.extra.sticky %}
               {{ <icon name="pin"/> }}
             {% else %}
               {{ <icon name="file"/> }}
@@ -89,7 +89,7 @@
           </span>
           <span class="cat-dir__file-title">{{ page.title }}</span>
           {% if page.extra.encrypted %}<span class="cat-dir__badge">加密</span>{% endif %}
-          {% if page.extra.sticky or page.extra.top or page.extra.pinned %}<span class="cat-dir__badge cat-dir__badge--pin">置顶</span>{% endif %}
+          {% if page.extra.sticky %}<span class="cat-dir__badge cat-dir__badge--pin">置顶</span>{% endif %}
         </a>
         <span class="cat-dir__file-meta">
           {% if page.taxonomies.tags %}

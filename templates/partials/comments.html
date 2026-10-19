@@ -1,13 +1,14 @@
 {# ############################################################################
    # Shared: 评论区（provider 统一由 [extra.comments] 决定：giscus | artalk | waline | none）
-   # 上下文：需 page 已定义；单页可用 page.extra.comments = false 关闭
+   # 上下文：需 page 已定义；单页开关 page.extra.comment_enable 优先于全站：false 关闭 / true 开启
    # 本模板只输出容器 + 配置数据；初始化逻辑在 static/js/comment.js（按需加载）
    ############################################################################ #}
-{% set comments_disabled_by_page = false %}
-{% if page.extra.comments is defined and page.extra.comments == false %}{% set_global comments_disabled_by_page = true %}{% endif %}
-{% set comments_global_enabled = true %}
-{% if config.extra.comments and config.extra.comments.enable is defined and config.extra.comments.enable == false %}{% set_global comments_global_enabled = false %}{% endif %}
-{% if not comments_disabled_by_page and comments_global_enabled %}
+{# 单页开关优先级：extra.comment_enable > 全站 [extra.comments].enable #}
+{% set comments_enabled = true %}
+{% if config.extra.comments and config.extra.comments.enable is defined and config.extra.comments.enable == false %}{% set_global comments_enabled = false %}{% endif %}
+{% if page.extra.comment_enable is defined and page.extra.comment_enable == false %}{% set_global comments_enabled = false %}{% endif %}
+{% if page.extra.comment_enable is defined and page.extra.comment_enable == true %}{% set_global comments_enabled = true %}{% endif %}
+{% if comments_enabled %}
   {% set provider = "none" %}
   {% if config.extra.comments and config.extra.comments.provider is defined and config.extra.comments.provider != "" %}
     {% set_global provider = config.extra.comments.provider | lower %}

@@ -1,6 +1,6 @@
 {# ############################################################################
    # Blog: 列表页（post-card 列表 + 分页；blog 子目录如 skill 复用此文件）
-   # 过滤：按路径排除 wiki/resume（extra.style 生产内容恒空，不再检查·死代码已删）
+   # 过滤：按路径排除 wiki / resume
    ############################################################################ #}
 {% extends "base.html" %}
 
@@ -36,9 +36,9 @@
 <div class="post-list" id="postList">
 {% for page in pages %}
   <article class="post-card">
-    {% if page.extra.sticky or page.extra.top or page.extra.pinned or page.extra.encrypted %}
+    {% if page.extra.sticky or page.extra.encrypted %}
     <div class="post-card__top">
-      {% if page.extra.sticky or page.extra.top or page.extra.pinned %}<span class="post-card__pin">置顶</span>{% endif %}
+      {% if page.extra.sticky %}<span class="post-card__pin">置顶</span>{% endif %}
       {% if page.extra.encrypted %}<span class="post-card__lock">🔒 加密</span>{% endif %}
     </div>
     {% endif %}

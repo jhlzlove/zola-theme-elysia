@@ -156,6 +156,25 @@
       : '<p class="friend-card__rss-empty">暂未配置 feed 订阅</p>';
   }
 
+  /* 标题被省略号截断时，悬浮条目显示完整标题（样式见 .friend-card__post-list li.is-overflow） */
+  function bindTitleTips(scope) {
+    var root = scope || document;
+    if (!root || !root.querySelectorAll) return;
+    var links = root.querySelectorAll('.friend-card__post-list a');
+    for (var i = 0; i < links.length; i++) {
+      (function (a) {
+        var li = a.parentNode;
+        if (!li || li._tipBound) return;
+        li._tipBound = true;
+        li.setAttribute('data-full', a.textContent);
+        li.addEventListener('mouseenter', function () {
+          if (a.scrollWidth > a.clientWidth + 1) li.classList.add('is-overflow');
+        });
+        li.addEventListener('mouseleave', function () { li.classList.remove('is-overflow'); });
+      })(links[i]);
+    }
+  }
+
   function loadFeedBox(box, url) {
     var ctrl = null, timer = 0;
     try {
@@ -171,6 +190,7 @@
       })
       .then(function (text) {
         box.innerHTML = renderFeedPosts(parseFeedXml(text), true);
+        bindTitleTips(box);
       })
       .catch(function (err) {
         console.warn('[elysia] friends feed failed', url, err);
@@ -220,6 +240,7 @@
           hideGrid(grid, null);
         } else {
           grid.innerHTML = list.map(renderCard).join('');
+          bindTitleTips(grid);
         }
         grid.setAttribute('aria-busy', 'false');
       })
@@ -249,6 +270,6 @@
   }
 
   /* Exposed for automated tests (node) only; no runtime use. */
-  if (typeof window !== 'undefined') window.ElysiaFriends = { normalizeItem: normalizeItem, sortByFeed: sortByFeed, escapeHtml: escapeHtml, safeUrl: safeUrl, hideGrid: hideGrid };
-  if (typeof module !== 'undefined' && module.exports) module.exports = { normalizeItem: normalizeItem, sortByFeed: sortByFeed, escapeHtml: escapeHtml, safeUrl: safeUrl, hideGrid: hideGrid };
+  if (typeof window !== 'undefined') window.ElysiaFriends = { normalizeItem: normalizeItem, sortByFeed: sortByFeed, escapeHtml: escapeHtml, safeUrl: safeUrl, hideGrid: hideGrid, bindTitleTips: bindTitleTips };
+  if (typeof module !== 'undefined' && module.exports) module.exports = { normalizeItem: normalizeItem, sortByFeed: sortByFeed, escapeHtml: escapeHtml, safeUrl: safeUrl, hideGrid: hideGrid, bindTitleTips: bindTitleTips };
 })();

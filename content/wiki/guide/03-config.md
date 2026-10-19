@@ -244,7 +244,7 @@ provider = "giscus"  # giscus | artalk | waline | none
 comment_title = "欢迎评论 — 留下你的想法"
 ```
 
-- `enable = false` 全站关闭；单篇 `extra.comments = false` 可关闭当页。
+- `enable = false` 全站关闭；单篇覆盖（优先于全站）：`extra.comment_enable = false` 关闭 / `true` 强制开启。
 - `provider` 为唯一开关，不再按服务地址自动推断。
 
 ### Giscus
@@ -311,7 +311,7 @@ article_expiry = "This article was last updated on {date} ({diff} days ago, over
 
 - `expiry_days`：阈值天数，超过即显示。
 - 文案通过 `translations` 的 `article_expiry` 管理，支持占位符 `{date}`（最后更新日期） `{diff}`（距今实际天数） `{days}`（阈值天数）。
-- 单篇覆盖（单篇配置优先于全局）：`extra.expiry_enable = false` 关闭 / `true` 强制开启；`extra.expiry_days` 覆写天数；`extra.expiry_text` 覆写文案；旧键 `extra.expiry` 仍兼容。
+- 单篇覆盖（单篇配置优先于全局）：`extra.expiry_enable = false` 关闭 / `true` 强制开启；`extra.expiry_days` 覆写天数；`extra.expiry_text` 覆写文案。
 
 ## KaTeX
 
@@ -382,14 +382,15 @@ description = "摘要"
 categories = ["技术"]
 tags = ["zola"]
 [extra]
-sticky = true          # 置顶：sticky / top / pinned 任一为真即置顶
+sticky = true          # 置顶
 encrypted = true
 password = "blog"      # 密码别名，对应 encrypt.toml [passwords] 的 key，真密码只写在那里
 password_hint = "提示"
-expiry_enable = false   # 本篇过期提示开关（优先于全局；旧键 expiry 兼容）
+expiry_enable = false   # 本篇过期提示开关（优先于全局）
 expiry_days = 60
 expiry_text = "自定义 {date} {diff} {days}"
-comments = false       # 关闭本篇评论
+comment_enable = false   # 本篇评论开关（优先于全站）
+license_enable = false   # 本篇许可声明开关（优先于全站）
 +++
 ```
 

@@ -830,13 +830,6 @@
         a.autoplay = false;
         try{ if(!a.paused) a.pause(); }catch(e){}
       });
-      root.querySelectorAll('audio').forEach(function(a){
-        var wrap = a.closest('.audio-wrap');
-        // 兼容旧结构：仅当明确允许时保留
-        var isAllowed = wrap && wrap.getAttribute('data-autoplay') === '1';
-        if(isAllowed) return;
-        // 已由上一段处理，此处仅兜底
-      });
       root.querySelectorAll('.video-wrap iframe').forEach(function(f){
         try{
           var wrap = f.closest('.video-wrap');

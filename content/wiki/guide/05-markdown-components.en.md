@@ -45,7 +45,7 @@ sticky = true
 - `date` controls sorting and display; `updated` records a later update.
 - `description` is used for summaries and page metadata; regular posts can also use `<!-- more -->` to generate `page.summary`.
 - `weight` orders Wiki chapters.
-- `sticky`, `top`, or `pinned` pins a post.
+- `sticky = true` pins a post.
 - Categories and tags belong under `[taxonomies]`.
 
 Encrypted post (`password` is an alias matching a key in `encrypt.toml` `[passwords]`; the real password lives only there and takes effect via post-build encryption, see chapter 04):
@@ -543,6 +543,7 @@ developer:
 - `description`: optional one-line intro, shown below the name; missing/non-string values are treated as empty.
 - `feed`: optional subscription URL; nothing is fetched at build time — the latest 3 posts are fetched by `friends.js` when a visitor opens the page and shown on the right side of the card.
   Missing, empty, or non-string values show a "no feed configured" note and sort later; an unreachable feed (or one disallowing cross-origin access) shows an "unavailable" note without breaking the build.
+- Article titles that are too long are truncated with an ellipsis; hover an item to see the full title.
 - The card no longer shows the raw site URL; top-level keys are groups, use `group` to render one group only.
 
 Component parameters:
@@ -844,6 +845,8 @@ page_template = "wiki/page.html"
 - A reading unit's `_index.md` uses `wiki/doc.html`; its pages automatically use `wiki/page.html` with the left directory. The Wiki root uses `wiki/grid.html` for the project card grid.
 - Chapter pages order by `weight` (`sort_by = "weight"`); blog posts order by `date`.
 - Layout comes from file location plus the `template` / `page_template` above. Do not set `extra.style`.
+- Sidebar subdirectory convention: a subdirectory **without `title` is flattened** — its pages (including those in deeper `title`-less subdirectories) unfold directly in the parent list and always come first; with **`title` it becomes a collapsible group** that sinks below the flat content, its count covering the whole subtree (also set `template = "wiki/doc.html"` so the directory landing page linked from the group title renders properly).
+- **Never set `transparent = true` on Wiki sections**: it copies subdirectory pages into the ancestor's `.pages` while the section itself stays in `.subsections`, duplicating sidebar entries. Flat vs. group is decided by `title` alone.
 
 > [!NOTE]
 > A Wiki project homepage (`_index.md`) is a Section, so it has no `page.summary` and `<!-- more -->` does not work there.
