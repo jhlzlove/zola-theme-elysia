@@ -1,0 +1,25 @@
+{# ############################################################################
+   # Article Content: 正文容器（加密态 / Pagefind / 首行缩进）
+   # 首行缩进仅支持单篇 front matter 配置，不提供全局开关：
+   #   [extra]
+   #   indent_enable = true
+   #   indent_size = 2      # 单位固定为 em，只写数字；省略时默认 2
+   ############################################################################ #}
+{% set_global _article_indent = page.extra.indent_enable | default(value=false) %}
+{% set_global _article_indent_size = page.extra.indent_size | default(value=2) %}
+
+{% set_global _article_content_class = "article__content" %}
+{% if _article_indent %}
+  {% set_global _article_content_class = _article_content_class ~ " article__content--indent" %}
+{% endif %}
+
+{% set _article_encrypted = page.extra.encrypted | default(value=false) %}
+{% if _article_encrypted %}
+<div class="{{ _article_content_class }}" id="articleContent" data-pagefind-ignore hidden{% if _article_indent %} style="--first-line-indent:{{ _article_indent_size }}em"{% endif %}>
+  {{ page.content | safe }}
+</div>
+{% else %}
+<div class="{{ _article_content_class }}" id="articleContent" data-pagefind-body{% if _article_indent %} style="--first-line-indent:{{ _article_indent_size }}em"{% endif %}>
+  {{ page.content | safe }}
+</div>
+{% endif %}

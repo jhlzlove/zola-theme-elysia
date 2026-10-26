@@ -369,6 +369,33 @@ article_expiry = "This article was last updated on {date} ({diff} days ago, over
 - 自定义 Section（`archive` / `heatmap` / `friends` / `links` / `search` / `resume`）需为每种语言创建对应的 `content/<section>/_index.<lang>.md` 或 `resume.<lang>.md`，否则对应语言下 404。
 - 不想要多语言：设 `[extra.features].i18n = false`，菜单全用 `name` 直写，删除 `[languages.en]` 与 `*.en.md` 即可；`[translations]`（默认语言文案）仍需保留供搜索框/目录/过期提示/许可声明使用。
 
+## 正文首行缩进
+
+首行缩进只支持**单篇文章**配置，不提供全局默认开关。在文章 front matter 的 `[extra]` 中开启：
+
+```toml
++++
+title = "滕王阁序"
+[extra]
+indent_enable = true
+indent_size = 2      # 单位 em，只写数字；省略时默认 2
++++
+```
+
+如果文章使用 YAML front matter，则对应写成：
+
+```yaml
+extra:
+  indent_enable: true
+  indent_size: 2
+```
+
+- `indent_enable`：本篇正文首行缩进开关，默认关闭。
+- `indent_size`：缩进量，单位固定为 `em`，只写数字（`2` 表示约两个汉字宽）；不写时默认 `2`。
+- 博客文章页与 Wiki 文章页均生效；栏目 `_index.md` 的介绍正文不生效。
+- 仅作用于正文顶层段落；引用、列表、代码块、表格、提示块、脚注不缩进；纯图片段落也不缩进。
+- 这是纯 CSS 效果，不影响列表页摘要与 RSS。
+
 ## Front Matter 速查
 
 ```toml
@@ -391,6 +418,8 @@ expiry_days = 60
 expiry_text = "自定义 {date} {diff} {days}"
 comment_enable = false   # 本篇评论开关（优先于全站）
 license_enable = false   # 本篇许可声明开关（优先于全站）
+indent_enable = true     # 本篇首行缩进
+indent_size = 2          # 缩进量，单位 em，只写数字；省略时默认 2
 +++
 ```
 

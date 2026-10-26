@@ -195,6 +195,8 @@
     .resume-md ul{margin:8px 0 8px 18px;color:var(--resume-fg);opacity:.92;font-size:13.5px;line-height:1.7}
     .resume-md li{margin:4px 0}
     .resume-md a{color:var(--resume-accent)}
+    /* Markdown 正文置于两栏下方，宽度与左栏（Projects）对齐 */
+    .resume-md--bottom{grid-column:1}
     .resume-footer{margin-top:28px;text-align:center;font-size:11px;color:var(--resume-muted-2)}
     @media (max-width:600px){
       .resume-shell{padding:20px 14px 32px}
@@ -298,14 +300,6 @@
           {% endfor %}
         </section>
         {% endif %}
-
-        {# Markdown body as fallback / extra content — 仅当有实质内容时显示，避免空卡片 #}
-        {% set md_stripped = page.content | striptags | trim %}
-        {% if md_stripped != "" %}
-        <section class="resume-card resume-md">
-          {{ page.content | safe }}
-        </section>
-        {% endif %}
       </div>
 
       <div class="resume-col">
@@ -366,6 +360,15 @@
         </section>
         {% endif %}
       </div>
+
+      {# Markdown body as fallback / extra content — 仅当有实质内容时显示，避免空卡片；
+         作为网格第三项放在左栏列，桌面端与 Projects 同宽，移动端自然排在所有栏目之后 #}
+      {% set md_stripped = page.content | striptags | trim %}
+      {% if md_stripped != "" %}
+      <section class="resume-card resume-md resume-md--bottom">
+        {{ page.content | safe }}
+      </section>
+      {% endif %}
     </div>
 
     <footer class="resume-footer">© {{ now() | date(format="%Y") }} · All rights reserved.</footer>

@@ -1099,6 +1099,12 @@ html[data-theme="dark"] .tag:nth-child(5n+5){background:#082f49;color:#7dd3fc;bo
 .article__title, .article__content h1, .article__content h2, .article__content h3, .article__content h4{overflow-wrap:break-word; word-break:keep-all;}
 .article__content video, .article__content iframe, .article__content svg{max-width:100%;}
 .article__content p{margin:14px 0}
+/* 首行缩进：单篇 front matter [extra] indent_enable / indent_size（单位 em，只写数字）
+   只作用于正文顶层段落，避免引用、列表、提示块、脚注等嵌套段落被缩进 */
+.article__content--indent > p{text-indent:var(--first-line-indent, 2em)}
+/* 纯图片段落不缩进，避免图片整体被推右 */
+.article__content--indent > p:has(> img:only-child),
+.article__content--indent > p:has(> a:only-child > img:only-child){text-indent:0}
 .article__content a{color:var(--accent);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong)}
 .article__content a:not(:has(img))::after{content:"";display:inline-block;width:.78em;height:.78em;margin-left:5px;background:currentColor;line-height:1;text-decoration:none;vertical-align:-.06em;opacity:.72;-webkit-mask:url("../icons/external.svg") center/contain no-repeat;mask:url("../icons/external.svg") center/contain no-repeat}
 .article__content a:hover{text-decoration-color:var(--accent)}

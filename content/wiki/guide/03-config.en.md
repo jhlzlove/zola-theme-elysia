@@ -361,6 +361,33 @@ article_expiry = "本文最后更新于 {date}，距今已有 {diff} 天（超�
 - Custom sections (`archive` / `heatmap` / `friends` / `links` / `search` / `resume`) need an `_index.<lang>.md` or `resume.<lang>.md` per language, otherwise 404.
 - To opt out of i18n: set `[extra.features].i18n = false`, use plain `name` for all menus, and drop extra `[languages.*]` sections plus `*.<lang>.md` files; keep `[translations]` (default-language strings) for search/TOC/expiry/license.
 
+## First-line indent
+
+First-line indent is configured **per article only**; there is no global switch. Enable it in the article front matter:
+
+```toml
++++
+title = "Preface to the Pavilion of Prince Teng"
+[extra]
+indent_enable = true
+indent_size = 2      # unit is em; write the number only; defaults to 2
++++
+```
+
+For YAML front matter, use:
+
+```yaml
+extra:
+  indent_enable: true
+  indent_size: 2
+```
+
+- `indent_enable`: per-page switch for first-line indent, off by default.
+- `indent_size`: indent amount in `em`; write the number only (`2` means roughly two CJK characters); defaults to `2`.
+- Works on both blog posts and Wiki article pages; section `_index.md` intro content is not affected.
+- Only top-level body paragraphs are indented. Blockquotes, lists, code blocks, tables, callouts and footnotes are not indented; image-only paragraphs are also skipped.
+- This is CSS-only and does not affect list summaries or RSS.
+
 ## Front Matter quick reference
 
 ```toml
@@ -383,6 +410,8 @@ expiry_days = 60
 expiry_text = "Custom {date} {diff} {days}"
 comment_enable = false   # per-page switch, beats the global one
 license_enable = false   # per-page switch, beats the global one
+indent_enable = true     # per-page first-line indent
+indent_size = 2          # unit is em; write the number only; defaults to 2
 +++
 ```
 

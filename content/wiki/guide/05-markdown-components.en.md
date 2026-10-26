@@ -39,6 +39,8 @@ tags = ["zola", "blog"]
 
 [extra]
 sticky = true
+indent_enable = true    # per-page first-line indent
+indent_size = 2         # unit is em; write the number only; defaults to 2
 +++
 ```
 
@@ -46,6 +48,7 @@ sticky = true
 - `description` is used for summaries and page metadata; regular posts can also use `<!-- more -->` to generate `page.summary`.
 - `weight` orders Wiki chapters.
 - `sticky = true` pins a post.
+- `indent_enable` / `indent_size`: per-page first-line indent switch and amount (`em`; write the number only).
 - Categories and tags belong under `[taxonomies]`.
 
 Encrypted post (`password` is an alias matching a key in `encrypt.toml` `[passwords]`; the real password lives only there and takes effect via post-build encryption, see chapter 04):

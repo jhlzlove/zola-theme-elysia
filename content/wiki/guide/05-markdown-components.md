@@ -39,12 +39,15 @@ tags = ["zola", "博客"]
 
 [extra]
 sticky = true
+indent_enable = true    # 本篇正文首行缩进
+indent_size = 2         # 缩进量，单位 em，只写数字；省略时默认 2
 +++
 ```
 
 - `date`：排序与显示日期；`updated`：更新时间（用于过期提示）。
 - `description`：列表摘要与页面描述；普通文章也可用正文 `<!-- more -->` 分隔生成 `page.summary`。
 - `weight`：Wiki 章节排序；`sticky = true` 置顶。
+- `indent_enable` / `indent_size`：仅单篇生效的首行缩进开关与缩进量（单位 `em`，只写数字）。
 - 分类与标签必须写在 `[taxonomies]` 下。
 
 加密文章（`password` 为别名，对应 `encrypt.toml` `[passwords]` 的 key，真密码只写在那里并通过构建后加密生效，详见第 04 章）：

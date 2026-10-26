@@ -1,5 +1,5 @@
 other.md
-content/blog/
+content/blog/*
 !content/blog/*.md
 public
 static/processed_images/

@@ -36,7 +36,7 @@
       {# # Wiki: 移动端折叠目录（自包含寻根，与左侧栏同树） #}
       {% include "partials/wiki-mobile.html" %}
 
-      {# # Wiki: 加密锁 / 正文 #}
+      {# # Wiki: 加密锁 / 正文（首行缩进等正文容器逻辑见 partials/article-content.html） #}
       {% if is_encrypted %}
         <div class="encrypted" id="encryptedBox" data-password-key="{{ page.extra.password | default(value="") | safe }}" data-hint="{{ page.extra.password_hint | default(value="") | safe }}">
           <div class="encrypted__icon">🔒</div>
@@ -48,14 +48,8 @@
           </form>
           <div class="encrypted__error" id="encryptedError" role="alert">密码错误，请重试</div>
         </div>
-        <div class="article__content" id="articleContent" data-pagefind-ignore hidden>
-          {{ page.content | safe }}
-        </div>
-      {% else %}
-        <div class="article__content" id="articleContent" data-pagefind-body>
-          {{ page.content | safe }}
-        </div>
       {% endif %}
+      {% include "partials/article-content.html" %}
     </article>
 
     {# # Wiki: 许可声明（正文末，随内容进 RSS） #}
