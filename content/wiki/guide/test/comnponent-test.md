@@ -1,5 +1,5 @@
 ---
-title: wiki 子目录文章测试
+title: 主题组件测试
 date: 2026-09-30
 weight: 1
 ---

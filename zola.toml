@@ -134,7 +134,7 @@ default_palette = "default"
 font_base_size = "16px"
 font_body_size = "1rem"
 font_code_size = "0.875rem"
-font_body_family = [ "Maple Mono NF CN", "Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"]
+font_body_family = ["LXGW WenKai Screen", "Maple Mono NF CN", "Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"]
 font_code_family = ["JetBrains Mono", "Maple Mono NF CN", "ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
 
 # ── Comments ──

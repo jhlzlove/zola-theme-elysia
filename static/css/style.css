@@ -2346,22 +2346,32 @@ html[data-theme="dark"] .col-card--orange{background:#2a1a10;border-color:#7a4a2
 
 /* Timeline (nestable: timeline > timenode, supports other block components inside) */
 .timeline{margin:18px 0}
-/* 直接子级限定：嵌套 timeline 的竖线/连线互不影响 */
+/* 直接子级限定：嵌套 timeline 的圆点/轨道互不影响 */
 .timeline > .timeline__node{position:relative;padding-left:26px}
 .timeline > .timeline__node + .timeline__node{margin-top:18px}
-/* 节点标记：poetry 同款竖线（4×18、圆角 2，居中于 x=5），默认灰、hover 上色 */
+/* 节点圆点：8px 空心小圆（圆心 x=5，与轨道对齐），内圈用页面底色挡住轨道，避免竖线从圆心穿出；
+   光标落在节点范围内（圆点或正文卡片）时填充 accent */
 .timeline > .timeline__node::before{
-  content:"";position:absolute;left:3px;top:1px;
-  width:4px;height:18px;border-radius:2px;
-  background:var(--border-strong);
-  transition:background .18s ease;
+  content:"";position:absolute;left:1px;top:8px;z-index:1;
+  width:8px;height:8px;box-sizing:border-box;border-radius:50%;
+  border:2px solid var(--border-strong);
+  background:var(--bg);
+  transition:background .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
-/* 节点之间的连接线：从本节点竖线下方 4px 连到下一节点竖线上方 4px，末节点不画 */
+.timeline > .timeline__node:hover::before{
+  background:var(--accent);
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-ring);
+}
+/* 轨道：贯穿整个节点，并用负 bottom 吃掉 18px 节点间距，节点之间不断线；
+   末节点不截断，一路画到正文卡片底部，长内容的节点不再只剩一小截线头 */
 .timeline > .timeline__node::after{
-  content:"";position:absolute;left:4px;top:23px;bottom:-15px;
+  content:"";position:absolute;left:4px;top:0;bottom:-18px;
   width:2px;border-radius:1px;background:var(--border);
 }
-.timeline > .timeline__node:last-child::after{display:none}
+/* 首节点从圆点中心起笔；末节点轨道与正文等高（bottom:0 即卡片底边） */
+.timeline > .timeline__node:first-child::after{top:12px}
+.timeline > .timeline__node:last-child::after{bottom:0}
 .timeline__head{margin-bottom:8px;font-size:0.8125rem;font-weight:600;color:var(--accent)}
 /* 正文卡片：与 col-card 同款（边框 + bg-soft + 圆角 + 内边距） */
 .timeline__body{
@@ -2374,12 +2384,10 @@ html[data-theme="dark"] .col-card--orange{background:#2a1a10;border-color:#7a4a2
 }
 .timeline__body > :first-child{margin-top:0}
 .timeline__body > :last-child{margin-bottom:0}
-/* 无 text 的节点：竖线/连线对齐卡片首行（仅直接子级判定，嵌套不受影响） */
-.timeline > .timeline__node:not(:has(> .timeline__head))::before{top:15px}
-.timeline > .timeline__node:not(:has(> .timeline__head))::after{top:37px}
-.timeline > .timeline__node:has(+ .timeline__node:not(:has(> .timeline__head)))::after{bottom:-29px}
-/* hover：竖线上色（accent，即 poetry 竖线色） */
-.timeline > .timeline__node:hover::before{background:var(--accent)}
+/* 无 text 的节点：圆点对齐卡片首行、轨道从节点顶部接上上一节点（仅直接子级判定，嵌套不受影响） */
+.timeline > .timeline__node:not(:has(> .timeline__head))::before{top:20px}
+.timeline > .timeline__node:not(:has(> .timeline__head))::after{top:0}
+.timeline > .timeline__node:first-child:not(:has(> .timeline__head))::after{top:24px}
 
 /* ─────────────────────────────────────────
    9. Archive / Taxonomy / Heatmap
